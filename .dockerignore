@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+README.md
+
+# Node.js (Frontend)
+frontend/node_modules
+frontend/npm-debug.log
+frontend/.next
+frontend/.env*.local
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend/.vite/
+
+# Python (API)
+api/__pycache__/
+api/*.pyc
+api/*.pyo
+api/*.pyd
+api/.Python
+api/env/
+api/venv/
+api/ENV/
+api/.venv/
+api/*.log
+api/.mypy_cache
+api/.pytest_cache
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Misc
+*.tmp
+*.temp
+*.log
