@@ -1,19 +1,13 @@
 'use client'
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  LoadingState,
-  EmptyState,
-  ChartTooltip,
-  Progress,
-  SeverityBadge,
-  QueryError
-} from '@/components/ui'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { LoadingState } from '@/components/ui/loading-state'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ChartTooltip } from '@/components/ui/chart'
+import { Progress } from '@/components/ui/progress'
+import { SeverityBadge } from '@/components/ui/severity-badge'
+import { QueryError } from '@/components/ui/error-boundary'
 import type { LogAggregationResponse } from '@/lib/types/log'
 import { SeverityLevel } from '@/lib/enums/severity'
 

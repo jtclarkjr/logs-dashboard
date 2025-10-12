@@ -1,7 +1,7 @@
 'use client'
 
 import { PlusIcon } from 'lucide-react'
-import { Button } from '@/components/ui'
+import { Button } from '@/components/ui/button'
 
 interface LogsHeaderProps {
   onCreateLog: () => void

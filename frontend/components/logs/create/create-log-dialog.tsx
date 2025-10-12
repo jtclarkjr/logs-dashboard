@@ -8,20 +8,21 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-  Button,
-  Input,
-  Textarea,
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-  SeverityBadge,
-  Alert,
-  AlertDescription,
-  FormFieldWrapper
-} from '@/components/ui'
+  SelectValue
+} from '@/components/ui/select'
+import { SeverityBadge } from '@/components/ui/severity-badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { FormFieldWrapper } from '@/components/ui/form-field'
 import { SeverityLevel } from '@/lib/enums/severity'
 import type { LogCreate } from '@/lib/types/log'
 import { useCreateLog } from '@/lib/hooks/query/use-logs'

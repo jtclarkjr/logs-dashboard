@@ -5,13 +5,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { FileTextIcon, BarChart3Icon, MenuIcon } from 'lucide-react'
-import {
-  Button,
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  Badge
-} from '@/components/ui'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Badge } from '@/components/ui/badge'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: BarChart3Icon },

@@ -2,26 +2,21 @@
 
 import { format } from 'date-fns'
 import { MoreHorizontalIcon, TrashIcon, EyeIcon } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Table, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { SeverityBadge } from '@/components/ui/severity-badge'
+import { LoadingState } from '@/components/ui/loading-state'
+import { EmptyState } from '@/components/ui/empty-state'
 import {
-  Card,
-  CardContent,
-  Table,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Badge,
-  SeverityBadge,
-  LoadingState,
-  EmptyState,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-  Button,
-  QueryError,
-  FadeTransition
-} from '@/components/ui'
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
+import { QueryError } from '@/components/ui/error-boundary'
+import { FadeTransition } from '@/components/ui/fade-transition'
 import { DEFAULT_PAGE_SIZE } from '@/lib/constants/pagination'
 import type { LogListResponse, LogResponse } from '@/lib/types/log'
 

@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns'
 import { DateRange } from 'react-day-picker'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DashboardHeader } from '@/components/dashboard/dashboard-header'
 import { DashboardFilters } from '@/components/dashboard/dashboard-filters'
 import { DashboardStats } from '@/components/dashboard/dashboard-stats'

@@ -8,17 +8,11 @@ import {
   CartesianGrid,
   ResponsiveContainer
 } from 'recharts'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  LoadingState,
-  EmptyState,
-  ChartTooltip,
-  QueryError
-} from '@/components/ui'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { LoadingState } from '@/components/ui/loading-state'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ChartTooltip } from '@/components/ui/chart'
+import { QueryError } from '@/components/ui/error-boundary'
 import type { ChartDataResponse } from '@/lib/types/chart'
 
 interface TimelineChartProps {

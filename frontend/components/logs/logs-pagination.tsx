@@ -6,7 +6,7 @@ import {
   ChevronsLeftIcon,
   ChevronsRightIcon
 } from 'lucide-react'
-import { Button } from '@/components/ui'
+import { Button } from '@/components/ui/button'
 import { LogListResponse } from '@/lib/types/log'
 import { PAGE_SIZE_OPTIONS } from '@/lib/constants/pagination'
 

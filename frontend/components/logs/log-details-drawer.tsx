@@ -15,17 +15,19 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerBody,
-  DrawerFooter,
-  Button,
-  Separator,
-  Input,
-  Textarea,
+  DrawerFooter
+} from '@/components/ui/drawer'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@/components/ui'
+} from '@/components/ui/select'
 import type { LogResponse } from '@/lib/types/log'
 import { SeverityLevel } from '@/lib/enums/severity'
 import { useUpdateLog } from '@/lib/hooks/query/use-logs'

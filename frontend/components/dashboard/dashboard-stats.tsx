@@ -8,12 +8,10 @@ import {
   BugIcon,
   InfoIcon
 } from 'lucide-react'
-import {
-  StatsCard,
-  LoadingState,
-  EmptyState,
-  QueryError
-} from '@/components/ui'
+import { StatsCard } from '@/components/ui/stats-card'
+import { LoadingState } from '@/components/ui/loading-state'
+import { EmptyState } from '@/components/ui/empty-state'
+import { QueryError } from '@/components/ui/error-boundary'
 import type { LogAggregationResponse } from '@/lib/types/log'
 import { SeverityLevel } from '@/lib/enums/severity'
 

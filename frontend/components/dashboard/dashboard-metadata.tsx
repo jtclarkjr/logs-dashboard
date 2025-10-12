@@ -2,7 +2,8 @@
 
 import { format } from 'date-fns'
 import { InfoIcon } from 'lucide-react'
-import { Alert, AlertDescription, QueryError } from '@/components/ui'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { QueryError } from '@/components/ui/error-boundary'
 import type { MetadataResponse } from '@/lib/types/common'
 
 interface DashboardMetadataProps {

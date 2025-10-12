@@ -7,11 +7,11 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-  Button,
-  Badge,
-  SeverityBadge
-} from '@/components/ui'
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { SeverityBadge } from '@/components/ui/severity-badge'
 import type { LogResponse } from '@/lib/types/log'
 
 interface DeleteLogDialogProps {

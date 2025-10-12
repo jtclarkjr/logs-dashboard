@@ -1,7 +1,7 @@
 'use client'
 
 import { ArrowLeftIcon } from 'lucide-react'
-import { Button } from '@/components/ui'
+import { Button } from '@/components/ui/button'
 
 interface CreateLogHeaderProps {
   onBack: () => void
