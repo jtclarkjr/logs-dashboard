@@ -200,6 +200,68 @@ function ChartTooltipContent({
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
             const indicatorColor = color || item.payload.fill || item.color
 
+            // Helper functions for cleaner conditional rendering
+            const shouldUseFormatter =
+              formatter && item?.value !== undefined && item.name
+            const shouldShowIcon = itemConfig?.icon
+            const shouldShowIndicator = !hideIndicator
+
+            const renderIndicator = () => {
+              if (shouldShowIcon && itemConfig.icon) {
+                const IconComponent = itemConfig.icon
+                return <IconComponent />
+              }
+
+              if (!shouldShowIndicator) {
+                return null
+              }
+
+              return (
+                <div
+                  className={cn(
+                    'shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)',
+                    {
+                      'h-2.5 w-2.5': indicator === 'dot',
+                      'w-1': indicator === 'line',
+                      'w-0 border-[1.5px] border-dashed bg-transparent':
+                        indicator === 'dashed',
+                      'my-0.5': nestLabel && indicator === 'dashed'
+                    }
+                  )}
+                  style={
+                    {
+                      '--color-bg': indicatorColor,
+                      '--color-border': indicatorColor
+                    } as React.CSSProperties
+                  }
+                />
+              )
+            }
+
+            const renderDefaultContent = () => (
+              <>
+                {renderIndicator()}
+                <div
+                  className={cn(
+                    'flex flex-1 justify-between leading-none',
+                    nestLabel ? 'items-end' : 'items-center'
+                  )}
+                >
+                  <div className="grid gap-1.5">
+                    {nestLabel ? tooltipLabel : null}
+                    <span className="text-muted-foreground">
+                      {itemConfig?.label || item.name}
+                    </span>
+                  </div>
+                  {item.value && (
+                    <span className="text-foreground font-mono font-medium tabular-nums">
+                      {item.value.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+              </>
+            )
+
             return (
               <div
                 key={item.dataKey}
@@ -208,54 +270,9 @@ function ChartTooltipContent({
                   indicator === 'dot' && 'items-center'
                 )}
               >
-                {formatter && item?.value !== undefined && item.name ? (
-                  formatter(item.value, item.name, item, index, item.payload)
-                ) : (
-                  <>
-                    {itemConfig?.icon ? (
-                      <itemConfig.icon />
-                    ) : (
-                      !hideIndicator && (
-                        <div
-                          className={cn(
-                            'shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)',
-                            {
-                              'h-2.5 w-2.5': indicator === 'dot',
-                              'w-1': indicator === 'line',
-                              'w-0 border-[1.5px] border-dashed bg-transparent':
-                                indicator === 'dashed',
-                              'my-0.5': nestLabel && indicator === 'dashed'
-                            }
-                          )}
-                          style={
-                            {
-                              '--color-bg': indicatorColor,
-                              '--color-border': indicatorColor
-                            } as React.CSSProperties
-                          }
-                        />
-                      )
-                    )}
-                    <div
-                      className={cn(
-                        'flex flex-1 justify-between leading-none',
-                        nestLabel ? 'items-end' : 'items-center'
-                      )}
-                    >
-                      <div className="grid gap-1.5">
-                        {nestLabel ? tooltipLabel : null}
-                        <span className="text-muted-foreground">
-                          {itemConfig?.label || item.name}
-                        </span>
-                      </div>
-                      {item.value && (
-                        <span className="text-foreground font-mono font-medium tabular-nums">
-                          {item.value.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                  </>
-                )}
+                {shouldUseFormatter
+                  ? formatter(item.value, item.name, item, index, item.payload)
+                  : renderDefaultContent()}
               </div>
             )
           })}
@@ -299,6 +316,25 @@ function ChartLegendContent({
           const key = `${nameKey || item.dataKey || 'value'}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
 
+          // Helper functions for legend rendering
+          const shouldShowIcon = itemConfig?.icon && !hideIcon
+
+          const renderLegendIcon = () => {
+            if (shouldShowIcon && itemConfig.icon) {
+              const IconComponent = itemConfig.icon
+              return <IconComponent />
+            }
+
+            return (
+              <div
+                className="h-2 w-2 shrink-0 rounded-[2px]"
+                style={{
+                  backgroundColor: item.color
+                }}
+              />
+            )
+          }
+
           return (
             <div
               key={item.value}
@@ -306,16 +342,7 @@ function ChartLegendContent({
                 '[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3'
               )}
             >
-              {itemConfig?.icon && !hideIcon ? (
-                <itemConfig.icon />
-              ) : (
-                <div
-                  className="h-2 w-2 shrink-0 rounded-[2px]"
-                  style={{
-                    backgroundColor: item.color
-                  }}
-                />
-              )}
+              {renderLegendIcon()}
               {itemConfig?.label}
             </div>
           )

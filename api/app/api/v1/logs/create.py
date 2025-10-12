@@ -29,7 +29,7 @@ def create_log(
         # Create the log entry
         db_log = log_crud.create(db=db, log_data=log_data)
         if not db_log:
-            raise_database_error("log creation", {"reason": "Failed to create log entry in database"})
+            raise_database_error("log creation", {"reason": "Log entry creation returned no result"})
         
         return LogResponse.from_orm(db_log)
         
@@ -37,5 +37,5 @@ def create_log(
         # These errors will be handled by the middleware
         raise
     except Exception as e:
-        # Convert unexpected errors to database errors
-        raise_database_error("log creation", {"original_error": str(e)})
+        # Convert unexpected errors to database errors with detailed analysis
+        raise_database_error("log creation", original_error=e)

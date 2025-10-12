@@ -1,20 +1,19 @@
-export interface LogEntry {
-  id: number
+import { SeverityLevel } from '@/lib/enums/severity'
+
+// Base properties that all log types share
+export interface BaseLogProperties {
   timestamp: string
   severity: SeverityLevel
   source: string
   message: string
+}
+
+export interface LogEntry extends BaseLogProperties {
+  id: number
   created_at: string
 }
 
-export interface LogResponse {
-  id: number
-  timestamp: string
-  severity: SeverityLevel
-  source: string
-  message: string
-  created_at: string
-}
+export type LogResponse = LogEntry
 
 export interface LogListResponse {
   logs: LogResponse[]
@@ -24,19 +23,11 @@ export interface LogListResponse {
   total_pages: number
 }
 
-export interface LogCreate {
+export interface LogCreate extends Omit<BaseLogProperties, 'timestamp'> {
   timestamp?: string
-  severity: SeverityLevel
-  source: string
-  message: string
 }
 
-export interface LogUpdate {
-  timestamp?: string
-  severity?: SeverityLevel
-  source?: string
-  message?: string
-}
+export type LogUpdate = Partial<BaseLogProperties>
 
 export interface LogCountByDate {
   date: string
@@ -60,12 +51,4 @@ export interface LogAggregationResponse {
   by_severity: LogCountBySeverity[]
   by_source: LogCountBySource[]
   by_date: LogCountByDate[]
-}
-
-export enum SeverityLevel {
-  DEBUG = 'DEBUG',
-  INFO = 'INFO',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-  CRITICAL = 'CRITICAL'
 }

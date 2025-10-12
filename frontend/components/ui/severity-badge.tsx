@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { SeverityLevel } from '@/lib/types'
+import { SeverityLevel } from '@/lib/enums/severity'
 
 interface SeverityBadgeProps {
   severity: SeverityLevel

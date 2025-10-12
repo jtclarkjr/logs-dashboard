@@ -17,7 +17,17 @@ logs-dashboard/
 Run the entire application stack with Docker Compose:
 
 ```bash
-docker-compose up --build
+docker compose up --build -d
+```
+
+show api docker logs:
+```bash
+docker compose logs api -f --tail=20
+```
+
+show frontend docker logs: 
+```bash
+docker compose logs frontend -f --tail=20
 ```
 
 This will start both the frontend and API services. The application will be available at:

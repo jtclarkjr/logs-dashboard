@@ -1,4 +1,4 @@
-import { SeverityLevel } from './log'
+import { SeverityLevel } from '@/lib/enums/severity'
 
 export type SortOrder = 'asc' | 'desc'
 export type GroupBy = 'hour' | 'day' | 'week' | 'month'
@@ -39,4 +39,9 @@ export interface LogAggregationFilters {
   end_date?: string
   severity?: string
   source?: string
+}
+
+export interface DateFilters {
+  start_date: string
+  end_date: string
 }

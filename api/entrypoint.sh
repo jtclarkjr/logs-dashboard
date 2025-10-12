@@ -12,6 +12,10 @@ done
 
 echo "Database is ready!"
 
+# Create database tables first
+echo "Creating database tables..."
+python -c "from app.core.database import create_tables; create_tables()"
+
 # Check if we need to seed data
 echo "Checking if database needs seeding..."
 python -c "

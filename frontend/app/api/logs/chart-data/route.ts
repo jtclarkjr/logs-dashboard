@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { serverApiClient } from '@/lib/clients/server-client'
-import { ChartDataResponse, ChartFilters } from '@/lib/types'
+import type { ChartDataResponse } from '@/lib/types/chart'
+import type { ChartFilters } from '@/lib/types/filters'
 
 export async function GET(request: NextRequest) {
   try {

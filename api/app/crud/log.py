@@ -2,10 +2,14 @@ from typing import List, Optional
 from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc, and_
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError, OperationalError
 import math
+import logging
 
 from app.models.log import LogEntry, SeverityLevel
 from app.schemas.log import LogCreate, LogUpdate
+
+logger = logging.getLogger(__name__)
 
 
 class LogCRUD:
@@ -14,16 +18,29 @@ class LogCRUD:
     @staticmethod
     def create(db: Session, log_data: LogCreate) -> LogEntry:
         """Create a new log entry"""
-        db_log = LogEntry(
-            message=log_data.message,
-            severity=log_data.severity,
-            source=log_data.source,
-            timestamp=log_data.timestamp or datetime.utcnow()
-        )
-        db.add(db_log)
-        db.commit()
-        db.refresh(db_log)
-        return db_log
+        try:
+            db_log = LogEntry(
+                message=log_data.message,
+                severity=log_data.severity,
+                source=log_data.source,
+                timestamp=log_data.timestamp or datetime.utcnow()
+            )
+            db.add(db_log)
+            db.commit()
+            db.refresh(db_log)
+            return db_log
+        except IntegrityError as e:
+            db.rollback()
+            logger.error(f"Integrity error creating log: {e}")
+            raise e
+        except OperationalError as e:
+            db.rollback()
+            logger.error(f"Operational error creating log: {e}")
+            raise e
+        except SQLAlchemyError as e:
+            db.rollback()
+            logger.error(f"Database error creating log: {e}")
+            raise e
     
     @staticmethod
     def get_by_id(db: Session, log_id: int) -> Optional[LogEntry]:
@@ -80,29 +97,55 @@ class LogCRUD:
     @staticmethod
     def update(db: Session, log_id: int, log_update: LogUpdate) -> Optional[LogEntry]:
         """Update a log entry"""
-        log = db.query(LogEntry).filter(LogEntry.id == log_id).first()
-        if not log:
-            return None
-        
-        # Update only provided fields
-        update_data = log_update.dict(exclude_unset=True)
-        for field, value in update_data.items():
-            setattr(log, field, value)
-        
-        db.commit()
-        db.refresh(log)
-        return log
+        try:
+            log = db.query(LogEntry).filter(LogEntry.id == log_id).first()
+            if not log:
+                return None
+            
+            # Update only provided fields
+            update_data = log_update.dict(exclude_unset=True)
+            for field, value in update_data.items():
+                setattr(log, field, value)
+            
+            db.commit()
+            db.refresh(log)
+            return log
+        except IntegrityError as e:
+            db.rollback()
+            logger.error(f"Integrity error updating log {log_id}: {e}")
+            raise e
+        except OperationalError as e:
+            db.rollback()
+            logger.error(f"Operational error updating log {log_id}: {e}")
+            raise e
+        except SQLAlchemyError as e:
+            db.rollback()
+            logger.error(f"Database error updating log {log_id}: {e}")
+            raise e
     
     @staticmethod
     def delete(db: Session, log_id: int) -> bool:
         """Delete a log entry"""
-        log = db.query(LogEntry).filter(LogEntry.id == log_id).first()
-        if not log:
-            return False
-        
-        db.delete(log)
-        db.commit()
-        return True
+        try:
+            log = db.query(LogEntry).filter(LogEntry.id == log_id).first()
+            if not log:
+                return False
+            
+            db.delete(log)
+            db.commit()
+            return True
+        except IntegrityError as e:
+            db.rollback()
+            logger.error(f"Integrity error deleting log {log_id}: {e}")
+            raise e
+        except OperationalError as e:
+            db.rollback()
+            logger.error(f"Operational error deleting log {log_id}: {e}")
+            raise e
+        except SQLAlchemyError as e:
+            db.rollback()
+            logger.error(f"Database error deleting log {log_id}: {e}")
+            raise e
     
     @staticmethod
     def get_aggregation_data(

@@ -26,9 +26,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui'
-import { LogResponse, SeverityLevel } from '@/lib/types'
-import { useUpdateLog } from '@/lib/hooks'
-import { updateLogValidator } from '@/lib/validators'
+import type { LogResponse } from '@/lib/types/log'
+import { SeverityLevel } from '@/lib/enums/severity'
+import { useUpdateLog } from '@/lib/hooks/query/use-logs'
+import { updateLogValidator } from '@/lib/validators/log'
 import { toast } from 'sonner'
 
 interface LogDetailsDrawerProps {
@@ -50,23 +51,26 @@ export function LogDetailsDrawer({
     source: '',
     timestamp: ''
   })
-  
+
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const updateLogMutation = useUpdateLog()
 
   // Validate individual field
   const validateField = (fieldName: string, value: unknown) => {
-    const fieldValidator = updateLogValidator.shape[fieldName as keyof typeof updateLogValidator.shape]
+    const fieldValidator =
+      updateLogValidator.shape[
+        fieldName as keyof typeof updateLogValidator.shape
+      ]
     if (fieldValidator) {
       const result = fieldValidator.safeParse(value)
       if (!result.success) {
-        setFieldErrors(prev => ({
+        setFieldErrors((prev) => ({
           ...prev,
           [fieldName]: result.error.issues[0]?.message || 'Invalid value'
         }))
       } else {
-        setFieldErrors(prev => {
+        setFieldErrors((prev) => {
           const newErrors = { ...prev }
           delete newErrors[fieldName]
           return newErrors
@@ -93,26 +97,28 @@ export function LogDetailsDrawer({
   const handleSave = async () => {
     // Validate the form data first
     const validationResult = updateLogValidator.safeParse(formData)
-    
+
     if (!validationResult.success) {
       // Set field-level errors
       const newFieldErrors: Record<string, string> = {}
-      validationResult.error.issues.forEach(issue => {
+      validationResult.error.issues.forEach((issue) => {
         if (issue.path.length > 0) {
           newFieldErrors[issue.path[0] as string] = issue.message
         }
       })
       setFieldErrors(newFieldErrors)
-      
+
       // Show validation errors
-      const errors = validationResult.error.issues.map(issue => issue.message).join(', ')
+      const errors = validationResult.error.issues
+        .map((issue) => issue.message)
+        .join(', ')
       toast.error(`Please fix the following errors: ${errors}`)
       return
     } else {
       // Clear errors if validation passes
       setFieldErrors({})
     }
-    
+
     try {
       await updateLogMutation.mutateAsync({
         id: log.id,
@@ -183,7 +189,9 @@ export function LogDetailsDrawer({
                     validateField('severity', value)
                   }}
                 >
-                  <SelectTrigger className={`w-40 ${fieldErrors.severity ? 'border-destructive' : ''}`}>
+                  <SelectTrigger
+                    className={`w-40 ${fieldErrors.severity ? 'border-destructive' : ''}`}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -195,7 +203,9 @@ export function LogDetailsDrawer({
                   </SelectContent>
                 </Select>
                 {fieldErrors.severity && (
-                  <div className="text-sm text-destructive">{fieldErrors.severity}</div>
+                  <div className="text-sm text-destructive">
+                    {fieldErrors.severity}
+                  </div>
                 )}
               </div>
             </div>
@@ -206,9 +216,7 @@ export function LogDetailsDrawer({
                 <ServerIcon className="h-3 w-3" />
               </div>
               <div className="flex-1 space-y-2">
-                <div className="text-xs text-muted-foreground">
-                  Source
-                </div>
+                <div className="text-xs text-muted-foreground">Source</div>
                 <Input
                   value={formData.source}
                   onChange={(e) => {
@@ -223,7 +231,9 @@ export function LogDetailsDrawer({
                   className={`max-w-xs ${fieldErrors.source ? 'border-destructive' : ''}`}
                 />
                 {fieldErrors.source && (
-                  <div className="text-sm text-destructive">{fieldErrors.source}</div>
+                  <div className="text-sm text-destructive">
+                    {fieldErrors.source}
+                  </div>
                 )}
               </div>
             </div>
@@ -260,7 +270,9 @@ export function LogDetailsDrawer({
                   }
                   onChange={(e) => {
                     const date = new Date(e.target.value)
-                    const newTimestamp = isNaN(date.getTime()) ? '' : date.toISOString()
+                    const newTimestamp = isNaN(date.getTime())
+                      ? ''
+                      : date.toISOString()
                     setFormData((prev) => ({
                       ...prev,
                       timestamp: newTimestamp
@@ -271,7 +283,9 @@ export function LogDetailsDrawer({
                   className={`max-w-xs ${fieldErrors.timestamp ? 'border-destructive' : ''}`}
                 />
                 {fieldErrors.timestamp && (
-                  <div className="text-sm text-destructive">{fieldErrors.timestamp}</div>
+                  <div className="text-sm text-destructive">
+                    {fieldErrors.timestamp}
+                  </div>
                 )}
               </div>
             </div>
@@ -314,7 +328,9 @@ export function LogDetailsDrawer({
               <div className="flex justify-between items-center">
                 <div>
                   {fieldErrors.message && (
-                    <div className="text-sm text-destructive">{fieldErrors.message}</div>
+                    <div className="text-sm text-destructive">
+                      {fieldErrors.message}
+                    </div>
                   )}
                 </div>
                 <div className="text-xs text-muted-foreground">

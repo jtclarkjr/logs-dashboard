@@ -12,7 +12,7 @@ import {
   Badge,
   SeverityBadge
 } from '@/components/ui'
-import { LogResponse } from '@/lib/types'
+import type { LogResponse } from '@/lib/types/log'
 
 interface DeleteLogDialogProps {
   open: boolean

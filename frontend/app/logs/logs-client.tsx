@@ -1,27 +1,22 @@
 'use client'
 
-import {
-  LogsHeader,
-  LogsFilters,
-  LogsTable,
-  LogsPagination,
-  DeleteLogDialog,
-  LogDetailsDrawer,
-  CreateLogDialog
-} from '@/components/logs'
-import {
-  LogListResponse,
+import { LogsHeader } from '@/components/logs/logs-header'
+import { LogsFilters } from '@/components/logs/logs-filters'
+import { LogsTable } from '@/components/logs/logs-table'
+import { LogsPagination } from '@/components/logs/logs-pagination'
+import { LogDetailsDrawer } from '@/components/logs/log-details-drawer'
+import { DeleteLogDialog } from '@/components/logs/delete/delete-log-dialog'
+import { CreateLogDialog } from '@/components/logs/create/create-log-dialog'
+import type { LogListResponse } from '@/lib/types/log'
+import type {
   SortOrder,
   SeverityFilter,
   SourceFilter,
   SortByField
-} from '@/lib/types'
-import {
-  useLogs,
-  useDeleteLog,
-  useLogsFilters,
-  useLogsUIState
-} from '@/lib/hooks'
+} from '@/lib/types/filters'
+import { useLogs, useDeleteLog } from '@/lib/hooks/query/use-logs'
+import { useLogsFilters } from '@/lib/hooks/state/use-logs-filters'
+import { useLogsUIState } from '@/lib/hooks/state/use-logs-ui-state'
 import { DateRange } from 'react-day-picker'
 
 interface LogsClientProps {
@@ -87,7 +82,7 @@ export function LogsClient({
   }
 
   // Use current data or fall back to initial data
-  const displayLogs = logs || initialData
+  const displayLogs: LogListResponse = logs || initialData
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -144,9 +139,6 @@ export function LogsClient({
       <CreateLogDialog
         open={createDialogOpen}
         onOpenChange={closeCreateDialog}
-        onSuccess={() => {
-          // Optionally refresh the logs or do other actions after successful creation
-        }}
       />
     </div>
   )

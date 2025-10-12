@@ -17,8 +17,9 @@ logger = logging.getLogger(__name__)
 class ErrorHandlingMiddleware(BaseHTTPMiddleware):
     """Middleware to handle all exceptions and return standardized error responses"""
     
-    def __init__(self, app: ASGIApp):
+    def __init__(self, app: ASGIApp, exclude_paths: list = None):
         super().__init__(app)
+        self.exclude_paths = exclude_paths or ['/health', '/api/v1/health']
     
     async def dispatch(self, request: Request, call_next):
         # Generate unique request ID for tracing
@@ -34,15 +35,16 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
             # Add request ID to successful responses
             response.headers["X-Request-ID"] = request_id
             
-            # Log successful requests
+            # Log successful requests (excluding health checks)
             process_time = time.time() - start_time
-            logger.info(
-                f"Request completed - Method: {request.method} "
-                f"URL: {request.url.path} "
-                f"Status: {response.status_code} "
-                f"Duration: {process_time:.3f}s "
-                f"Request-ID: {request_id}"
-            )
+            if request.url.path not in self.exclude_paths:
+                logger.info(
+                    f"Request completed - Method: {request.method} "
+                    f"URL: {request.url.path} "
+                    f"Status: {response.status_code} "
+                    f"Duration: {process_time:.3f}s "
+                    f"Request-ID: {request_id}"
+                )
             
             return response
             
@@ -67,19 +69,22 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
-    """Middleware to log all incoming requests"""
+    """Middleware to log all incoming requests (excluding health checks)"""
     
-    def __init__(self, app: ASGIApp):
+    def __init__(self, app: ASGIApp, exclude_paths: list = None):
         super().__init__(app)
+        self.exclude_paths = exclude_paths or ['/health', '/api/v1/health']
     
     async def dispatch(self, request: Request, call_next):
-        # Log incoming request
-        logger.info(
-            f"Incoming request - Method: {request.method} "
-            f"URL: {request.url.path} "
-            f"Query: {request.url.query} "
-            f"Client: {request.client.host if request.client else 'unknown'}"
-        )
+        # Skip logging for excluded paths (like health checks)
+        if request.url.path not in self.exclude_paths:
+            # Log incoming request
+            logger.info(
+                f"Incoming request - Method: {request.method} "
+                f"URL: {request.url.path} "
+                f"Query: {request.url.query} "
+                f"Client: {request.client.host if request.client else 'unknown'}"
+            )
         
         response = await call_next(request)
         return response

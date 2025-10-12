@@ -31,11 +31,11 @@ def delete_log(log_id: int, db: Session = Depends(get_db)) -> Dict[str, str]:
         # Perform deletion
         success = log_crud.delete(db=db, log_id=log_id)
         if not success:
-            raise_database_error("log deletion", {"log_id": log_id, "reason": "Delete operation failed"})
+            raise_database_error("log deletion", {"log_id": log_id, "reason": "Log deletion failed - log may have already been deleted"})
         
         return {"message": f"Log {log_id} deleted successfully"}
         
     except (ValidationError, NotFoundError, DatabaseError):
         raise
     except Exception as e:
-        raise_database_error("log deletion", {"log_id": log_id, "original_error": str(e)})
+        raise_database_error("log deletion", {"log_id": log_id}, original_error=e)

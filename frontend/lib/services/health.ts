@@ -1,4 +1,4 @@
-import { HealthResponse, MetadataResponse } from '../types'
+import type { HealthResponse, MetadataResponse } from '@/lib/types/common'
 
 const API_BASE = '/api'
 

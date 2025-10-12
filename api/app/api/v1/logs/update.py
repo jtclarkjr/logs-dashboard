@@ -35,11 +35,11 @@ def update_log(
         # Perform the update
         updated_log = log_crud.update(db=db, log_id=log_id, log_update=log_update)
         if not updated_log:
-            raise_database_error("log update", {"log_id": log_id, "reason": "Update operation failed"})
+            raise_database_error("log update", {"log_id": log_id, "reason": "Log update returned no result - log may have been deleted"})
         
         return LogResponse.from_orm(updated_log)
         
     except (ValidationError, NotFoundError, DatabaseError):
         raise
     except Exception as e:
-        raise_database_error("log update", {"log_id": log_id, "original_error": str(e)})
+        raise_database_error("log update", {"log_id": log_id}, original_error=e)

@@ -14,7 +14,8 @@ import {
   EmptyState,
   QueryError
 } from '@/components/ui'
-import { LogAggregationResponse, SeverityLevel } from '@/lib/types'
+import type { LogAggregationResponse } from '@/lib/types/log'
+import { SeverityLevel } from '@/lib/enums/severity'
 
 const SEVERITY_ICONS = {
   [SeverityLevel.DEBUG]: BugIcon,

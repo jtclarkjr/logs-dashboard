@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
 import { toast } from 'sonner'
-import {
-  SeverityLevel,
+import { SeverityLevel } from '@/lib/enums/severity'
+import type {
   SortOrder,
   FilterAllOption,
   SeverityFilter,
   SourceFilter,
   SortByField
-} from '@/lib/types'
+} from '@/lib/types/filters'
 
 interface LogsFiltersState {
   searchQuery: string

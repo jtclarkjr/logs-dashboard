@@ -20,6 +20,20 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Create Base class for models
 Base = declarative_base()
 
+# Ensure all models are registered with SQLAlchemy Base
+def _register_models() -> None:
+    """Import all models to register them with SQLAlchemy Base.
+    
+    This function exists solely to import models for their side effects.
+    SQLAlchemy needs models to be imported before create_all() is called.
+    """
+    from app.models.log import LogEntry  # Import for registration
+    # Explicitly reference the model to satisfy linters
+    assert LogEntry.__tablename__ == "logs"
+
+# Register models immediately after Base is defined
+_register_models()
+
 
 def get_db() -> Generator[Session, None, None]:
     """

@@ -2,7 +2,7 @@
 
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { Button } from '@/components/ui'
-import { LogListResponse } from '@/lib/types'
+import { LogListResponse } from '@/lib/types/log'
 
 interface LogsPaginationProps {
   logs?: LogListResponse

@@ -1,14 +1,16 @@
-import {
+import type {
   LogListResponse,
   LogCreate,
   LogResponse,
   LogUpdate,
-  LogAggregationResponse,
-  ChartDataResponse,
+  LogAggregationResponse
+} from '@/lib/types/log'
+import type { ChartDataResponse } from '@/lib/types/chart'
+import type {
   LogFilters,
   ChartFilters,
   ExportFilters
-} from '../types'
+} from '@/lib/types/filters'
 
 const API_BASE = '/api'
 

@@ -1,5 +1,5 @@
 import { BaseApiClient } from './base-client'
-import { API_CONFIG } from '../config'
+import { API_CONFIG } from '@/lib/config/constants'
 
 export class ServerApiClient extends BaseApiClient {
   constructor(baseUrl?: string, timeout?: number) {

@@ -1,10 +1,13 @@
 import { z } from 'zod'
-import { SeverityLevel } from '@/lib/types'
+import { SeverityLevel } from '@/lib/enums/severity'
 
 export const createLogValidator = z.object({
-  severity: z.enum(Object.values(SeverityLevel) as [SeverityLevel, ...SeverityLevel[]], {
-    message: 'Severity level is required',
-  }),
+  severity: z.enum(
+    Object.values(SeverityLevel) as [SeverityLevel, ...SeverityLevel[]],
+    {
+      message: 'Severity level is required'
+    }
+  ),
   source: z
     .string({ message: 'Source is required' })
     .min(1, 'Source is required')
@@ -25,12 +28,9 @@ export const createLogValidator = z.object({
         return !isNaN(date.getTime())
       },
       {
-        message: 'Please provide a valid timestamp',
+        message: 'Please provide a valid timestamp'
       }
-    ),
+    )
 })
 
 export const updateLogValidator = createLogValidator
-
-export type CreateLogFormData = z.infer<typeof createLogValidator>
-export type UpdateLogFormData = CreateLogFormData // Same shape

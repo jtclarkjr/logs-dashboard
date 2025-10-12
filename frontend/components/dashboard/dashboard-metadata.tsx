@@ -3,7 +3,7 @@
 import { format } from 'date-fns'
 import { InfoIcon } from 'lucide-react'
 import { Alert, AlertDescription, QueryError } from '@/components/ui'
-import { MetadataResponse } from '@/lib/types'
+import type { MetadataResponse } from '@/lib/types/common'
 
 interface DashboardMetadataProps {
   metadata?: MetadataResponse

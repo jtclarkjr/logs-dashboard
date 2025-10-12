@@ -1,16 +1,28 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
-import { logsService, healthService } from '@/lib/services'
-import {
+import { logsService } from '@/lib/services/logs'
+import { healthService } from '@/lib/services/health'
+import { ApiError } from '@/lib/clients/errors'
+import type {
   LogFilters,
   LogAggregationFilters,
   ChartFilters,
   ExportFilters,
-  LogCreate,
-  LogUpdate,
   GroupBy
-} from '@/lib/types'
+} from '@/lib/types/filters'
+import type { LogCreate, LogUpdate } from '@/lib/types/log'
+
+// Helper function to get user-friendly error messages
+const getUserErrorMessage = (error: unknown, fallback: string): string => {
+  if (error instanceof ApiError) {
+    return error.getDetailedMessage()
+  }
+  if (error instanceof Error) {
+    return error.message
+  }
+  return fallback
+}
 
 // Query Keys
 export const QUERY_KEYS = {
@@ -27,7 +39,8 @@ export function useLogs(filters?: LogFilters) {
   return useQuery({
     queryKey: QUERY_KEYS.logs(filters),
     queryFn: () => logsService.getLogs(filters),
-    enabled: true // Always enabled since we want to show logs
+    enabled: true,
+    placeholderData: (previousData) => previousData
   })
 }
 
@@ -36,7 +49,7 @@ export function useLogAggregation(filters?: LogAggregationFilters) {
   return useQuery({
     queryKey: QUERY_KEYS.logAggregation(filters),
     queryFn: () => logsService.getLogAggregation(filters),
-    enabled: Boolean(filters?.start_date && filters?.end_date) // Only fetch when date range is provided
+    enabled: Boolean(filters?.start_date && filters?.end_date)
   })
 }
 
@@ -45,7 +58,7 @@ export function useChartData(filters?: ChartFilters) {
   return useQuery({
     queryKey: QUERY_KEYS.chartData(filters),
     queryFn: () => logsService.getChartData(filters),
-    enabled: Boolean(filters?.start_date && filters?.end_date) // Only fetch when date range is provided
+    enabled: Boolean(filters?.start_date && filters?.end_date)
   })
 }
 
@@ -54,7 +67,7 @@ export function useMetadata() {
   return useQuery({
     queryKey: QUERY_KEYS.metadata(),
     queryFn: () => healthService.getMetadata(),
-    staleTime: 10 * 60 * 1000 // Metadata is relatively static, cache for 10 minutes
+    staleTime: 10 * 60 * 1000 // Cache for 10 minutes since metadata is static
   })
 }
 
@@ -63,7 +76,7 @@ export function useLog(id: number) {
   return useQuery({
     queryKey: QUERY_KEYS.log(id),
     queryFn: () => logsService.getLog(id),
-    enabled: Boolean(id) // Only fetch when id is provided
+    enabled: Boolean(id)
   })
 }
 
@@ -87,8 +100,7 @@ export function useDeleteLog() {
       toast.success('Log deleted successfully')
     },
     onError: (error) => {
-      toast.error('Failed to delete log')
-      console.error('Delete error:', error)
+      toast.error(getUserErrorMessage(error, 'Failed to delete log'))
     }
   })
 }
@@ -121,8 +133,7 @@ export function useExportLogs() {
       toast.success('Logs exported successfully!')
     },
     onError: (error) => {
-      toast.error('Failed to export logs')
-      console.error('Export error:', error)
+      toast.error(getUserErrorMessage(error, 'Failed to export logs'))
     }
   })
 }
@@ -141,17 +152,14 @@ export function useCreateLog() {
       queryClient.invalidateQueries({ queryKey: ['log-aggregation'] })
       queryClient.invalidateQueries({ queryKey: ['chart-data'] })
       queryClient.invalidateQueries({ queryKey: ['metadata'] })
-
-      toast.success('Log created successfully')
     },
     onError: (error) => {
-      toast.error('Failed to create log')
-      console.error('Create error:', error)
+      toast.error(getUserErrorMessage(error, 'Failed to create log'))
     }
   })
 }
 
-// Formatted Chart Data Hook - uses React Query selector for memoized transformation
+// Formatted Chart Data Hook
 export function useFormattedChartData(
   filters?: ChartFilters,
   timeGrouping?: GroupBy
@@ -195,8 +203,7 @@ export function useUpdateLog() {
       toast.success('Log updated successfully')
     },
     onError: (error) => {
-      toast.error('Failed to update log')
-      console.error('Update error:', error)
+      toast.error(getUserErrorMessage(error, 'Failed to update log'))
     }
   })
 }

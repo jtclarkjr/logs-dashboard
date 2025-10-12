@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { serverApiClient } from '@/lib/clients/server-client'
-import { MetadataResponse } from '@/lib/types'
+import type { MetadataResponse } from '@/lib/types/common'
 
 export async function GET() {
   try {

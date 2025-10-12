@@ -1,15 +1,15 @@
-import { serverApiClient } from '@/lib/clients/server-client'
-import {
+import { SeverityLevel } from '@/lib/enums/severity'
+import type {
   LogFilters,
-  LogListResponse,
-  SeverityLevel,
   SortOrder,
   SortByField,
   FilterAllOption,
   SeverityFilter,
   SourceFilter
-} from '@/lib/types'
+} from '@/lib/types/filters'
 import { LogsClient } from './logs-client'
+import { getInitialLogs } from '@/lib/clients/initial/logs-api'
+import { DEFAULT_PAGE_SIZE } from '@/lib/constants/pagination'
 
 interface LogsPageProps {
   searchParams: Promise<{
@@ -25,38 +25,15 @@ interface LogsPageProps {
   }>
 }
 
-async function getInitialLogs(filters: LogFilters): Promise<LogListResponse> {
-  try {
-    const response = await serverApiClient.get<LogListResponse>(
-      '/logs',
-      filters as Record<string, unknown>
-    )
-
-    if (response.error) {
-      throw new Error(response.error)
-    }
-
-    return response.data!
-  } catch (error) {
-    console.error('Failed to fetch initial logs:', error)
-    // Return empty data structure on error
-    return {
-      logs: [],
-      total: 0,
-      page: 1,
-      page_size: 15,
-      total_pages: 0
-    }
-  }
-}
-
 export default async function LogsPage({ searchParams }: LogsPageProps) {
   const params = await searchParams
 
   // Parse URL parameters
   const filters: LogFilters = {
     page: params.page ? parseInt(params.page) : 1,
-    page_size: params.page_size ? parseInt(params.page_size) : 15,
+    page_size: params.page_size
+      ? parseInt(params.page_size)
+      : DEFAULT_PAGE_SIZE,
     sort_by: (params.sort_by as SortByField) || ('timestamp' as SortByField),
     sort_order: params.sort_order || ('desc' as SortOrder),
     ...(params.search && { search: params.search }),

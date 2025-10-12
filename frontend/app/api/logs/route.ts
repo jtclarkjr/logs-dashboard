@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { serverApiClient } from '@/lib/clients/server-client'
-import {
-  LogListResponse,
-  LogCreate,
-  LogResponse,
-  LogFilters,
-  SortOrder,
-  SortByField
-} from '@/lib/types'
+import type { LogListResponse, LogCreate, LogResponse } from '@/lib/types/log'
+import type { LogFilters, SortOrder, SortByField } from '@/lib/types/filters'
 import { ApiError } from '@/lib/clients/errors'
 
 export async function GET(request: NextRequest) {
@@ -49,8 +43,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response.data)
   } catch (error) {
-    console.error('Get logs error:', error)
-    
     // Handle ApiError with detailed error information
     if (error instanceof ApiError) {
       return NextResponse.json(
@@ -63,9 +55,10 @@ export async function GET(request: NextRequest) {
         { status: error.status }
       )
     }
-    
+
     // Handle generic errors
-    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch logs'
+    const errorMessage =
+      error instanceof Error ? error.message : 'Failed to fetch logs'
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
@@ -85,8 +78,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response.data, { status: 201 })
   } catch (error) {
-    console.error('Create log error:', error)
-    
     // Handle ApiError with detailed error information
     if (error instanceof ApiError) {
       return NextResponse.json(
@@ -100,9 +91,10 @@ export async function POST(request: NextRequest) {
         { status: error.status }
       )
     }
-    
+
     // Handle generic errors
-    const errorMessage = error instanceof Error ? error.message : 'Failed to create log'
+    const errorMessage =
+      error instanceof Error ? error.message : 'Failed to create log'
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }

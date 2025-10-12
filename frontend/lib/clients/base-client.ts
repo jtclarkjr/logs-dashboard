@@ -1,6 +1,7 @@
-import { buildQueryString } from '../config'
-import { ApiResponse } from '../types'
+import { buildQueryString } from '@/lib/config/utils'
+import type { ApiResponse } from '@/lib/types/common'
 import { ApiError, ApiErrorResponse } from './errors'
+import { logError } from '@/lib/utils/error-handler'
 
 interface ApiClientConfig {
   baseUrl: string
@@ -48,24 +49,61 @@ export class BaseApiClient {
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`
         let errorData: ApiErrorResponse | null = null
-        
+
         try {
           const rawErrorData = await response.json()
-          
+
           // Check if it's our new standardized error format
           if (rawErrorData.error && typeof rawErrorData.error === 'object') {
             errorData = rawErrorData as ApiErrorResponse
             errorMessage = errorData.error.message || errorMessage
           } else {
             // Handle legacy error formats (FastAPI default, etc.)
-            errorMessage = rawErrorData.detail || rawErrorData.message || errorMessage
+            // Ensure we extract string message properly, not object
+            if (typeof rawErrorData.detail === 'string') {
+              errorMessage = rawErrorData.detail
+            } else if (typeof rawErrorData.message === 'string') {
+              errorMessage = rawErrorData.message
+            } else if (typeof rawErrorData === 'string') {
+              errorMessage = rawErrorData
+            } else if (
+              rawErrorData.detail &&
+              typeof rawErrorData.detail === 'object'
+            ) {
+              // Handle case where detail is an object - stringify it properly
+              errorMessage = JSON.stringify(rawErrorData.detail)
+            } else if (
+              rawErrorData.message &&
+              typeof rawErrorData.message === 'object'
+            ) {
+              // Handle case where message is an object - stringify it properly
+              errorMessage = JSON.stringify(rawErrorData.message)
+            }
           }
         } catch (parseError) {
           // If we can't parse the error response, use the default message
           console.warn('Failed to parse error response:', parseError)
         }
-        
-        throw new ApiError(errorMessage, response.status, errorData || undefined, response)
+
+        const apiError = new ApiError(
+          errorMessage,
+          response.status,
+          errorData || undefined
+        )
+
+        // Conditional logging - skip logging for specific error conditions
+        // Don't log 422 errors on /logs endpoint with code 0
+        const shouldSkipLogging =
+          response.status === 422 &&
+          endpoint === '/logs' &&
+          (apiError.code === 0 || !apiError.code)
+
+        if (!shouldSkipLogging) {
+          // Centralized error logging - all API errors are logged here
+          logError(`API Error [${method} ${endpoint}]:`, apiError)
+        }
+
+        throw apiError
       }
 
       // Handle different response types
@@ -91,6 +129,8 @@ export class BaseApiClient {
 
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error occurred'
+      // Log non-API errors (network issues, timeouts, etc.)
+      logError(`Network Error [${method} ${endpoint}]:`, error)
       return {
         error: errorMessage,
         status: 0

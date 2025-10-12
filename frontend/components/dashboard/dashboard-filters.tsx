@@ -16,13 +16,9 @@ import {
   DateRangePicker,
   SeverityBadge
 } from '@/components/ui'
-import {
-  SeverityLevel,
-  MetadataResponse,
-  GroupBy,
-  SeverityFilter,
-  SourceFilter
-} from '@/lib/types'
+import { SeverityLevel } from '@/lib/enums/severity'
+import type { MetadataResponse } from '@/lib/types/common'
+import type { GroupBy, SeverityFilter, SourceFilter } from '@/lib/types/filters'
 
 interface DashboardFiltersProps {
   dateRange: DateRange | undefined

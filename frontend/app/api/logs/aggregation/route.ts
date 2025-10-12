@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { serverApiClient } from '@/lib/clients/server-client'
-import { LogAggregationResponse } from '@/lib/types'
+import type { LogAggregationResponse } from '@/lib/types/log'
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,8 +31,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(response.data)
-  } catch (error) {
-    console.error('Get aggregation error:', error)
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch aggregation data' },
       { status: 500 }

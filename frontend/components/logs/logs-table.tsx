@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   Table,
-  TableBody,
   TableCell,
   TableHead,
   TableHeader,
@@ -20,9 +19,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Button,
-  QueryError
+  QueryError,
+  FadeTransition
 } from '@/components/ui'
-import { LogListResponse, LogResponse } from '@/lib/types'
+import { DEFAULT_PAGE_SIZE } from '@/lib/constants/pagination'
+import type { LogListResponse, LogResponse } from '@/lib/types/log'
 
 interface LogsTableProps {
   logs?: LogListResponse
@@ -41,11 +42,15 @@ export function LogsTable({
   onDeleteLog,
   onResetFilters
 }: LogsTableProps) {
+  // Calculate skeleton row count based on actual data or default page size
+  const skeletonRowCount =
+    logs?.logs?.length || logs?.page_size || DEFAULT_PAGE_SIZE
+
   return (
     <Card className="mb-0">
       <CardContent>
         {isLoading ? (
-          <LoadingState variant="table" count={10} />
+          <LoadingState variant="table" count={skeletonRowCount} />
         ) : error ? (
           <QueryError error={error} title="Failed to load logs" />
         ) : !logs || logs.logs.length === 0 ? (
@@ -69,9 +74,18 @@ export function LogsTable({
                   <TableHead className="w-[50px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <FadeTransition
+                as="tbody"
+                isVisible={!isLoading}
+                duration="fast"
+                data-slot="table-body"
+                className="[&_tr:last-child]:border-0"
+              >
                 {logs.logs.map((log) => (
-                  <TableRow key={log.id}>
+                  <TableRow
+                    key={log.id}
+                    className="animate-in fade-in-0 duration-200"
+                  >
                     <TableCell className="font-mono text-sm">
                       {format(new Date(log.timestamp), 'MMM dd, yyyy HH:mm:ss')}
                     </TableCell>
@@ -108,7 +122,7 @@ export function LogsTable({
                     </TableCell>
                   </TableRow>
                 ))}
-              </TableBody>
+              </FadeTransition>
             </Table>
           </div>
         )}

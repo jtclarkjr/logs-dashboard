@@ -49,5 +49,9 @@ export interface FieldProps {
 
 export interface SubscribeProps<T> {
   selector?: (state: any) => any
-  children: (state: { values: T; canSubmit: boolean; isSubmitting: boolean }) => React.ReactNode
+  children: (state: {
+    values: T
+    canSubmit: boolean
+    isSubmitting: boolean
+  }) => React.ReactNode
 }

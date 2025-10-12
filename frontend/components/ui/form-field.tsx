@@ -19,24 +19,24 @@ export function FormFieldWrapper({
   required,
   errors,
   children,
-  className,
+  className
 }: FormFieldWrapperProps) {
   const hasError = errors && errors.length > 0
 
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <label className={cn(
-          'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-          hasError && 'text-destructive'
-        )}>
+        <label
+          className={cn(
+            'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+            hasError && 'text-destructive'
+          )}
+        >
           {label}
           {required && <span className="text-destructive ml-1">*</span>}
         </label>
       )}
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
       {description && !hasError && (
         <p className="text-sm text-muted-foreground">{description}</p>
       )}

@@ -19,7 +19,7 @@ import {
   ChartTooltip,
   QueryError
 } from '@/components/ui'
-import { LogAggregationResponse } from '@/lib/types'
+import type { LogAggregationResponse } from '@/lib/types/log'
 
 interface TopSourcesChartProps {
   aggregationData?: LogAggregationResponse

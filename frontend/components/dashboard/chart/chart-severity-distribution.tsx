@@ -14,7 +14,8 @@ import {
   SeverityBadge,
   QueryError
 } from '@/components/ui'
-import { LogAggregationResponse, SeverityLevel } from '@/lib/types'
+import type { LogAggregationResponse } from '@/lib/types/log'
+import { SeverityLevel } from '@/lib/enums/severity'
 
 const SEVERITY_COLORS = {
   [SeverityLevel.DEBUG]: '#6b7280',
@@ -49,66 +50,85 @@ export function SeverityDistributionChart({
         <CardDescription>Breakdown of logs by severity level</CardDescription>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <LoadingState variant="chart" />
-        ) : error ? (
-          <QueryError error={error} title="Failed to load severity data" />
-        ) : severityDistribution.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={severityDistribution}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    dataKey="value"
-                    label={({ name, percent }) =>
-                      `${name} ${typeof percent === 'number' ? (percent * 100).toFixed(0) : 0}%`
-                    }
-                  >
-                    {severityDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+        {(() => {
+          if (isLoading) {
+            return <LoadingState variant="chart" />
+          }
 
-            <div className="space-y-4">
-              <h4 className="font-medium">Severity Breakdown</h4>
-              {aggregationData?.by_severity.map((item) => {
-                const percentage =
-                  aggregationData.total_logs > 0
+          if (error) {
+            return (
+              <QueryError error={error} title="Failed to load severity data" />
+            )
+          }
+
+          if (severityDistribution.length === 0) {
+            return (
+              <EmptyState
+                title="No severity data available"
+                description="No logs found for the selected filters"
+              />
+            )
+          }
+
+          return (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={severityDistribution}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      dataKey="value"
+                      label={({ name, percent }) => {
+                        const percentValue =
+                          typeof percent === 'number'
+                            ? (percent * 100).toFixed(0)
+                            : 0
+                        return `${name} ${percentValue}%`
+                      }}
+                    >
+                      {severityDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-medium">Severity Breakdown</h4>
+                {aggregationData?.by_severity.map((item) => {
+                  const hasLogs = aggregationData.total_logs > 0
+                  const percentage = hasLogs
                     ? ((item.count / aggregationData.total_logs) * 100).toFixed(
                         1
                       )
                     : '0'
 
-                return (
-                  <div key={item.severity} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <SeverityBadge
-                        severity={item.severity as SeverityLevel}
+                  return (
+                    <div key={item.severity} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <SeverityBadge
+                          severity={item.severity as SeverityLevel}
+                        />
+                        <span className="text-sm font-medium">
+                          {item.count.toLocaleString()} ({percentage}%)
+                        </span>
+                      </div>
+                      <Progress
+                        value={parseFloat(percentage)}
+                        className="h-2"
                       />
-                      <span className="text-sm font-medium">
-                        {item.count.toLocaleString()} ({percentage}%)
-                      </span>
                     </div>
-                    <Progress value={parseFloat(percentage)} className="h-2" />
-                  </div>
-                )
-              })}
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        ) : (
-          <EmptyState
-            title="No severity data available"
-            description="No logs found for the selected filters"
-          />
-        )}
+          )
+        })()}
       </CardContent>
     </Card>
   )

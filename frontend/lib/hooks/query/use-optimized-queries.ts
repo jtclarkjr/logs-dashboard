@@ -1,23 +1,25 @@
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { logsService, healthService } from '@/lib/services'
-import {
-  ChartFilters,
-  LogAggregationFilters,
+import { logsService } from '@/lib/services/logs'
+import { healthService } from '@/lib/services/health'
+import type {
   LogFilters,
-  SeverityLevel,
   GroupBy,
   FilterAllOption,
   SeverityFilter,
   SourceFilter,
   SortOrder,
   SortByField
-} from '@/lib/types'
+} from '@/lib/types/filters'
 import { DateRange } from 'react-day-picker'
+import {
+  createAggregationFilters,
+  createChartFilters
+} from '@/lib/utils/filter-helpers'
 
 /**
  * Optimized hook for dashboard data that combines filters and data transformation
- * Uses React Query's built-in memoization instead of manual useMemo
+ * Uses React Query's built-in memoization
  */
 export function useDashboardData({
   dateRange,
@@ -30,40 +32,18 @@ export function useDashboardData({
   selectedSource: SourceFilter
   timeGrouping: GroupBy
 }) {
-  // Base filters computation (React Query will memoize this automatically)
-  const hasValidDateRange = Boolean(dateRange?.from && dateRange?.to)
+  const aggregationFilters = createAggregationFilters(
+    dateRange,
+    selectedSeverity,
+    selectedSource
+  )
 
-  const aggregationFilters: LogAggregationFilters | undefined =
-    hasValidDateRange
-      ? {
-          start_date: dateRange!.from!.toISOString(),
-          end_date: dateRange!.to!.toISOString(),
-          severity:
-            selectedSeverity === ('all' as FilterAllOption)
-              ? undefined
-              : selectedSeverity,
-          source:
-            selectedSource === ('all' as FilterAllOption)
-              ? undefined
-              : selectedSource
-        }
-      : undefined
-
-  const chartFilters: ChartFilters | undefined = hasValidDateRange
-    ? {
-        start_date: dateRange!.from!.toISOString(),
-        end_date: dateRange!.to!.toISOString(),
-        severity:
-          selectedSeverity === ('all' as FilterAllOption)
-            ? undefined
-            : (selectedSeverity as SeverityLevel),
-        source:
-          selectedSource === ('all' as FilterAllOption)
-            ? undefined
-            : selectedSource,
-        group_by: timeGrouping
-      }
-    : undefined
+  const chartFilters = createChartFilters(
+    dateRange,
+    selectedSeverity,
+    selectedSource,
+    timeGrouping
+  )
 
   // Aggregation data query
   const aggregationQuery = useQuery({

@@ -64,7 +64,7 @@ def get_logs(
     except (ValidationError, NotFoundError, DatabaseError):
         raise
     except Exception as e:
-        raise_database_error("log querying", {"original_error": str(e)})
+        raise_database_error("log querying", original_error=e)
 
 
 @router.get("/{log_id}", response_model=LogResponse, summary="Get log by ID")

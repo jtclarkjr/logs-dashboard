@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { serverApiClient } from '@/lib/clients/server-client'
-import { LogResponse, LogUpdate } from '@/lib/types'
+import type { LogResponse, LogUpdate } from '@/lib/types/log'
 import { ApiError } from '@/lib/clients/errors'
 
 interface RouteParams {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json(response.data)
   } catch (error) {
     console.error('Get log error:', error)
-    
+
     // Handle ApiError with detailed error information
     if (error instanceof ApiError) {
       return NextResponse.json(
@@ -38,9 +38,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         { status: error.status }
       )
     }
-    
+
     // Handle generic errors
-    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch log'
+    const errorMessage =
+      error instanceof Error ? error.message : 'Failed to fetch log'
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
@@ -60,7 +61,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         error: response.error,
         status: response.status
       })
-      
+
       return NextResponse.json(
         { error: response.error },
         { status: response.status || 500 }
@@ -70,7 +71,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json(response.data)
   } catch (error) {
     console.error('Update log error:', error)
-    
+
     // Handle ApiError with detailed error information
     if (error instanceof ApiError) {
       return NextResponse.json(
@@ -84,9 +85,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         { status: error.status }
       )
     }
-    
+
     // Handle generic errors
-    const errorMessage = error instanceof Error ? error.message : 'Failed to update log'
+    const errorMessage =
+      error instanceof Error ? error.message : 'Failed to update log'
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
@@ -109,7 +111,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json(response.data)
   } catch (error) {
     console.error('Delete log error:', error)
-    
+
     // Handle ApiError with detailed error information
     if (error instanceof ApiError) {
       return NextResponse.json(
@@ -122,9 +124,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         { status: error.status }
       )
     }
-    
+
     // Handle generic errors
-    const errorMessage = error instanceof Error ? error.message : 'Failed to delete log'
+    const errorMessage =
+      error instanceof Error ? error.message : 'Failed to delete log'
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }

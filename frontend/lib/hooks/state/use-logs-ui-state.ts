@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LogResponse } from '@/lib/types'
+import type { LogResponse } from '@/lib/types/log'
 
 interface LogsUIState {
   deleteDialogOpen: boolean

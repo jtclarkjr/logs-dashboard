@@ -41,6 +41,17 @@ async def startup_event():
 
 if __name__ == "__main__":
     import uvicorn
+    import logging
+    
+    # Configure uvicorn to suppress access logs for health checks
+    class HealthCheckFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            return '/health' not in record.getMessage()
+    
+    # Apply filter to uvicorn access logger
+    uvicorn_access_logger = logging.getLogger("uvicorn.access")
+    uvicorn_access_logger.addFilter(HealthCheckFilter())
+    
     uvicorn.run(
         "main:app",
         host=settings.HOST,

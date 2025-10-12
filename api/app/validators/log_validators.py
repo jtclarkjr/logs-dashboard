@@ -1,7 +1,7 @@
 """
 Validation functions for log operations
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from app.core.errors import ValidationError
@@ -73,7 +73,9 @@ def validate_log_creation(log_data: LogCreate) -> None:
     
     # Validate timestamp field
     if hasattr(log_data, 'timestamp') and log_data.timestamp is not None:
-        if log_data.timestamp > datetime.now():
+        # Handle timezone-aware vs timezone-naive datetime comparison
+        current_time = datetime.now(timezone.utc) if log_data.timestamp.tzinfo else datetime.now()
+        if log_data.timestamp > current_time:
             validation_errors.append({
                 "field": "timestamp", 
                 "value": log_data.timestamp.isoformat(), 
@@ -151,7 +153,9 @@ def validate_log_update(log_id: int, log_update: LogUpdate) -> None:
     
     # Check if timestamp is being updated and is valid
     if hasattr(log_update, 'timestamp') and log_update.timestamp is not None:
-        if log_update.timestamp > datetime.now():
+        # Handle timezone-aware vs timezone-naive datetime comparison
+        current_time = datetime.now(timezone.utc) if log_update.timestamp.tzinfo else datetime.now()
+        if log_update.timestamp > current_time:
             validation_errors.append({
                 "field": "timestamp", 
                 "value": log_update.timestamp.isoformat(), 

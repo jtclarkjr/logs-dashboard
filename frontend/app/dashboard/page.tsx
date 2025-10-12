@@ -1,15 +1,12 @@
 import { subDays } from 'date-fns'
-import { serverApiClient } from '@/lib/clients/server-client'
-import {
-  LogAggregationResponse,
-  ChartDataResponse,
-  MetadataResponse,
+import type {
   GroupBy,
   FilterAllOption,
   SeverityFilter,
   SourceFilter
-} from '@/lib/types'
+} from '@/lib/types/filters'
 import { DashboardClient } from './dashboard-client'
+import { getInitialDashboardData } from '@/lib/clients/initial/dashboard-api'
 
 interface DashboardPageProps {
   searchParams: Promise<{
@@ -19,62 +16,6 @@ interface DashboardPageProps {
     source?: string
     group_by?: GroupBy
   }>
-}
-
-async function getInitialDashboardData(filters: {
-  start_date: string
-  end_date: string
-  severity?: SeverityFilter
-  source?: SourceFilter
-  group_by?: GroupBy
-}) {
-  try {
-    // Fetch all data in parallel
-    const [aggregationResponse, chartDataResponse, metadataResponse] =
-      await Promise.allSettled([
-        serverApiClient.get<LogAggregationResponse>('/logs/aggregation', {
-          start_date: filters.start_date,
-          end_date: filters.end_date,
-          ...(filters.severity &&
-            filters.severity !== ('all' as FilterAllOption) && {
-              severity: filters.severity
-            }),
-          ...(filters.source &&
-            filters.source !== ('all' as FilterAllOption) && {
-              source: filters.source
-            })
-        } as Record<string, unknown>),
-        serverApiClient.get<ChartDataResponse>(
-          '/logs/chart-data',
-          filters as Record<string, unknown>
-        ),
-        serverApiClient.get<MetadataResponse>('/logs/metadata')
-      ])
-
-    return {
-      aggregationData:
-        aggregationResponse.status === 'fulfilled' &&
-        !aggregationResponse.value.error
-          ? aggregationResponse.value.data
-          : undefined,
-      timeSeriesData:
-        chartDataResponse.status === 'fulfilled' &&
-        !chartDataResponse.value.error
-          ? chartDataResponse.value.data
-          : undefined,
-      metadata:
-        metadataResponse.status === 'fulfilled' && !metadataResponse.value.error
-          ? metadataResponse.value.data
-          : undefined
-    }
-  } catch (error) {
-    console.error('Failed to fetch initial dashboard data:', error)
-    return {
-      aggregationData: undefined,
-      timeSeriesData: undefined,
-      metadata: undefined
-    }
-  }
 }
 
 export default async function DashboardPage({

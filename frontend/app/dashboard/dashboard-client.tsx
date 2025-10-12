@@ -3,30 +3,24 @@
 import { format } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
-import {
-  DashboardHeader,
-  DashboardFilters,
-  DashboardStats,
-  TimelineChart,
-  SeverityDistributionChart,
-  TopSourcesChart,
-  DashboardMetadata
-} from '@/components/dashboard'
-import {
-  LogAggregationResponse,
-  ChartDataResponse,
-  MetadataResponse,
-  GroupBy,
-  SeverityFilter,
-  SourceFilter
-} from '@/lib/types'
+import { DashboardHeader } from '@/components/dashboard/dashboard-header'
+import { DashboardFilters } from '@/components/dashboard/dashboard-filters'
+import { DashboardStats } from '@/components/dashboard/dashboard-stats'
+import { DashboardMetadata } from '@/components/dashboard/dashboard-metadata'
+import { TimelineChart } from '@/components/dashboard/chart/chart-timeline'
+import { SeverityDistributionChart } from '@/components/dashboard/chart/chart-severity-distribution'
+import { TopSourcesChart } from '@/components/dashboard/chart/chart-top-sources'
+import type { LogAggregationResponse } from '@/lib/types/log'
+import type { ChartDataResponse } from '@/lib/types/chart'
+import type { MetadataResponse } from '@/lib/types/common'
+import type { GroupBy, SeverityFilter, SourceFilter } from '@/lib/types/filters'
 import {
   useLogAggregation,
   useFormattedChartData,
   useMetadata,
-  useExportLogs,
-  useDashboardFilters
-} from '@/lib/hooks'
+  useExportLogs
+} from '@/lib/hooks/query/use-logs'
+import { useDashboardFilters } from '@/lib/hooks/state/use-dashboard-filters'
 import { toast } from 'sonner'
 
 interface DashboardClientProps {
@@ -65,7 +59,7 @@ export function DashboardClient({
     canExport
   } = useDashboardFilters(initialFilters)
 
-  // React Query hooks - use computed filters from hook
+  // Data queries
   const {
     data: aggregationData,
     isLoading: isLoadingAggregation,

@@ -1,7 +1,7 @@
 'use client'
 
 import { DateRange } from 'react-day-picker'
-import { SearchIcon } from 'lucide-react'
+import { SearchIcon, XIcon } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -14,15 +14,16 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  DateRangePicker
+  DateRangePicker,
+  Button
 } from '@/components/ui'
-import {
-  SeverityLevel,
+import { SeverityLevel } from '@/lib/enums/severity'
+import type {
   SortOrder,
   SeverityFilter,
   SortByField
-} from '@/lib/types'
-import { useDebouncedSearch } from '@/lib/hooks'
+} from '@/lib/types/filters'
+import { useDebouncedSearch } from '@/lib/hooks/utils/use-debounced-search'
 
 interface LogsFiltersProps {
   searchQuery: string
@@ -76,8 +77,19 @@ export function LogsFilters({
                 placeholder="Search logs..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                className="pl-9"
+                className="pl-9 pr-9"
               />
+              {searchValue && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSearchValue('')}
+                  className="absolute right-1 top-0.5 h-8 w-8 p-0 hover:bg-transparent cursor-pointer"
+                >
+                  <XIcon className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  <span className="sr-only">Clear search</span>
+                </Button>
+              )}
             </div>
           </div>
 

@@ -20,10 +20,8 @@ export function useDebouncedSearch(
 
   // Call the callback when debounced value changes
   useEffect(() => {
-    if (debouncedSearchValue !== initialValue) {
-      onDebouncedChange(debouncedSearchValue)
-    }
-  }, [debouncedSearchValue, onDebouncedChange, initialValue])
+    onDebouncedChange(debouncedSearchValue)
+  }, [debouncedSearchValue, onDebouncedChange])
 
   return {
     searchValue,

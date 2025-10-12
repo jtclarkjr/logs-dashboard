@@ -2,13 +2,19 @@ import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
 import { format, subDays } from 'date-fns'
 import { toast } from 'sonner'
-import {
-  SeverityLevel,
+import type {
   GroupBy,
   FilterAllOption,
   SeverityFilter,
   SourceFilter
-} from '@/lib/types'
+} from '@/lib/types/filters'
+import {
+  createAggregationFilters,
+  createChartFilters,
+  createBaseDateFilters,
+  processSeverityFilter,
+  processSourceFilter
+} from '@/lib/utils/filter-helpers'
 
 interface DashboardFiltersState {
   dateRange: DateRange | undefined
@@ -55,56 +61,28 @@ export function useDashboardFilters(
     toast.info('Filters reset to default')
   }
 
-  // Computed values for API calls
+  // Computed values for API calls using utility functions
   const getAggregationFilters = () => {
-    if (!dateRange?.from || !dateRange?.to) return undefined
-
-    return {
-      start_date: dateRange.from.toISOString(),
-      end_date: dateRange.to.toISOString(),
-      severity:
-        selectedSeverity === ('all' as FilterAllOption)
-          ? undefined
-          : (selectedSeverity as SeverityLevel),
-      source:
-        selectedSource === ('all' as FilterAllOption)
-          ? undefined
-          : selectedSource
-    }
+    return createAggregationFilters(dateRange, selectedSeverity, selectedSource)
   }
 
   const getChartDataFilters = () => {
-    if (!dateRange?.from || !dateRange?.to) return undefined
-
-    return {
-      start_date: dateRange.from.toISOString(),
-      end_date: dateRange.to.toISOString(),
-      severity:
-        selectedSeverity === ('all' as FilterAllOption)
-          ? undefined
-          : (selectedSeverity as SeverityLevel),
-      source:
-        selectedSource === ('all' as FilterAllOption)
-          ? undefined
-          : selectedSource,
-      group_by: timeGrouping
-    }
+    return createChartFilters(
+      dateRange,
+      selectedSeverity,
+      selectedSource,
+      timeGrouping
+    )
   }
 
   const getExportFilters = () => {
-    if (!dateRange?.from || !dateRange?.to) return null
+    const baseDateFilters = createBaseDateFilters(dateRange)
+    if (!baseDateFilters) return null
 
     return {
-      start_date: dateRange.from.toISOString(),
-      end_date: dateRange.to.toISOString(),
-      severity:
-        selectedSeverity === ('all' as FilterAllOption)
-          ? undefined
-          : (selectedSeverity as SeverityLevel),
-      source:
-        selectedSource === ('all' as FilterAllOption)
-          ? undefined
-          : selectedSource
+      ...baseDateFilters,
+      severity: processSeverityFilter(selectedSeverity, true),
+      source: processSourceFilter(selectedSource)
     }
   }
 

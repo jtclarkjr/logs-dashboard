@@ -18,7 +18,7 @@ from app.schemas.log import (
     LogAggregationResponse
 )
 from app.models.log import SeverityLevel, LogEntry as DBLogEntry
-from .utils import validate_date_range, get_time_group_expression, format_chart_data
+from .utilities import validate_date_range, get_time_group_expression, format_chart_data
 
 router = APIRouter()
 
@@ -64,7 +64,7 @@ def get_log_aggregation(
     except (ValidationError, NotFoundError, DatabaseError):
         raise
     except Exception as e:
-        raise_database_error("aggregation generation", {"original_error": str(e)})
+        raise_database_error("aggregation generation", original_error=e)
 
 
 @router.get("/chart-data", summary="Get chart data for time series")

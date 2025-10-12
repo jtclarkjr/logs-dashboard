@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { serverApiClient } from '@/lib/clients/server-client'
-import { HealthResponse } from '@/lib/types'
+import type { HealthResponse } from '@/lib/types/common'
 
 export async function GET() {
   try {
@@ -14,8 +14,7 @@ export async function GET() {
     }
 
     return NextResponse.json(response.data)
-  } catch (error) {
-    console.error('Health check error:', error)
+  } catch {
     return NextResponse.json(
       { error: 'Failed to perform health check' },
       { status: 500 }

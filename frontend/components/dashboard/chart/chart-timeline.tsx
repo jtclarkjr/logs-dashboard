@@ -19,7 +19,7 @@ import {
   ChartTooltip,
   QueryError
 } from '@/components/ui'
-import { ChartDataResponse } from '@/lib/types'
+import type { ChartDataResponse } from '@/lib/types/chart'
 
 interface TimelineChartProps {
   chartData?: ChartDataResponse
