@@ -3,7 +3,13 @@
 import { format } from 'date-fns'
 import { MoreHorizontalIcon, TrashIcon, EyeIcon } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Table, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { SeverityBadge } from '@/components/ui/severity-badge'
 import { LoadingState } from '@/components/ui/loading-state'

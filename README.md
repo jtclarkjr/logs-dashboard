@@ -38,9 +38,9 @@ This will start both the frontend and API services. The application will be avai
 
 #### Prerequisites
 
-- Python 3.x (for API)
-- Bun (JavaScript runtime and package manager)
-- Docker & Docker Compose (for containerized deployment)
+- Python 3.x
+- Bun (Works as a runtime, package manager and testing)
+- Docker & Docker Compose
 
 #### Frontend Setup
 
@@ -57,6 +57,12 @@ bun dev
 ```
 
 The frontend will be available at `http://localhost:3000`
+
+```bash
+cd frontend
+bun storybook
+```
+The frontend storybook on local only will be available at `http://localhost:6006`
 
 #### API Setup
 

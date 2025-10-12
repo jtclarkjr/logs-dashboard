@@ -2,9 +2,21 @@
 
 import { DateRange } from 'react-day-picker'
 import { SearchIcon, XIcon, FilterIcon } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { Button } from '@/components/ui/button'
 import { SeverityLevel } from '@/lib/enums/severity'
