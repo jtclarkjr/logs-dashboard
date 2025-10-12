@@ -6,7 +6,8 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 import traceback
 import logging
-import re
+
+from .database_errors import analyze_database_error
 
 logger = logging.getLogger(__name__)
 
@@ -174,117 +175,6 @@ def raise_validation_error(field: str, value: Any, reason: str) -> NoReturn:
     raise ValidationError(message, details)
 
 
-def _analyze_database_error(error: Exception, operation: str) -> tuple[str, Dict[str, Any]]:
-    """Analyze database error and provide specific error message and details"""
-    error_str = str(error).lower()
-    error_details = {"operation": operation, "error_type": type(error).__name__}
-    
-    # Datetime/timezone errors (check these first before connection errors)
-    if 'offset-naive' in error_str and 'offset-aware' in error_str:
-        message = f"Date/time format error during {operation}: Can't compare offset-naive and offset-aware datetimes."
-        error_details.update({
-            "error_category": "datetime_timezone_mismatch",
-            "suggestion": "Ensure all datetime values include timezone information or are consistently timezone-naive.",
-            "original_error": str(error)
-        })
-    elif any(keyword in error_str for keyword in ['datetime', 'timezone', 'offset']):
-        message = f"Date/time validation error during {operation}: {str(error)}"
-        error_details.update({
-            "error_category": "datetime_format_error",
-            "suggestion": "Check that all date/time values are properly formatted.",
-            "original_error": str(error)
-        })
-    
-    # Connection errors
-    elif any(keyword in error_str for keyword in ['connection', 'connect', 'timeout', 'refused']):
-        if 'timeout' in error_str:
-            message = f"Database connection timeout during {operation}. The database may be overloaded."
-            error_details.update({
-                "error_category": "connection_timeout",
-                "suggestion": "Try again in a moment. If this persists, contact system administrator."
-            })
-        elif 'refused' in error_str:
-            message = f"Database connection refused during {operation}. Database service may be unavailable."
-            error_details.update({
-                "error_category": "connection_refused", 
-                "suggestion": "Check if the database service is running."
-            })
-        else:
-            message = f"Failed to connect to database during {operation}. Database may be unavailable."
-            error_details.update({
-                "error_category": "connection_failed",
-                "suggestion": "Check database connectivity and try again."
-            })
-    
-    # Constraint violations
-    elif any(keyword in error_str for keyword in ['unique', 'constraint', 'duplicate', 'violates']):
-        if 'unique' in error_str or 'duplicate' in error_str:
-            # Try to extract constraint name
-            constraint_match = re.search(r'constraint "([^"]+)"', error_str)
-            constraint_name = constraint_match.group(1) if constraint_match else 'unknown'
-            
-            message = f"Data conflict during {operation}: A record with this information already exists."
-            error_details.update({
-                "error_category": "duplicate_entry",
-                "constraint": constraint_name,
-                "suggestion": "Check if a similar record already exists or modify the data to make it unique."
-            })
-        else:
-            message = f"Data validation failed during {operation}: The data violates database rules."
-            error_details.update({
-                "error_category": "constraint_violation",
-                "suggestion": "Verify all required fields are provided and data meets format requirements."
-            })
-    
-    # Permission/authorization errors  
-    elif any(keyword in error_str for keyword in ['permission', 'denied', 'access', 'unauthorized']):
-        message = f"Database access denied during {operation}. Insufficient permissions."
-        error_details.update({
-            "error_category": "access_denied",
-            "suggestion": "Contact system administrator to check database permissions."
-        })
-    
-    # Syntax/query errors
-    elif any(keyword in error_str for keyword in ['syntax', 'invalid', 'malformed', 'parse']):
-        message = f"Database query error during {operation}. Invalid database operation."
-        error_details.update({
-            "error_category": "query_error",
-            "suggestion": "This appears to be a system error. Please contact support."
-        })
-    
-    # Resource/capacity errors
-    elif any(keyword in error_str for keyword in ['disk', 'space', 'memory', 'limit', 'quota']):
-        if 'disk' in error_str or 'space' in error_str:
-            message = f"Database storage full during {operation}. Insufficient disk space."
-            error_details.update({
-                "error_category": "storage_full",
-                "suggestion": "Contact system administrator - database storage needs attention."
-            })
-        else:
-            message = f"Database resource limit exceeded during {operation}."
-            error_details.update({
-                "error_category": "resource_limit",
-                "suggestion": "Try again later or contact system administrator."
-            })
-    
-    # Transaction/lock errors
-    elif any(keyword in error_str for keyword in ['deadlock', 'lock', 'transaction', 'serialization']):
-        message = f"Database concurrency conflict during {operation}. Multiple operations interfered with each other."
-        error_details.update({
-            "error_category": "concurrency_conflict",
-            "suggestion": "Try the operation again - this is usually temporary."
-        })
-    
-    # Generic fallback with more context
-    else:
-        message = f"Unexpected database error during {operation}: {str(error)[:100]}..."
-        error_details.update({
-            "error_category": "unknown",
-            "original_error": str(error),
-            "suggestion": "Please try again or contact support if the problem persists."
-        })
-    
-    return message, error_details
 
 
 def raise_database_error(operation: str, details: Optional[Dict[str, Any]] = None, original_error: Optional[Exception] = None) -> NoReturn:
@@ -293,7 +183,7 @@ def raise_database_error(operation: str, details: Optional[Dict[str, Any]] = Non
         # Use the same message format as in the logs
         message = f"Unexpected database error during {operation}: {str(original_error)}"
         # Still provide analysis details for debugging, but use the log message format
-        analyzed_message, analyzed_details = _analyze_database_error(original_error, operation)
+        analyzed_message, analyzed_details = analyze_database_error(original_error, operation)
         
         # Keep the analyzed details for debugging but use the consistent message format
         final_details = {
