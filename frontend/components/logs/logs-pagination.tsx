@@ -1,6 +1,11 @@
 'use client'
 
-import { ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon } from 'lucide-react'
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon
+} from 'lucide-react'
 import { Button } from '@/components/ui'
 import { LogListResponse } from '@/lib/types/log'
 import { PAGE_SIZE_OPTIONS } from '@/lib/constants/pagination'
@@ -11,34 +16,39 @@ interface LogsPaginationProps {
   onPageSizeChange?: (pageSize: number) => void
 }
 
-export function LogsPagination({ logs, onPageChange, onPageSizeChange }: LogsPaginationProps) {
+export function LogsPagination({
+  logs,
+  onPageChange,
+  onPageSizeChange
+}: LogsPaginationProps) {
   if (!logs) return null
 
   return (
-      <div className="flex items-center justify-between px-2 py-4">
-        <div className="flex items-center space-x-4">
-          <div className="text-sm text-muted-foreground">
-            Showing {(logs.page - 1) * logs.page_size + 1} to{' '}
-            {Math.min(logs.page * logs.page_size, logs.total)} of{' '}
-            {logs.total.toLocaleString()} results
-          </div>
-          
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-muted-foreground">Show:</span>
-              <select
-                value={logs.page_size}
-                onChange={(e) => onPageSizeChange ? onPageSizeChange(Number(e.target.value)) : null}
-                className="text-sm border border-input rounded px-2 py-1 bg-background"
-              >
-                {PAGE_SIZE_OPTIONS.map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-            </div>
-          
+    <div className="flex items-center justify-between px-2 py-4">
+      <div className="flex items-center space-x-4">
+        <div className="text-sm text-muted-foreground">
+          Showing {(logs.page - 1) * logs.page_size + 1} to{' '}
+          {Math.min(logs.page * logs.page_size, logs.total)} of{' '}
+          {logs.total.toLocaleString()} results
         </div>
+
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-muted-foreground">Show:</span>
+          <select
+            value={logs.page_size}
+            onChange={(e) =>
+              onPageSizeChange ? onPageSizeChange(Number(e.target.value)) : null
+            }
+            className="text-sm border border-input rounded px-2 py-1 bg-background"
+          >
+            {PAGE_SIZE_OPTIONS.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
       <div className="flex items-center space-x-2">
         <Button
           variant="outline"

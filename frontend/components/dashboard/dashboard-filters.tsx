@@ -51,9 +51,7 @@ export function DashboardFilters({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              Filters
-            </CardTitle>
+            <CardTitle className="flex items-center gap-2">Filters</CardTitle>
             <CardDescription>
               Select date range, severity, and source to filter log data
             </CardDescription>

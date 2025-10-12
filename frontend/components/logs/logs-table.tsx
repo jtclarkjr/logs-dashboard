@@ -110,12 +110,11 @@ export function LogsTable({
                             <EyeIcon className="mr-2 h-4 w-4" />
                             View
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onDeleteLog(log)}
-                            className="text-destructive"
-                          >
+                          <DropdownMenuItem onClick={() => onDeleteLog(log)}>
                             <TrashIcon className="mr-2 h-4 w-4" />
-                            Delete
+                            <span className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:text-destructive">
+                              Delete
+                            </span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

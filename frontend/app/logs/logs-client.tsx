@@ -88,9 +88,7 @@ export function LogsClient({
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <LogsHeader
-        onCreateLog={openCreateDialog}
-      />
+      <LogsHeader onCreateLog={openCreateDialog} />
 
       {/* Filters */}
       <LogsFilters
@@ -117,9 +115,9 @@ export function LogsClient({
       />
 
       {/* Pagination */}
-      <LogsPagination 
-        logs={displayLogs} 
-        onPageChange={setCurrentPage} 
+      <LogsPagination
+        logs={displayLogs}
+        onPageChange={setCurrentPage}
         onPageSizeChange={setPageSize}
       />
 
