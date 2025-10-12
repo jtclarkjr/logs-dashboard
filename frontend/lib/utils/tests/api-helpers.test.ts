@@ -8,7 +8,11 @@ import { SeverityLevel } from '@/lib/enums/severity'
 describe('api-helpers', () => {
   describe('extractDataFromSettledResponse', () => {
     it('should extract data from fulfilled promise with successful response', () => {
-      const successfulResponse: PromiseSettledResult<{ data: { test: string }; error?: string; status: number }> = {
+      const successfulResponse: PromiseSettledResult<{
+        data: { test: string }
+        error?: string
+        status: number
+      }> = {
         status: 'fulfilled',
         value: {
           data: { test: 'success' },
@@ -21,7 +25,11 @@ describe('api-helpers', () => {
     })
 
     it('should return undefined for fulfilled promise with error response', () => {
-      const errorResponse: PromiseSettledResult<{ data?: { test: string }; error?: string; status: number }> = {
+      const errorResponse: PromiseSettledResult<{
+        data?: { test: string }
+        error?: string
+        status: number
+      }> = {
         status: 'fulfilled',
         value: {
           error: 'API Error',
@@ -34,7 +42,11 @@ describe('api-helpers', () => {
     })
 
     it('should return undefined for rejected promise', () => {
-      const rejectedResponse: PromiseSettledResult<{ data?: { test: string }; error?: string; status: number }> = {
+      const rejectedResponse: PromiseSettledResult<{
+        data?: { test: string }
+        error?: string
+        status: number
+      }> = {
         status: 'rejected',
         reason: new Error('Network error')
       }
@@ -44,7 +56,11 @@ describe('api-helpers', () => {
     })
 
     it('should return undefined for fulfilled promise with both data and error', () => {
-      const ambiguousResponse: PromiseSettledResult<{ data?: { test: string }; error?: string; status: number }> = {
+      const ambiguousResponse: PromiseSettledResult<{
+        data?: { test: string }
+        error?: string
+        status: number
+      }> = {
         status: 'fulfilled',
         value: {
           data: { test: 'data' },
@@ -58,7 +74,11 @@ describe('api-helpers', () => {
     })
 
     it('should handle fulfilled promise without data property', () => {
-      const noDataResponse: PromiseSettledResult<{ data?: { test: string }; error?: string; status: number }> = {
+      const noDataResponse: PromiseSettledResult<{
+        data?: { test: string }
+        error?: string
+        status: number
+      }> = {
         status: 'fulfilled',
         value: {
           status: 200
@@ -70,7 +90,11 @@ describe('api-helpers', () => {
     })
 
     it('should handle different data types', () => {
-      const stringResponse: PromiseSettledResult<{ data: string; error?: string; status: number }> = {
+      const stringResponse: PromiseSettledResult<{
+        data: string
+        error?: string
+        status: number
+      }> = {
         status: 'fulfilled',
         value: {
           data: 'test string',
@@ -83,7 +107,11 @@ describe('api-helpers', () => {
     })
 
     it('should handle array data', () => {
-      const arrayResponse: PromiseSettledResult<{ data: number[]; error?: string; status: number }> = {
+      const arrayResponse: PromiseSettledResult<{
+        data: number[]
+        error?: string
+        status: number
+      }> = {
         status: 'fulfilled',
         value: {
           data: [1, 2, 3],
@@ -96,7 +124,11 @@ describe('api-helpers', () => {
     })
 
     it('should handle null data', () => {
-      const nullResponse: PromiseSettledResult<{ data: null; error?: string; status: number }> = {
+      const nullResponse: PromiseSettledResult<{
+        data: null
+        error?: string
+        status: number
+      }> = {
         status: 'fulfilled',
         value: {
           data: null,
@@ -208,7 +240,7 @@ describe('api-helpers', () => {
         SeverityLevel.CRITICAL
       ]
 
-      severityLevels.forEach(severity => {
+      severityLevels.forEach((severity) => {
         const filters = {
           ...mockDateFilters,
           severity
@@ -225,9 +257,15 @@ describe('api-helpers', () => {
     })
 
     it('should handle various source names', () => {
-      const sources = ['web-server', 'database', 'cache', 'auth-service', 'api-gateway']
+      const sources = [
+        'web-server',
+        'database',
+        'cache',
+        'auth-service',
+        'api-gateway'
+      ]
 
-      sources.forEach(source => {
+      sources.forEach((source) => {
         const filters = {
           ...mockDateFilters,
           source

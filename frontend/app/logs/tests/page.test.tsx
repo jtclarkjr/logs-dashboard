@@ -9,7 +9,13 @@ import { DEFAULT_PAGE_SIZE } from '@/lib/constants/pagination'
 
 // Mock the logs client component
 mock.module('../logs-client', () => ({
-  LogsClient: ({ initialData, initialFilters }: { initialData: unknown; initialFilters: unknown }) => (
+  LogsClient: ({
+    initialData,
+    initialFilters
+  }: {
+    initialData: unknown
+    initialFilters: unknown
+  }) => (
     <div data-testid="logs-client">
       <div data-testid="initial-data">{JSON.stringify(initialData)}</div>
       <div data-testid="initial-filters">{JSON.stringify(initialFilters)}</div>
@@ -61,15 +67,15 @@ describe('LogsPage', () => {
   describe('Default behavior', () => {
     it('should render with default parameters when no search params provided', async () => {
       const searchParams = Promise.resolve({})
-      const { getByTestId } = render(
-        await LogsPage({ searchParams })
-      )
+      const { getByTestId } = render(await LogsPage({ searchParams }))
 
       const clientComponent = getByTestId('logs-client')
       expect(clientComponent).toBeTruthy()
 
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
-      
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
+      )
+
       // Check default filters
       expect(initialFilters.searchQuery).toBe('')
       expect(initialFilters.selectedSeverity).toBe('all')
@@ -82,13 +88,15 @@ describe('LogsPage', () => {
 
     it('should use default pagination settings', async () => {
       const searchParams = Promise.resolve({})
-      const { getByTestId } = render(
-        await LogsPage({ searchParams })
+      const { getByTestId } = render(await LogsPage({ searchParams }))
+
+      const initialData = JSON.parse(
+        getByTestId('initial-data').textContent || '{}'
+      )
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
       )
 
-      const initialData = JSON.parse(getByTestId('initial-data').textContent || '{}')
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
-      
       expect(initialFilters.currentPage).toBe(1)
       expect(initialData.page_size).toBe(DEFAULT_PAGE_SIZE)
     })
@@ -101,11 +109,11 @@ describe('LogsPage', () => {
           page: '3'
         })
 
-        const { getByTestId } = render(
-          await LogsPage({ searchParams })
-        )
+        const { getByTestId } = render(await LogsPage({ searchParams }))
 
-        const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+        const initialFilters = JSON.parse(
+          getByTestId('initial-filters').textContent || '{}'
+        )
         expect(initialFilters.currentPage).toBe(3)
       })
 
@@ -135,11 +143,11 @@ describe('LogsPage', () => {
           search: 'error message'
         })
 
-        const { getByTestId } = render(
-          await LogsPage({ searchParams })
-        )
+        const { getByTestId } = render(await LogsPage({ searchParams }))
 
-        const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+        const initialFilters = JSON.parse(
+          getByTestId('initial-filters').textContent || '{}'
+        )
         expect(initialFilters.searchQuery).toBe('error message')
       })
 
@@ -148,11 +156,11 @@ describe('LogsPage', () => {
           severity: 'error'
         })
 
-        const { getByTestId } = render(
-          await LogsPage({ searchParams })
-        )
+        const { getByTestId } = render(await LogsPage({ searchParams }))
 
-        const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+        const initialFilters = JSON.parse(
+          getByTestId('initial-filters').textContent || '{}'
+        )
         expect(initialFilters.selectedSeverity).toBe('error')
       })
 
@@ -161,11 +169,11 @@ describe('LogsPage', () => {
           source: 'web-server'
         })
 
-        const { getByTestId } = render(
-          await LogsPage({ searchParams })
-        )
+        const { getByTestId } = render(await LogsPage({ searchParams }))
 
-        const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+        const initialFilters = JSON.parse(
+          getByTestId('initial-filters').textContent || '{}'
+        )
         expect(initialFilters.selectedSource).toBe('web-server')
       })
 
@@ -208,11 +216,11 @@ describe('LogsPage', () => {
           sort_by: 'severity'
         })
 
-        const { getByTestId } = render(
-          await LogsPage({ searchParams })
-        )
+        const { getByTestId } = render(await LogsPage({ searchParams }))
 
-        const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+        const initialFilters = JSON.parse(
+          getByTestId('initial-filters').textContent || '{}'
+        )
         expect(initialFilters.sortBy).toBe('severity')
       })
 
@@ -221,11 +229,11 @@ describe('LogsPage', () => {
           sort_order: 'asc' as SortOrder
         })
 
-        const { getByTestId } = render(
-          await LogsPage({ searchParams })
-        )
+        const { getByTestId } = render(await LogsPage({ searchParams }))
 
-        const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+        const initialFilters = JSON.parse(
+          getByTestId('initial-filters').textContent || '{}'
+        )
         expect(initialFilters.sortOrder).toBe('asc')
       })
     })
@@ -234,21 +242,25 @@ describe('LogsPage', () => {
       it('should parse date range from search params', async () => {
         const startDate = '2024-01-01T00:00:00Z'
         const endDate = '2024-01-08T00:00:00Z'
-        
+
         const searchParams = Promise.resolve({
           start_date: startDate,
           end_date: endDate
         })
 
-        const { getByTestId } = render(
-          await LogsPage({ searchParams })
+        const { getByTestId } = render(await LogsPage({ searchParams }))
+
+        const initialFilters = JSON.parse(
+          getByTestId('initial-filters').textContent || '{}'
         )
 
-        const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
-        
         expect(initialFilters.dateRange).toBeTruthy()
-      expect(new Date(initialFilters.dateRange.from).toISOString()).toBe('2024-01-01T00:00:00.000Z')
-      expect(new Date(initialFilters.dateRange.to).toISOString()).toBe('2024-01-08T00:00:00.000Z')
+        expect(new Date(initialFilters.dateRange.from).toISOString()).toBe(
+          '2024-01-01T00:00:00.000Z'
+        )
+        expect(new Date(initialFilters.dateRange.to).toISOString()).toBe(
+          '2024-01-08T00:00:00.000Z'
+        )
       })
 
       it('should not set date range when only start_date is provided', async () => {
@@ -256,11 +268,11 @@ describe('LogsPage', () => {
           start_date: '2024-01-01T00:00:00Z'
         })
 
-        const { getByTestId } = render(
-          await LogsPage({ searchParams })
-        )
+        const { getByTestId } = render(await LogsPage({ searchParams }))
 
-        const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+        const initialFilters = JSON.parse(
+          getByTestId('initial-filters').textContent || '{}'
+        )
         expect(initialFilters.dateRange).toBeUndefined()
       })
 
@@ -269,11 +281,11 @@ describe('LogsPage', () => {
           end_date: '2024-01-08T00:00:00Z'
         })
 
-        const { getByTestId } = render(
-          await LogsPage({ searchParams })
-        )
+        const { getByTestId } = render(await LogsPage({ searchParams }))
 
-        const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+        const initialFilters = JSON.parse(
+          getByTestId('initial-filters').textContent || '{}'
+        )
         expect(initialFilters.dateRange).toBeUndefined()
       })
     })
@@ -292,12 +304,12 @@ describe('LogsPage', () => {
           end_date: '2024-01-08T00:00:00Z'
         })
 
-        const { getByTestId } = render(
-          await LogsPage({ searchParams })
+        const { getByTestId } = render(await LogsPage({ searchParams }))
+
+        const initialFilters = JSON.parse(
+          getByTestId('initial-filters').textContent || '{}'
         )
 
-        const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
-        
         expect(initialFilters.currentPage).toBe(2)
         expect(initialFilters.searchQuery).toBe('error')
         expect(initialFilters.selectedSeverity).toBe('warn')
@@ -305,8 +317,12 @@ describe('LogsPage', () => {
         expect(initialFilters.sortBy).toBe('severity')
         expect(initialFilters.sortOrder).toBe('asc')
         expect(initialFilters.dateRange).toBeTruthy()
-      expect(new Date(initialFilters.dateRange.from).toISOString()).toBe('2024-01-01T00:00:00.000Z')
-      expect(new Date(initialFilters.dateRange.to).toISOString()).toBe('2024-01-08T00:00:00.000Z')
+        expect(new Date(initialFilters.dateRange.from).toISOString()).toBe(
+          '2024-01-01T00:00:00.000Z'
+        )
+        expect(new Date(initialFilters.dateRange.to).toISOString()).toBe(
+          '2024-01-08T00:00:00.000Z'
+        )
       })
     })
   })
@@ -331,7 +347,7 @@ describe('LogsPage', () => {
       await render(await LogsPage({ searchParams }))
 
       expect(mockGetInitialData).toHaveBeenCalledTimes(1)
-      
+
       const callArgs = mockGetInitialData.mock.calls[0][0]
       expect(callArgs.page).toBe(2)
       expect(callArgs.search).toBe('error')
@@ -344,12 +360,12 @@ describe('LogsPage', () => {
 
     it('should pass initial data to client component', async () => {
       const searchParams = Promise.resolve({})
-      const { getByTestId } = render(
-        await LogsPage({ searchParams })
+      const { getByTestId } = render(await LogsPage({ searchParams }))
+
+      const initialData = JSON.parse(
+        getByTestId('initial-data').textContent || '{}'
       )
 
-      const initialData = JSON.parse(getByTestId('initial-data').textContent || '{}')
-      
       expect(initialData.logs).toBeTruthy()
       expect(initialData.total).toBe(50)
       expect(initialData.page).toBe(1)
@@ -467,12 +483,10 @@ describe('LogsPage', () => {
       }))
 
       const searchParams = Promise.resolve({})
-      
+
       // Should render without throwing an error
-      const { getByTestId } = render(
-        await LogsPage({ searchParams })
-      )
-      
+      const { getByTestId } = render(await LogsPage({ searchParams }))
+
       expect(getByTestId('logs-client')).toBeTruthy()
     })
   })
@@ -486,16 +500,18 @@ describe('LogsPage', () => {
         source: 'web-server'
       })
 
-      const { getByTestId } = render(
-        await LogsPage({ searchParams })
-      )
+      const { getByTestId } = render(await LogsPage({ searchParams }))
 
       const clientComponent = getByTestId('logs-client')
       expect(clientComponent).toBeTruthy()
 
-      const initialData = JSON.parse(getByTestId('initial-data').textContent || '{}')
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
-      
+      const initialData = JSON.parse(
+        getByTestId('initial-data').textContent || '{}'
+      )
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
+      )
+
       expect(initialData).toBeTruthy()
       expect(initialData.logs).toBeTruthy()
       expect(initialFilters).toBeTruthy()

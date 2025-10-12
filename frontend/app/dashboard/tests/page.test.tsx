@@ -10,7 +10,13 @@ import { SeverityLevel } from '@/lib/enums/severity'
 
 // Mock the dashboard client component
 mock.module('../dashboard-client', () => ({
-  DashboardClient: ({ initialData, initialFilters }: { initialData: unknown; initialFilters: unknown }) => (
+  DashboardClient: ({
+    initialData,
+    initialFilters
+  }: {
+    initialData: unknown
+    initialFilters: unknown
+  }) => (
     <div data-testid="dashboard-client">
       <div data-testid="initial-data">{JSON.stringify(initialData)}</div>
       <div data-testid="initial-filters">{JSON.stringify(initialFilters)}</div>
@@ -42,9 +48,7 @@ const mockAggregationData: LogAggregationResponse = {
     { source: 'database', count: 300 },
     { source: 'cache', count: 100 }
   ],
-  by_date: [
-    { date: '2024-01-01', count: 1000 }
-  ]
+  by_date: [{ date: '2024-01-01', count: 1000 }]
 }
 
 const mockMetadata: MetadataResponse = {
@@ -81,15 +85,15 @@ describe('DashboardPage', () => {
   describe('Default behavior', () => {
     it('should render with default parameters when no search params provided', async () => {
       const searchParams = Promise.resolve({})
-      const { getByTestId } = render(
-        await DashboardPage({ searchParams })
-      )
+      const { getByTestId } = render(await DashboardPage({ searchParams }))
 
       const clientComponent = getByTestId('dashboard-client')
       expect(clientComponent).toBeTruthy()
 
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
-      
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
+      )
+
       // Check default filters
       expect(initialFilters.selectedSeverity).toBe('all')
       expect(initialFilters.selectedSource).toBe('all')
@@ -101,17 +105,19 @@ describe('DashboardPage', () => {
 
     it('should use 7-day default date range', async () => {
       const searchParams = Promise.resolve({})
-      const { getByTestId } = render(
-        await DashboardPage({ searchParams })
-      )
+      const { getByTestId } = render(await DashboardPage({ searchParams }))
 
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
+      )
       const fromDate = new Date(initialFilters.dateRange.from)
       const toDate = new Date(initialFilters.dateRange.to)
-      
+
       const expectedFromDate = subDays(new Date(), 7)
-      const daysDifference = Math.abs(fromDate.getTime() - expectedFromDate.getTime()) / (1000 * 60 * 60 * 24)
-      
+      const daysDifference =
+        Math.abs(fromDate.getTime() - expectedFromDate.getTime()) /
+        (1000 * 60 * 60 * 24)
+
       expect(daysDifference).toBeLessThan(1) // Within 1 day tolerance
       expect(toDate.getDate()).toBe(new Date().getDate())
     })
@@ -121,20 +127,24 @@ describe('DashboardPage', () => {
     it('should parse date range from search params', async () => {
       const startDate = '2024-01-01T00:00:00Z'
       const endDate = '2024-01-08T00:00:00Z'
-      
+
       const searchParams = Promise.resolve({
         start_date: startDate,
         end_date: endDate
       })
 
-      const { getByTestId } = render(
-        await DashboardPage({ searchParams })
+      const { getByTestId } = render(await DashboardPage({ searchParams }))
+
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
       )
 
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
-      
-      expect(new Date(initialFilters.dateRange.from).toISOString()).toBe('2024-01-01T00:00:00.000Z')
-      expect(new Date(initialFilters.dateRange.to).toISOString()).toBe('2024-01-08T00:00:00.000Z')
+      expect(new Date(initialFilters.dateRange.from).toISOString()).toBe(
+        '2024-01-01T00:00:00.000Z'
+      )
+      expect(new Date(initialFilters.dateRange.to).toISOString()).toBe(
+        '2024-01-08T00:00:00.000Z'
+      )
     })
 
     it('should parse severity filter from search params', async () => {
@@ -142,11 +152,11 @@ describe('DashboardPage', () => {
         severity: 'error'
       })
 
-      const { getByTestId } = render(
-        await DashboardPage({ searchParams })
-      )
+      const { getByTestId } = render(await DashboardPage({ searchParams }))
 
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
+      )
       expect(initialFilters.selectedSeverity).toBe('error')
     })
 
@@ -155,11 +165,11 @@ describe('DashboardPage', () => {
         source: 'web-server'
       })
 
-      const { getByTestId } = render(
-        await DashboardPage({ searchParams })
-      )
+      const { getByTestId } = render(await DashboardPage({ searchParams }))
 
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
+      )
       expect(initialFilters.selectedSource).toBe('web-server')
     })
 
@@ -168,11 +178,11 @@ describe('DashboardPage', () => {
         group_by: 'hour' as GroupBy
       })
 
-      const { getByTestId } = render(
-        await DashboardPage({ searchParams })
-      )
+      const { getByTestId } = render(await DashboardPage({ searchParams }))
 
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
+      )
       expect(initialFilters.timeGrouping).toBe('hour')
     })
 
@@ -185,17 +195,21 @@ describe('DashboardPage', () => {
         group_by: 'hour' as GroupBy
       })
 
-      const { getByTestId } = render(
-        await DashboardPage({ searchParams })
+      const { getByTestId } = render(await DashboardPage({ searchParams }))
+
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
       )
 
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
-      
       expect(initialFilters.selectedSeverity).toBe('error')
       expect(initialFilters.selectedSource).toBe('database')
       expect(initialFilters.timeGrouping).toBe('hour')
-      expect(new Date(initialFilters.dateRange.from).toISOString()).toBe('2024-01-01T00:00:00.000Z')
-      expect(new Date(initialFilters.dateRange.to).toISOString()).toBe('2024-01-08T00:00:00.000Z')
+      expect(new Date(initialFilters.dateRange.from).toISOString()).toBe(
+        '2024-01-01T00:00:00.000Z'
+      )
+      expect(new Date(initialFilters.dateRange.to).toISOString()).toBe(
+        '2024-01-08T00:00:00.000Z'
+      )
     })
   })
 
@@ -223,12 +237,12 @@ describe('DashboardPage', () => {
 
     it('should pass initial data to client component', async () => {
       const searchParams = Promise.resolve({})
-      const { getByTestId } = render(
-        await DashboardPage({ searchParams })
+      const { getByTestId } = render(await DashboardPage({ searchParams }))
+
+      const initialData = JSON.parse(
+        getByTestId('initial-data').textContent || '{}'
       )
 
-      const initialData = JSON.parse(getByTestId('initial-data').textContent || '{}')
-      
       expect(initialData.aggregationData).toBeTruthy()
       expect(initialData.metadata).toBeTruthy()
       expect(initialData.aggregationData.total_logs).toBe(1000)
@@ -248,12 +262,10 @@ describe('DashboardPage', () => {
       }))
 
       const searchParams = Promise.resolve({})
-      
+
       // Should render without throwing an error
-      const result = render(
-        await DashboardPage({ searchParams })
-      )
-      
+      const result = render(await DashboardPage({ searchParams }))
+
       expect(result.container.firstChild).toBeTruthy()
     })
   })
@@ -265,16 +277,18 @@ describe('DashboardPage', () => {
         source: 'database'
       })
 
-      const { getByTestId } = render(
-        await DashboardPage({ searchParams })
-      )
+      const { getByTestId } = render(await DashboardPage({ searchParams }))
 
       const clientComponent = getByTestId('dashboard-client')
       expect(clientComponent).toBeTruthy()
 
-      const initialData = JSON.parse(getByTestId('initial-data').textContent || '{}')
-      const initialFilters = JSON.parse(getByTestId('initial-filters').textContent || '{}')
-      
+      const initialData = JSON.parse(
+        getByTestId('initial-data').textContent || '{}'
+      )
+      const initialFilters = JSON.parse(
+        getByTestId('initial-filters').textContent || '{}'
+      )
+
       expect(initialData).toBeTruthy()
       expect(initialFilters).toBeTruthy()
       expect(initialFilters.selectedSeverity).toBe('warn')

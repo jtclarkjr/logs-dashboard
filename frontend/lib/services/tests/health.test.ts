@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, jest, spyOn } from 'bun:test'
+import { describe, it, expect, beforeEach, afterEach, jest } from 'bun:test'
 import { healthService } from '../health'
 import type { HealthResponse, MetadataResponse } from '@/lib/types/common'
 
 // Mock fetch globally
 const mockFetch = jest.fn()
-global.fetch = mockFetch as any
+global.fetch = mockFetch as typeof fetch
 
 describe('HealthService', () => {
   beforeEach(() => {
@@ -100,7 +100,9 @@ describe('HealthService', () => {
       }
       mockFetch.mockResolvedValue(mockResponse)
 
-      await expect(healthService.healthCheck()).rejects.toThrow('Custom error message')
+      await expect(healthService.healthCheck()).rejects.toThrow(
+        'Custom error message'
+      )
     })
 
     it('should handle network errors', async () => {
@@ -127,7 +129,7 @@ describe('HealthService', () => {
 
   describe('getApiInfo', () => {
     it('should call correct endpoint', async () => {
-      const mockResponseData = { 
+      const mockResponseData = {
         name: 'Logs API',
         version: '1.0.0',
         description: 'API for log management'
@@ -271,17 +273,22 @@ describe('HealthService', () => {
       }
       mockFetch.mockResolvedValue(mockResponse)
 
-      await expect(healthService.healthCheck()).rejects.toThrow('Service is down')
+      await expect(healthService.healthCheck()).rejects.toThrow(
+        'Service is down'
+      )
     })
 
     it('should handle health check timeout scenarios', async () => {
-      mockFetch.mockImplementation(() => 
-        new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Request timeout')), 100)
-        })
+      mockFetch.mockImplementation(
+        () =>
+          new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Request timeout')), 100)
+          })
       )
 
-      await expect(healthService.healthCheck()).rejects.toThrow('Request timeout')
+      await expect(healthService.healthCheck()).rejects.toThrow(
+        'Request timeout'
+      )
     })
   })
 
@@ -316,7 +323,13 @@ describe('HealthService', () => {
 
     it('should return complete metadata structure', async () => {
       const metadata: MetadataResponse = {
-        sources: ['web-server', 'database', 'api-gateway', 'auth-service', 'cache'],
+        sources: [
+          'web-server',
+          'database',
+          'api-gateway',
+          'auth-service',
+          'cache'
+        ],
         severity_levels: ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
         total_logs: 245678,
         date_range: {
@@ -377,12 +390,19 @@ describe('HealthService', () => {
       }
       mockFetch.mockResolvedValue(mockResponse)
 
-      await expect(healthService.getMetadata()).rejects.toThrow('Metadata not found')
+      await expect(healthService.getMetadata()).rejects.toThrow(
+        'Metadata not found'
+      )
     })
 
     it('should handle metadata with special characters in sources', async () => {
       const metadata: MetadataResponse = {
-        sources: ['web-server-v2', 'database@main', 'api.gateway', 'auth:service'],
+        sources: [
+          'web-server-v2',
+          'database@main',
+          'api.gateway',
+          'auth:service'
+        ],
         severity_levels: ['INFO', 'WARNING', 'ERROR'],
         total_logs: 1000,
         date_range: {
@@ -438,7 +458,9 @@ describe('HealthService', () => {
       }
       mockFetch.mockResolvedValue(mockResponse)
 
-      await expect(healthService.getApiInfo()).rejects.toThrow('JSON parse error')
+      await expect(healthService.getApiInfo()).rejects.toThrow(
+        'JSON parse error'
+      )
     })
 
     it('should handle null response data', async () => {
@@ -467,7 +489,9 @@ describe('HealthService', () => {
       const fetchError = new Error('Failed to fetch')
       mockFetch.mockRejectedValue(fetchError)
 
-      await expect(healthService.healthCheck()).rejects.toThrow('Failed to fetch')
+      await expect(healthService.healthCheck()).rejects.toThrow(
+        'Failed to fetch'
+      )
     })
 
     it('should handle empty error message in response', async () => {
@@ -479,7 +503,9 @@ describe('HealthService', () => {
       }
       mockFetch.mockResolvedValue(mockResponse)
 
-      await expect(healthService.healthCheck()).rejects.toThrow('HTTP 400: Bad Request')
+      await expect(healthService.healthCheck()).rejects.toThrow(
+        'HTTP 400: Bad Request'
+      )
     })
 
     it('should handle missing statusText', async () => {
@@ -491,7 +517,9 @@ describe('HealthService', () => {
       }
       mockFetch.mockResolvedValue(mockResponse)
 
-      await expect(healthService.healthCheck()).rejects.toThrow('HTTP 500: undefined')
+      await expect(healthService.healthCheck()).rejects.toThrow(
+        'HTTP 500: undefined'
+      )
     })
   })
 

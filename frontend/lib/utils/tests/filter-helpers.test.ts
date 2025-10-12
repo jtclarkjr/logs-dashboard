@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'bun:test'
-import { 
+import {
   processSeverityFilter,
   processSourceFilter,
   createBaseDateFilters,
@@ -41,7 +41,7 @@ describe('filter-helpers', () => {
         SeverityLevel.CRITICAL
       ]
 
-      severityLevels.forEach(severity => {
+      severityLevels.forEach((severity) => {
         const result = processSeverityFilter(severity)
         expect(result).toBe(severity)
       })
@@ -61,8 +61,8 @@ describe('filter-helpers', () => {
 
     it('should handle various source names', () => {
       const sources = ['database', 'api-gateway', 'cache', 'auth-service']
-      
-      sources.forEach(source => {
+
+      sources.forEach((source) => {
         const result = processSourceFilter(source)
         expect(result).toBe(source)
       })
@@ -277,8 +277,8 @@ describe('filter-helpers', () => {
 
     it('should handle different group_by values', () => {
       const groupByValues: GroupBy[] = ['hour', 'day', 'week', 'month']
-      
-      groupByValues.forEach(groupBy => {
+
+      groupByValues.forEach((groupBy) => {
         const result = createChartFilters(
           validDateRange,
           SeverityLevel.DEBUG,

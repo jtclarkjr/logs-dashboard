@@ -17,11 +17,9 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
       mutations: { retry: false }
     }
   })
-  
+
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 }
 
@@ -41,9 +39,7 @@ const mockAggregationData: LogAggregationResponse = {
     { source: 'database', count: 300 },
     { source: 'cache', count: 100 }
   ],
-  by_date: [
-    { date: '2024-01-01', count: 1000 }
-  ]
+  by_date: [{ date: '2024-01-01', count: 1000 }]
 }
 
 const mockMetadata: MetadataResponse = {
@@ -95,10 +91,7 @@ describe('DashboardClient', () => {
       expect(() => {
         render(
           <TestWrapper>
-            <DashboardClient 
-              initialData={{}} 
-              initialFilters={initialFilters}
-            />
+            <DashboardClient initialData={{}} initialFilters={initialFilters} />
           </TestWrapper>
         )
       }).not.toThrow()
@@ -269,9 +262,9 @@ describe('DashboardClient', () => {
     it('should not crash when QueryClient has custom config', () => {
       const customQueryClient = new QueryClient({
         defaultOptions: {
-          queries: { 
+          queries: {
             retry: 3,
-            staleTime: 5 * 60 * 1000,
+            staleTime: 5 * 60 * 1000
           },
           mutations: { retry: 1 }
         }
@@ -294,17 +287,14 @@ describe('DashboardClient', () => {
         { selectedSeverity: 'error' },
         { selectedSource: 'web-server' },
         { timeGrouping: 'day' as GroupBy },
-        { timeGrouping: 'hour' as GroupBy },
+        { timeGrouping: 'hour' as GroupBy }
       ]
 
-      testCases.forEach(filters => {
+      testCases.forEach((filters) => {
         expect(() => {
           render(
             <TestWrapper>
-              <DashboardClient 
-                initialData={{}} 
-                initialFilters={filters}
-              />
+              <DashboardClient initialData={{}} initialFilters={filters} />
             </TestWrapper>
           )
         }).not.toThrow()
@@ -315,17 +305,14 @@ describe('DashboardClient', () => {
       const testCases = [
         { dateRange: { from: new Date(), to: new Date() } },
         { dateRange: { from: subDays(new Date(), 7), to: new Date() } },
-        { dateRange: undefined },
+        { dateRange: undefined }
       ]
 
-      testCases.forEach(filters => {
+      testCases.forEach((filters) => {
         expect(() => {
           render(
             <TestWrapper>
-              <DashboardClient 
-                initialData={{}} 
-                initialFilters={filters}
-              />
+              <DashboardClient initialData={{}} initialFilters={filters} />
             </TestWrapper>
           )
         }).not.toThrow()

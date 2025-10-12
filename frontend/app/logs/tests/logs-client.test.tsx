@@ -16,11 +16,9 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
       mutations: { retry: false }
     }
   })
-  
+
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 }
 
@@ -74,7 +72,7 @@ describe('LogsClient', () => {
       expect(() => {
         render(
           <TestWrapper>
-            <LogsClient 
+            <LogsClient
               initialData={mockLogListResponse}
               initialFilters={initialFilters}
             />
@@ -105,9 +103,9 @@ describe('LogsClient', () => {
       expect(() => {
         render(
           <TestWrapper>
-            <LogsClient 
-              initialData={mockLogListResponse} 
-              initialFilters={undefined} 
+            <LogsClient
+              initialData={mockLogListResponse}
+              initialFilters={undefined}
             />
           </TestWrapper>
         )
@@ -169,7 +167,7 @@ describe('LogsClient', () => {
         { logs: mockLogListResponse.logs, total: 50 }
       ]
 
-      testCases.forEach(testCase => {
+      testCases.forEach((testCase) => {
         const testData = {
           ...mockLogListResponse,
           logs: testCase.logs,
@@ -193,7 +191,7 @@ describe('LogsClient', () => {
         { page: 10, total_pages: 10 }
       ]
 
-      testCases.forEach(testCase => {
+      testCases.forEach((testCase) => {
         const testData = {
           ...mockLogListResponse,
           page: testCase.page,
@@ -216,7 +214,7 @@ describe('LogsClient', () => {
       const malformedData = {
         ...mockLogListResponse,
         logs: [
-          { id: '1' } as never, // Missing required fields
+          { id: '1' } as never // Missing required fields
         ]
       }
 
@@ -279,9 +277,9 @@ describe('LogsClient', () => {
     it('should not crash when QueryClient has custom config', () => {
       const customQueryClient = new QueryClient({
         defaultOptions: {
-          queries: { 
+          queries: {
             retry: 3,
-            staleTime: 5 * 60 * 1000,
+            staleTime: 5 * 60 * 1000
           },
           mutations: { retry: 1 }
         }
@@ -309,14 +307,14 @@ describe('LogsClient', () => {
         { sortOrder: 'asc' as SortOrder },
         { sortOrder: 'desc' as SortOrder },
         { currentPage: 1 },
-        { currentPage: 5 },
+        { currentPage: 5 }
       ]
 
-      testCases.forEach(filters => {
+      testCases.forEach((filters) => {
         expect(() => {
           render(
             <TestWrapper>
-              <LogsClient 
+              <LogsClient
                 initialData={mockLogListResponse}
                 initialFilters={filters}
               />
@@ -329,15 +327,20 @@ describe('LogsClient', () => {
     it('should handle date range variations', () => {
       const testCases = [
         { dateRange: { from: new Date(), to: new Date() } },
-        { dateRange: { from: new Date('2024-01-01'), to: new Date('2024-01-08') } },
-        { dateRange: undefined },
+        {
+          dateRange: {
+            from: new Date('2024-01-01'),
+            to: new Date('2024-01-08')
+          }
+        },
+        { dateRange: undefined }
       ]
 
-      testCases.forEach(filters => {
+      testCases.forEach((filters) => {
         expect(() => {
           render(
             <TestWrapper>
-              <LogsClient 
+              <LogsClient
                 initialData={mockLogListResponse}
                 initialFilters={filters}
               />
@@ -400,7 +403,13 @@ describe('LogsClient', () => {
     })
 
     it('should handle logs with different sources', () => {
-      const sources = ['web-server', 'database', 'cache', 'auth-service', 'api-gateway']
+      const sources = [
+        'web-server',
+        'database',
+        'cache',
+        'auth-service',
+        'api-gateway'
+      ]
       const diverseLogs = sources.map((source, index) => ({
         id: index + 1,
         timestamp: '2024-01-01T12:00:00Z',
@@ -425,8 +434,11 @@ describe('LogsClient', () => {
     })
 
     it('should handle logs with long messages', () => {
-      const longMessage = 'This is a very long log message that should be handled correctly by the component. '.repeat(10)
-      
+      const longMessage =
+        'This is a very long log message that should be handled correctly by the component. '.repeat(
+          10
+        )
+
       const longMessageLog = {
         ...mockLogListResponse.logs[0],
         message: longMessage

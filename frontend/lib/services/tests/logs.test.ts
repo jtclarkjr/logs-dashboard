@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, jest, spyOn } from 'bun:test'
+import { describe, it, expect, beforeEach, afterEach, jest } from 'bun:test'
 import { logsService } from '../logs'
 import type {
   LogListResponse,
@@ -17,7 +17,7 @@ import { SeverityLevel } from '@/lib/enums/severity'
 
 // Mock fetch globally
 const mockFetch = jest.fn()
-global.fetch = mockFetch as any
+global.fetch = mockFetch as typeof fetch
 
 // Mock DOM methods for download functionality
 const mockCreateElement = jest.fn()
@@ -74,7 +74,7 @@ describe('LogsService', () => {
   afterEach(() => {
     jest.restoreAllMocks()
     console.error = originalConsoleError
-    
+
     // Restore original DOM methods
     document.createElement = originalCreateElement
     document.body.appendChild = originalAppendChild
@@ -163,7 +163,8 @@ describe('LogsService', () => {
 
       await logsService.getLogs(filters)
 
-      const expectedUrl = '/api/logs?page=1&page_size=20&search=error&severity=ERROR&source=web-server'
+      const expectedUrl =
+        '/api/logs?page=1&page_size=20&search=error&severity=ERROR&source=web-server'
       expect(mockFetch).toHaveBeenCalledWith(expectedUrl, expect.any(Object))
     })
 
@@ -181,12 +182,12 @@ describe('LogsService', () => {
     })
 
     it('should filter out undefined, null, and empty values', async () => {
-      const filters = {
+      const filters: Partial<LogFilters> = {
         page: 1,
         search: '',
         severity: undefined,
         source: null
-      } as any
+      }
       const mockResponse = {
         ok: true,
         json: jest.fn().mockResolvedValue({ logs: [] }),
@@ -196,7 +197,10 @@ describe('LogsService', () => {
 
       await logsService.getLogs(filters)
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/logs?page=1', expect.any(Object))
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/logs?page=1',
+        expect.any(Object)
+      )
     })
 
     it('should handle special characters in parameters', async () => {
@@ -278,7 +282,8 @@ describe('LogsService', () => {
 
       const result = await logsService.getLogs(filters)
 
-      const expectedUrl = '/api/logs?page=2&page_size=50&search=database+error&severity=ERROR&source=database&sort_by=timestamp&sort_order=desc&start_date=2024-01-01T00%3A00%3A00Z&end_date=2024-01-08T00%3A00%3A00Z'
+      const expectedUrl =
+        '/api/logs?page=2&page_size=50&search=database+error&severity=ERROR&source=database&sort_by=timestamp&sort_order=desc&start_date=2024-01-01T00%3A00%3A00Z&end_date=2024-01-08T00%3A00%3A00Z'
       expect(mockFetch).toHaveBeenCalledWith(expectedUrl, expect.any(Object))
       expect(result).toEqual(mockLogList)
     })
@@ -333,7 +338,10 @@ describe('LogsService', () => {
 
       const result = await logsService.getLog(123)
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/logs/123', expect.any(Object))
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/logs/123',
+        expect.any(Object)
+      )
       expect(result).toEqual(mockLog)
     })
 
@@ -438,7 +446,7 @@ describe('LogsService', () => {
     it('should handle create log validation errors', async () => {
       const invalidLogData = {
         message: '', // Invalid empty message
-        severity: 'INVALID' as any,
+        severity: 'INVALID' as SeverityLevel,
         source: 'test'
       }
       const mockResponse = {
@@ -524,9 +532,9 @@ describe('LogsService', () => {
       }
       mockFetch.mockResolvedValue(mockResponse)
 
-      await expect(logsService.updateLog(999, { message: 'test' })).rejects.toThrow(
-        'Log not found for update'
-      )
+      await expect(
+        logsService.updateLog(999, { message: 'test' })
+      ).rejects.toThrow('Log not found for update')
     })
   })
 
@@ -534,7 +542,9 @@ describe('LogsService', () => {
     it('should delete a log', async () => {
       const mockResponse = {
         ok: true,
-        json: jest.fn().mockResolvedValue({ message: 'Log deleted successfully' }),
+        json: jest
+          .fn()
+          .mockResolvedValue({ message: 'Log deleted successfully' }),
         headers: { get: jest.fn().mockReturnValue('application/json') }
       }
       mockFetch.mockResolvedValue(mockResponse)
@@ -555,7 +565,9 @@ describe('LogsService', () => {
         ok: false,
         status: 404,
         statusText: 'Not Found',
-        json: jest.fn().mockResolvedValue({ error: 'Log not found for deletion' })
+        json: jest
+          .fn()
+          .mockResolvedValue({ error: 'Log not found for deletion' })
       }
       mockFetch.mockResolvedValue(mockResponse)
 
@@ -573,7 +585,9 @@ describe('LogsService', () => {
       }
       mockFetch.mockResolvedValue(mockResponse)
 
-      await expect(logsService.deleteLog(123)).rejects.toThrow('Insufficient permissions')
+      await expect(logsService.deleteLog(123)).rejects.toThrow(
+        'Insufficient permissions'
+      )
     })
   })
 
@@ -590,7 +604,7 @@ describe('LogsService', () => {
         },
         source_counts: {
           'web-server': 4000,
-          'database': 3000,
+          database: 3000,
           'auth-service': 2000,
           'api-gateway': 1000
         },
@@ -608,7 +622,10 @@ describe('LogsService', () => {
 
       const result = await logsService.getLogAggregation()
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/logs/aggregation', expect.any(Object))
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/logs/aggregation',
+        expect.any(Object)
+      )
       expect(result).toEqual(mockAggregation)
     })
 
@@ -634,7 +651,8 @@ describe('LogsService', () => {
 
       const result = await logsService.getLogAggregation(filters)
 
-      const expectedUrl = '/api/logs/aggregation?start_date=2024-01-01T00%3A00%3A00Z&end_date=2024-01-07T00%3A00%3A00Z&severity=ERROR&source=database'
+      const expectedUrl =
+        '/api/logs/aggregation?start_date=2024-01-01T00%3A00%3A00Z&end_date=2024-01-07T00%3A00%3A00Z&severity=ERROR&source=database'
       expect(mockFetch).toHaveBeenCalledWith(expectedUrl, expect.any(Object))
       expect(result).toEqual(mockAggregation)
     })
@@ -705,7 +723,10 @@ describe('LogsService', () => {
 
       const result = await logsService.getChartData()
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/logs/chart-data', expect.any(Object))
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/logs/chart-data',
+        expect.any(Object)
+      )
       expect(result).toEqual(mockChartData)
     })
 
@@ -743,7 +764,8 @@ describe('LogsService', () => {
 
       const result = await logsService.getChartData(filters)
 
-      const expectedUrl = '/api/logs/chart-data?start_date=2024-01-01T00%3A00%3A00Z&end_date=2024-01-08T00%3A00%3A00Z&severity=ERROR&source=web-server&group_by=day'
+      const expectedUrl =
+        '/api/logs/chart-data?start_date=2024-01-01T00%3A00%3A00Z&end_date=2024-01-08T00%3A00%3A00Z&severity=ERROR&source=web-server&group_by=day'
       expect(mockFetch).toHaveBeenCalledWith(expectedUrl, expect.any(Object))
       expect(result).toEqual(mockChartData)
     })
@@ -776,7 +798,9 @@ describe('LogsService', () => {
 
   describe('exportLogs', () => {
     it('should export logs as CSV blob', async () => {
-      const mockBlob = new Blob(['id,message,severity\n1,Test,INFO'], { type: 'text/csv' })
+      const mockBlob = new Blob(['id,message,severity\n1,Test,INFO'], {
+        type: 'text/csv'
+      })
       const mockResponse = {
         ok: true,
         blob: jest.fn().mockResolvedValue(mockBlob),
@@ -786,7 +810,10 @@ describe('LogsService', () => {
 
       const result = await logsService.exportLogs()
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/logs/export/csv', expect.any(Object))
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/logs/export/csv',
+        expect.any(Object)
+      )
       expect(result).toEqual(mockBlob)
       expect(mockResponse.blob).toHaveBeenCalled()
     })
@@ -808,7 +835,8 @@ describe('LogsService', () => {
 
       const result = await logsService.exportLogs(filters)
 
-      const expectedUrl = '/api/logs/export/csv?severity=ERROR&source=database&start_date=2024-01-01T00%3A00%3A00Z&end_date=2024-01-08T00%3A00%3A00Z'
+      const expectedUrl =
+        '/api/logs/export/csv?severity=ERROR&source=database&start_date=2024-01-01T00%3A00%3A00Z&end_date=2024-01-08T00%3A00%3A00Z'
       expect(mockFetch).toHaveBeenCalledWith(expectedUrl, expect.any(Object))
       expect(result).toEqual(mockBlob)
     })
@@ -870,9 +898,10 @@ describe('LogsService', () => {
 
       await logsService.downloadLogsAsCsv(filters, filename)
 
-      const expectedUrl = '/api/logs/export/csv?severity=ERROR&start_date=2024-01-01T00%3A00%3A00Z&end_date=2024-01-08T00%3A00%3A00Z'
+      const expectedUrl =
+        '/api/logs/export/csv?severity=ERROR&start_date=2024-01-01T00%3A00%3A00Z&end_date=2024-01-08T00%3A00%3A00Z'
       expect(mockFetch).toHaveBeenCalledWith(expectedUrl, expect.any(Object))
-      
+
       const mockElement = mockCreateElement.mock.results[0].value
       expect(mockElement.download).toBe(filename)
     })
@@ -886,8 +915,13 @@ describe('LogsService', () => {
       }
       mockFetch.mockResolvedValue(mockResponse)
 
-      await expect(logsService.downloadLogsAsCsv()).rejects.toThrow('Export failed')
-      expect(mockConsoleError).toHaveBeenCalledWith('Failed to download CSV:', expect.any(Error))
+      await expect(logsService.downloadLogsAsCsv()).rejects.toThrow(
+        'Export failed'
+      )
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Failed to download CSV:',
+        expect.any(Error)
+      )
     })
 
     it('should cleanup resources even if download fails', async () => {
@@ -899,15 +933,20 @@ describe('LogsService', () => {
         headers: { get: jest.fn().mockReturnValue('text/csv') }
       }
       mockFetch.mockResolvedValue(mockResponse)
-      
+
       // Make appendChild throw an error
       mockAppendChild.mockImplementation(() => {
         throw new Error('DOM manipulation failed')
       })
 
-      await expect(logsService.downloadLogsAsCsv()).rejects.toThrow('DOM manipulation failed')
-      
-      expect(mockConsoleError).toHaveBeenCalledWith('Failed to download CSV:', expect.any(Error))
+      await expect(logsService.downloadLogsAsCsv()).rejects.toThrow(
+        'DOM manipulation failed'
+      )
+
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'Failed to download CSV:',
+        expect.any(Error)
+      )
       expect(mockCreateObjectURL).toHaveBeenCalled()
     })
   })
@@ -943,10 +982,11 @@ describe('LogsService', () => {
 
   describe('error handling edge cases', () => {
     it('should handle network timeouts', async () => {
-      mockFetch.mockImplementation(() => 
-        new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Network timeout')), 100)
-        })
+      mockFetch.mockImplementation(
+        () =>
+          new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Network timeout')), 100)
+          })
       )
 
       await expect(logsService.getLogs()).rejects.toThrow('Network timeout')
@@ -961,7 +1001,7 @@ describe('LogsService', () => {
       }
       mockFetch.mockResolvedValue(mockResponse)
 
-      const result = await logsService.getLogs()
+      await logsService.getLogs()
       expect(mockResponse.json).toHaveBeenCalled()
       expect(mockResponse.blob).not.toHaveBeenCalled()
     })
