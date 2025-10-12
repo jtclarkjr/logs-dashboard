@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
 import { toast } from 'sonner'
 import { SeverityLevel } from '@/lib/enums/severity'
+import { DEFAULT_PAGE_SIZE } from '@/lib/constants/pagination'
 import type {
   SortOrder,
   FilterAllOption,
@@ -28,6 +29,7 @@ interface InitialLogsFilters {
   sortBy?: SortByField
   sortOrder?: SortOrder
   currentPage?: number
+  pageSize?: number
   dateRange?: DateRange
 }
 
@@ -51,7 +53,9 @@ export function useLogsFilters(initialFilters: InitialLogsFilters = {}) {
   const [currentPage, setCurrentPage] = useState(
     initialFilters.currentPage || 1
   )
-  const [pageSize] = useState(15) // Fixed page size
+  const [pageSize, setPageSize] = useState(
+    initialFilters.pageSize || DEFAULT_PAGE_SIZE
+  )
   const [dateRange, setDateRange] = useState<DateRange | undefined>(
     initialFilters.dateRange
   )
@@ -90,6 +94,11 @@ export function useLogsFilters(initialFilters: InitialLogsFilters = {}) {
 
   const setDateRangeWithReset = (range: DateRange | undefined) => {
     handleFilterChange(() => setDateRange(range))
+  }
+
+  const setPageSizeWithReset = (size: number) => {
+    setPageSize(size)
+    setCurrentPage(1) // Reset to first page when page size changes
   }
 
   const handleSortChange = (field: SortByField, order: SortOrder) => {
@@ -136,6 +145,7 @@ export function useLogsFilters(initialFilters: InitialLogsFilters = {}) {
     setSortBy,
     setSortOrder,
     setCurrentPage: handlePageChange,
+    setPageSize: setPageSizeWithReset,
 
     // Compound actions
     handleSortChange,

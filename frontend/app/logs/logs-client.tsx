@@ -48,6 +48,7 @@ export function LogsClient({
     setDateRange,
     handleSortChange,
     setCurrentPage,
+    setPageSize,
     resetFilters,
     getAPIFilters
   } = useLogsFilters(initialFilters)
@@ -116,7 +117,11 @@ export function LogsClient({
       />
 
       {/* Pagination */}
-      <LogsPagination logs={displayLogs} onPageChange={setCurrentPage} />
+      <LogsPagination 
+        logs={displayLogs} 
+        onPageChange={setCurrentPage} 
+        onPageSizeChange={setPageSize}
+      />
 
       {/* Delete Confirmation Dialog */}
       <DeleteLogDialog
