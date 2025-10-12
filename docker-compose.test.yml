@@ -1,0 +1,35 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.test  # Use dedicated test Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/logs_dashboard_test
+      - DEBUG=true
+      - ENVIRONMENT=test
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./api:/app  # Mount source code for development
+    entrypoint: []  # Override the entrypoint to avoid database seeding
+  
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: logs_dashboard_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"  # Different port to avoid conflicts with main db
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_test_data:

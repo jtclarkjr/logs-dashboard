@@ -73,7 +73,7 @@ def get_chart_data(
     end_date: Optional[datetime] = Query(None, description="End date for chart data"),
     severity: Optional[SeverityLevel] = Query(None, description="Filter by severity"),
     source: Optional[str] = Query(None, description="Filter by source"),
-    group_by: str = Query("day", regex="^(hour|day|week|month)$", description="Time grouping"),
+    group_by: str = Query("day", pattern="^(hour|day|week|month)$", description="Time grouping"),
     db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """Get time series data for charts"""

@@ -10,6 +10,8 @@
     "prettier": "prettier --write .",
     "test": "bun test",
     "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage --coverage-reporter text lib/*/tests/*.test.ts app/*/tests/page.test.tsx",
+    "test:coverage-clean": "bun test --coverage --coverage-reporter text lib/utils/tests/*.test.ts lib/services/tests/*.test.ts lib/clients/tests/*.test.ts lib/hooks/query/tests/use-logs.test.ts lib/hooks/state/tests/*.test.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

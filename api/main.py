@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -6,13 +7,25 @@ from app.core.database import create_tables
 from app.core.middleware import ErrorHandlingMiddleware, LoggingMiddleware
 from app.api import api_router
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Handle application lifespan events."""
+    # Startup
+    create_tables()
+    yield
+    # Shutdown (if needed in the future)
+    pass
+
+
 # Initialize FastAPI app
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description=settings.DESCRIPTION,
     version=settings.VERSION,
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # Add error handling middleware (should be first)
@@ -32,12 +45,6 @@ app.add_middleware(
 
 # Include API router with versioning
 app.include_router(api_router, prefix=settings.API_V1_STR)
-
-# Create database tables on startup
-@app.on_event("startup")
-async def startup_event():
-    """Initialize the database on startup"""
-    create_tables()
 
 if __name__ == "__main__":
     import uvicorn

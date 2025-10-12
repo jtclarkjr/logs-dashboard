@@ -31,7 +31,7 @@ def get_logs(
     end_date: Optional[datetime] = Query(None, description="End date filter"),
     search: Optional[str] = Query(None, description="Search in message"),
     sort_by: str = Query("timestamp", description="Sort field"),
-    sort_order: str = Query("desc", regex="^(asc|desc)$", description="Sort order"),
+    sort_order: str = Query("desc", pattern="^(asc|desc)$", description="Sort order"),
     db: Session = Depends(get_db)
 ) -> LogListResponse:
     """Get logs with filtering, searching, sorting, and pagination"""
@@ -55,7 +55,7 @@ def get_logs(
         total_pages = math.ceil(total / page_size) if total > 0 else 1
         
         return LogListResponse(
-            logs=[LogResponse.from_orm(log) for log in logs],
+            logs=[LogResponse.model_validate(log) for log in logs],
             total=total,
             page=page,
             page_size=page_size,
@@ -76,4 +76,4 @@ def get_log(log_id: int, db: Session = Depends(get_db)) -> LogResponse:
     if not log:
         raise_not_found_error("Log", log_id)
     
-    return LogResponse.from_orm(log)
+    return LogResponse.model_validate(log)

@@ -31,7 +31,7 @@ def create_log(
         if not db_log:
             raise_database_error("log creation", {"reason": "Log entry creation returned no result"})
         
-        return LogResponse.from_orm(db_log)
+        return LogResponse.model_validate(db_log)
         
     except (ValidationError, NotFoundError, DatabaseError):
         # These errors will be handled by the middleware

@@ -21,8 +21,6 @@ COPY frontend/.env* ./
 
 COPY frontend/ .
 
-# Set ENV=dev to enable standalone output
-ENV ENV=dev
 RUN bun run build
 
 # Production image, copy all the files and run next

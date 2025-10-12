@@ -11,7 +11,7 @@ import io
 
 from app.core.database import get_db
 from app.core.config import settings
-from app.core.errors import ValidationError
+from app.core.errors import ValidationError, ApiError
 from app.crud.log import log_crud
 from app.models.log import SeverityLevel, LogEntry as DBLogEntry
 
@@ -144,6 +144,9 @@ def export_logs_csv(
 ) -> Response:
     """Export filtered logs as CSV file"""
     try:
+        # Validate date range
+        validate_date_range(start_date, end_date)
+        
         logs = log_crud.get_for_export(
             db=db,
             severity=severity,
@@ -159,5 +162,8 @@ def export_logs_csv(
             media_type="text/csv",
             headers={"Content-Disposition": "attachment; filename=logs_export.csv"}
         )
+    except ApiError:
+        # Re-raise ApiError (including ValidationError) to be handled by middleware
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error exporting logs: {str(e)}")

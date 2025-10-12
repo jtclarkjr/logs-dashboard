@@ -37,7 +37,7 @@ def update_log(
         if not updated_log:
             raise_database_error("log update", {"log_id": log_id, "reason": "Log update returned no result - log may have been deleted"})
         
-        return LogResponse.from_orm(updated_log)
+        return LogResponse.model_validate(updated_log)
         
     except (ValidationError, NotFoundError, DatabaseError):
         raise

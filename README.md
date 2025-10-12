@@ -20,12 +20,18 @@ Run the entire application stack with Docker Compose:
 docker compose up --build -d
 ```
 
-show api docker logs:
+Remove the entire application stack with Docker Compose:
+
+```bash
+docker compose down -v
+```
+
+Show api docker logs:
 ```bash
 docker compose logs api -f --tail=20
 ```
 
-show frontend docker logs: 
+Show frontend docker logs: 
 ```bash
 docker compose logs frontend -f --tail=20
 ```
@@ -36,11 +42,10 @@ This will start both the frontend and API services. The application will be avai
 
 ### Manual Setup
 
-#### Prerequisites
+#### Prerequisites (For non-docker options)
 
 - Python 3.x
 - Bun (Works as a runtime, package manager and testing)
-- Docker & Docker Compose
 
 #### Frontend Setup
 
@@ -86,3 +91,19 @@ python main.py
 ```
 
 The API will be available at `http://localhost:8000`
+
+### Testing
+To run all tests for api and frontend together, run script which is ran with docker from root
+```bash
+./test-all.sh all
+```
+or
+```bash
+chmod +x ./test-all.sh && ./test-all.sh all
+```
+To run individual: 
+
+API: `./test-all.sh api-only` or `./test-api.sh`; Frontend: `./test-all.sh frontend-only` or `./test-frontend.sh`
+
+
+Run `./test-all.sh help`, `./test-api.sh help`, or `./test-frontend.sh help` to to check which commands are available.  

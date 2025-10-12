@@ -103,7 +103,7 @@ class LogCRUD:
                 return None
             
             # Update only provided fields
-            update_data = log_update.dict(exclude_unset=True)
+            update_data = log_update.model_dump(exclude_unset=True)
             for field, value in update_data.items():
                 setattr(log, field, value)
             

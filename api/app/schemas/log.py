@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 from datetime import datetime
 from typing import Optional, List, Dict
 
@@ -29,12 +29,11 @@ class LogUpdate(BaseModel):
 
 class LogResponse(LogBase):
     """Schema for log entry responses"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 # Response schemas
