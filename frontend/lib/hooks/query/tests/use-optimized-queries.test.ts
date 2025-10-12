@@ -1,26 +1,91 @@
-import { describe, it, expect, beforeEach, mock } from 'bun:test'
-import { QueryClient } from '@tanstack/react-query'
-import {
-  renderHookWithQuery,
-  createTestQueryClient,
-  mockLogsService,
-  mockHealthService,
-  createMockDateRange
-} from '@/lib/hooks/test-utils'
-import {
-  useDashboardData,
-  useOptimizedLogs
-} from '@/lib/hooks/query/use-optimized-queries'
+import { describe, it, expect, mock, beforeEach } from 'bun:test'
 import { SeverityLevel } from '@/lib/enums/severity'
 import type {
   SeverityFilter,
   SourceFilter,
   GroupBy,
-  SortOrder,
-  SortByField
+  SortByField,
+  SortOrder
 } from '@/lib/types/filters'
 
+// Mock query results
+let mockUseQueryResult = {
+  data: undefined,
+  isLoading: false,
+  isError: false,
+  error: null
+}
+
+let useQueryCallLog: Array<{
+  queryKey: any
+  queryFn: Function
+  enabled?: boolean
+  select?: Function
+  staleTime?: number
+}> = []
+
 // Mock the services
+const mockLogsService = {
+  getLogs: mock(() => Promise.resolve({
+    logs: [
+      { id: '1', message: 'Test log', severity: SeverityLevel.INFO, timestamp: '2023-01-01T10:00:00Z' }
+    ],
+    total: 1,
+    page: 1,
+    page_size: 10,
+    total_pages: 1
+  })),
+  getLogAggregation: mock(() => Promise.resolve({
+    total_logs: 100,
+    by_severity: [{ severity: SeverityLevel.ERROR, count: 50 }],
+    by_source: [{ source: 'api', count: 75 }],
+    by_date: [{ date: '2023-01-01', count: 100 }]
+  })),
+  getChartData: mock(() => Promise.resolve({
+    data: [
+      { timestamp: '2023-01-01T10:00:00Z', count: 10 },
+      { timestamp: '2023-01-01T11:00:00Z', count: 15 }
+    ]
+  }))
+}
+
+const mockHealthService = {
+  getMetadata: mock(() => Promise.resolve({
+    severity_levels: [SeverityLevel.ERROR, SeverityLevel.INFO],
+    sources: ['api', 'worker']
+  }))
+}
+
+// Mock filter helpers
+const mockCreateAggregationFilters = mock((dateRange: any, severity: any, source: any) => {
+  if (!dateRange) return undefined
+  return {
+    start_date: dateRange.from?.toISOString(),
+    end_date: dateRange.to?.toISOString(),
+    ...(severity !== 'all' && { severity }),
+    ...(source !== 'all' && { source })
+  }
+})
+
+const mockCreateChartFilters = mock((dateRange: any, severity: any, source: any, groupBy: any) => {
+  if (!dateRange) return undefined
+  return {
+    start_date: dateRange.from?.toISOString(),
+    end_date: dateRange.to?.toISOString(),
+    ...(severity !== 'all' && { severity }),
+    ...(source !== 'all' && { source }),
+    group_by: groupBy
+  }
+})
+
+// Mock the date-fns format function
+const mockFormat = mock((date: Date, formatStr: string) => {
+  if (formatStr.includes('HH:mm')) {
+    return 'Jan 01 10:30'
+  }
+  return 'Jan 01'
+})
+
 mock.module('@/lib/services/logs', () => ({
   logsService: mockLogsService
 }))
@@ -29,513 +94,534 @@ mock.module('@/lib/services/health', () => ({
   healthService: mockHealthService
 }))
 
-// Mock date-fns format function
+mock.module('@/lib/utils/filter-helpers', () => ({
+  createAggregationFilters: mockCreateAggregationFilters,
+  createChartFilters: mockCreateChartFilters
+}))
+
 mock.module('date-fns', () => ({
-  format: mock((date: Date, formatStr: string) => {
-    if (formatStr.includes('HH:mm')) {
-      return 'Jan 01 10:30'
-    }
-    return 'Jan 01'
+  format: mockFormat
+}))
+
+// Mock React Query useQuery hook
+mock.module('@tanstack/react-query', () => ({
+  useQuery: mock((options: any) => {
+    useQueryCallLog.push(options)
+    return mockUseQueryResult
   })
 }))
 
-describe('useDashboardData', () => {
-  let queryClient: QueryClient
-
+describe('use-optimized-queries', () => {
   beforeEach(() => {
-    queryClient = createTestQueryClient()
+    // Reset mocks and call log
+    useQueryCallLog = []
+    mockUseQueryResult = {
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      error: null
+    }
+    
+    // Reset mock call counts
+    mockLogsService.getLogs.mockClear()
+    mockLogsService.getLogAggregation.mockClear()
+    mockLogsService.getChartData.mockClear()
+    mockHealthService.getMetadata.mockClear()
+    mockCreateAggregationFilters.mockClear()
+    mockCreateChartFilters.mockClear()
+    mockFormat.mockClear()
   })
 
-  describe('initialization and basic functionality', () => {
-    it('should initialize with correct loading states', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useDashboardData({
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            timeGrouping: 'day' as GroupBy,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      // All queries should start as loading
-      expect(result.current.isLoading).toBe(true)
-      expect(result.current.isLoadingAggregation).toBe(true)
-      expect(result.current.isLoadingChart).toBe(true)
-      expect(result.current.isLoadingMetadata).toBe(true)
-    })
-
-    it('should return empty time series data when chart query is loading', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useDashboardData({
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            timeGrouping: 'day' as GroupBy,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.timeSeriesData).toEqual([])
-    })
-  })
-
-  describe('filter handling', () => {
-    it('should handle severity filter correctly', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useDashboardData({
-            selectedSeverity: SeverityLevel.ERROR as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            timeGrouping: 'day' as GroupBy,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      // Should be loading since filters are valid
-      expect(result.current.isLoading).toBe(true)
-    })
-
-    it('should handle source filter correctly', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useDashboardData({
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'api' as SourceFilter,
-            timeGrouping: 'day' as GroupBy,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-
-    it('should disable queries when dateRange is invalid', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useDashboardData({
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            timeGrouping: 'day' as GroupBy,
-            dateRange: undefined
-          }),
-        { queryClient }
-      )
-
-      // Without dateRange, aggregation and chart queries should be disabled
-      // Only metadata query should be running
-      expect(result.current.isLoadingMetadata).toBe(true)
-    })
-  })
-
-  describe('time grouping and data transformation', () => {
-    it('should handle hour-based time grouping', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useDashboardData({
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            timeGrouping: 'hour' as GroupBy,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-
-    it('should handle day-based time grouping', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useDashboardData({
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            timeGrouping: 'day' as GroupBy,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-  })
-
-  describe('combined loading states', () => {
-    it('should correctly calculate combined loading state', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useDashboardData({
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            timeGrouping: 'day' as GroupBy,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      // Combined loading should be true when any individual query is loading
-      const individualLoading =
-        result.current.isLoadingAggregation ||
-        result.current.isLoadingChart ||
-        result.current.isLoadingMetadata
-
-      expect(result.current.isLoading).toBe(individualLoading)
-    })
-  })
-
-  describe('query key generation', () => {
-    it('should generate consistent query keys for aggregation', () => {
-      const props = {
-        selectedSeverity: 'all' as SeverityFilter,
-        selectedSource: 'all' as SourceFilter,
-        timeGrouping: 'day' as GroupBy,
-        dateRange: createMockDateRange()
+  describe('useDashboardData hook', () => {
+    it('should call createAggregationFilters with correct parameters', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      const dateRange = {
+        from: new Date('2023-01-01'),
+        to: new Date('2023-01-02')
       }
-
-      const { result: result1 } = renderHookWithQuery(
-        () => useDashboardData(props),
-        { queryClient }
+      const selectedSeverity: SeverityFilter = SeverityLevel.ERROR
+      const selectedSource: SourceFilter = 'api'
+      const timeGrouping: GroupBy = 'day'
+      
+      useDashboardData({ dateRange, selectedSeverity, selectedSource, timeGrouping })
+      
+      expect(mockCreateAggregationFilters).toHaveBeenCalledWith(
+        dateRange,
+        selectedSeverity,
+        selectedSource
       )
+    })
 
-      const { result: result2 } = renderHookWithQuery(
-        () => useDashboardData(props),
-        { queryClient }
+    it('should call createChartFilters with correct parameters', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      const dateRange = {
+        from: new Date('2023-01-01'),
+        to: new Date('2023-01-02')
+      }
+      const selectedSeverity: SeverityFilter = SeverityLevel.INFO
+      const selectedSource: SourceFilter = 'worker'
+      const timeGrouping: GroupBy = 'hour'
+      
+      useDashboardData({ dateRange, selectedSeverity, selectedSource, timeGrouping })
+      
+      expect(mockCreateChartFilters).toHaveBeenCalledWith(
+        dateRange,
+        selectedSeverity,
+        selectedSource,
+        timeGrouping
       )
+    })
 
-      // Both should have the same loading state since they use the same keys
-      expect(result1.current.isLoadingAggregation).toBe(
-        result2.current.isLoadingAggregation
-      )
+    it('should create three useQuery calls for aggregation, chart, and metadata', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      const dateRange = {
+        from: new Date('2023-01-01'),
+        to: new Date('2023-01-02')
+      }
+      
+      useDashboardData({
+        dateRange,
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'day'
+      })
+      
+      expect(useQueryCallLog).toHaveLength(3)
+      expect(useQueryCallLog[0].queryKey[0]).toBe('log-aggregation')
+      expect(useQueryCallLog[1].queryKey[0]).toBe('chart-data')
+      expect(useQueryCallLog[2].queryKey[0]).toBe('metadata')
+    })
+
+    it('should set enabled: false when aggregationFilters is undefined', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      // No dateRange will make aggregationFilters undefined
+      useDashboardData({
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'day'
+      })
+      
+      expect(useQueryCallLog[0].enabled).toBe(false)
+      expect(useQueryCallLog[1].enabled).toBe(false)
+    })
+
+    it('should set enabled: true when filters are provided', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      const dateRange = {
+        from: new Date('2023-01-01'),
+        to: new Date('2023-01-02')
+      }
+      
+      useDashboardData({
+        dateRange,
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'day'
+      })
+      
+      expect(useQueryCallLog[0].enabled).toBe(true)
+      expect(useQueryCallLog[1].enabled).toBe(true)
+    })
+
+    it('should call queryFn for aggregation data', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      const dateRange = {
+        from: new Date('2023-01-01'),
+        to: new Date('2023-01-02')
+      }
+      
+      useDashboardData({
+        dateRange,
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'day'
+      })
+      
+      // Call the aggregation queryFn
+      await useQueryCallLog[0].queryFn()
+      expect(mockLogsService.getLogAggregation).toHaveBeenCalled()
+    })
+
+    it('should call queryFn for chart data', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      const dateRange = {
+        from: new Date('2023-01-01'),
+        to: new Date('2023-01-02')
+      }
+      
+      useDashboardData({
+        dateRange,
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'day'
+      })
+      
+      // Call the chart data queryFn
+      await useQueryCallLog[1].queryFn()
+      expect(mockLogsService.getChartData).toHaveBeenCalled()
+    })
+
+    it('should call queryFn for metadata', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      useDashboardData({
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'day'
+      })
+      
+      // Call the metadata queryFn
+      await useQueryCallLog[2].queryFn()
+      expect(mockHealthService.getMetadata).toHaveBeenCalled()
+    })
+
+    it('should set staleTime for metadata query', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      useDashboardData({
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'day'
+      })
+      
+      expect(useQueryCallLog[2].staleTime).toBe(10 * 60 * 1000) // 10 minutes
+    })
+
+    it('should apply select transformation for chart data with hour grouping', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      const dateRange = {
+        from: new Date('2023-01-01'),
+        to: new Date('2023-01-02')
+      }
+      
+      useDashboardData({
+        dateRange,
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'hour'
+      })
+      
+      const selectFn = useQueryCallLog[1].select
+      expect(selectFn).toBeDefined()
+      
+      // Test select function with mock data
+      const mockChartData = {
+        data: [
+          { timestamp: '2023-01-01T10:00:00Z', count: 10 },
+          { timestamp: '2023-01-01T11:00:00Z', count: 15 }
+        ]
+      }
+      
+      const result = selectFn!(mockChartData)
+      expect(result).toHaveLength(2)
+      expect(result[0]).toEqual({
+        timestamp: '2023-01-01T10:00:00Z',
+        count: 10,
+        date: 'Jan 01 10:30'
+      })
+      expect(mockFormat).toHaveBeenCalledWith(new Date('2023-01-01T10:00:00Z'), 'MMM dd HH:mm')
+    })
+
+    it('should apply select transformation for chart data with day grouping', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      const dateRange = {
+        from: new Date('2023-01-01'),
+        to: new Date('2023-01-02')
+      }
+      
+      useDashboardData({
+        dateRange,
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'day'
+      })
+      
+      const selectFn = useQueryCallLog[1].select
+      const mockChartData = {
+        data: [
+          { timestamp: '2023-01-01T10:00:00Z', count: 10 }
+        ]
+      }
+      
+      const result = selectFn!(mockChartData)
+      expect(result[0].date).toBe('Jan 01')
+      expect(mockFormat).toHaveBeenCalledWith(new Date('2023-01-01T10:00:00Z'), 'MMM dd')
+    })
+
+    it('should handle empty chart data in select transformation', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      useDashboardData({
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'day'
+      })
+      
+      const selectFn = useQueryCallLog[1].select
+      expect(selectFn!({ data: null })).toEqual([])
+      expect(selectFn!({})).toEqual([])
+      expect(selectFn!(null)).toEqual([])
+    })
+
+    it('should return properly structured hook result', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      mockUseQueryResult = {
+        data: { test: 'data' },
+        isLoading: true,
+        isError: false,
+        error: null
+      }
+      
+      const result = useDashboardData({
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        timeGrouping: 'day'
+      })
+      
+      expect(result).toHaveProperty('aggregationData')
+      expect(result).toHaveProperty('isLoadingAggregation')
+      expect(result).toHaveProperty('aggregationError')
+      expect(result).toHaveProperty('timeSeriesData')
+      expect(result).toHaveProperty('isLoadingChart')
+      expect(result).toHaveProperty('chartError')
+      expect(result).toHaveProperty('metadata')
+      expect(result).toHaveProperty('isLoadingMetadata')
+      expect(result).toHaveProperty('metadataError')
+      expect(result).toHaveProperty('isLoading')
+      
+      expect(result.isLoading).toBe(true) // Combined loading state
+      // timeSeriesData should be the chart query data or empty array if undefined
+      expect(result.timeSeriesData).toEqual(mockUseQueryResult.data || [])
     })
   })
-})
 
-describe('useOptimizedLogs', () => {
-  let queryClient: QueryClient
-
-  beforeEach(() => {
-    queryClient = createTestQueryClient()
-  })
-
-  describe('initialization', () => {
-    it('should initialize with basic parameters', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: undefined
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-      expect(result.current.data).toBeUndefined()
-    })
-  })
-
-  describe('filter parameters', () => {
-    it('should handle search query parameter', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: 'error message',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-
-    it('should handle severity filter parameter', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: SeverityLevel.ERROR as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-
-    it('should handle source filter parameter', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'api' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-
-    it('should handle date range parameter', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: createMockDateRange()
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-  })
-
-  describe('pagination parameters', () => {
-    it('should handle different page sizes', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 50,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: undefined
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-
-    it('should handle different page numbers', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 3,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: undefined
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-  })
-
-  describe('sorting parameters', () => {
-    it('should handle different sort fields', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'severity' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: undefined
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-
-    it('should handle different sort orders', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'asc' as SortOrder,
-            dateRange: undefined
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-  })
-
-  describe('query key generation and memoization', () => {
-    it('should generate consistent query keys for identical parameters', () => {
+  describe('useOptimizedLogs hook', () => {
+    it('should create useQuery call with correct queryKey', async () => {
+      const { useOptimizedLogs } = await import('@/lib/hooks/query/use-optimized-queries')
+      
       const params = {
         currentPage: 1,
         pageSize: 20,
-        searchQuery: 'test',
-        selectedSeverity: 'all' as SeverityFilter,
-        selectedSource: 'all' as SourceFilter,
+        searchQuery: 'test search',
+        selectedSeverity: SeverityLevel.ERROR as SeverityFilter,
+        selectedSource: 'api' as SourceFilter,
         sortBy: 'timestamp' as SortByField,
         sortOrder: 'desc' as SortOrder,
-        dateRange: createMockDateRange()
+        dateRange: {
+          from: new Date('2023-01-01'),
+          to: new Date('2023-01-02')
+        }
       }
-
-      const { result: result1 } = renderHookWithQuery(
-        () => useOptimizedLogs(params),
-        { queryClient }
-      )
-
-      const { result: result2 } = renderHookWithQuery(
-        () => useOptimizedLogs(params),
-        { queryClient }
-      )
-
-      // Both should have the same loading state since they use the same query keys
-      expect(result1.current.isLoading).toBe(result2.current.isLoading)
+      
+      useOptimizedLogs(params)
+      
+      expect(useQueryCallLog).toHaveLength(1)
+      expect(useQueryCallLog[0].queryKey[0]).toBe('logs')
+      
+      const queryFilters = useQueryCallLog[0].queryKey[1]
+      expect(queryFilters.page).toBe(1)
+      expect(queryFilters.page_size).toBe(20)
+      expect(queryFilters.search).toBe('test search')
+      expect(queryFilters.severity).toBe(SeverityLevel.ERROR)
+      expect(queryFilters.source).toBe('api')
+      expect(queryFilters.sort_by).toBe('timestamp')
+      expect(queryFilters.sort_order).toBe('desc')
+      expect(queryFilters.start_date).toBe(params.dateRange.from.toISOString())
+      expect(queryFilters.end_date).toBe(params.dateRange.to.toISOString())
     })
 
-    it('should generate different query keys for different parameters', () => {
-      const params1 = {
+    it('should exclude "all" severity from queryKey', async () => {
+      const { useOptimizedLogs } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      useOptimizedLogs({
         currentPage: 1,
-        pageSize: 20,
-        searchQuery: 'test1',
-        selectedSeverity: 'all' as SeverityFilter,
-        selectedSource: 'all' as SourceFilter,
-        sortBy: 'timestamp' as SortByField,
-        sortOrder: 'desc' as SortOrder,
-        dateRange: undefined
+        pageSize: 10,
+        searchQuery: '',
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        sortBy: 'timestamp',
+        sortOrder: 'desc'
+      })
+      
+      const queryFilters = useQueryCallLog[0].queryKey[1]
+      expect(queryFilters.severity).toBeUndefined()
+      expect(queryFilters.source).toBeUndefined()
+    })
+
+    it('should exclude empty search query from queryKey', async () => {
+      const { useOptimizedLogs } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      useOptimizedLogs({
+        currentPage: 1,
+        pageSize: 10,
+        searchQuery: '',
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        sortBy: 'timestamp',
+        sortOrder: 'desc'
+      })
+      
+      const queryFilters = useQueryCallLog[0].queryKey[1]
+      expect(queryFilters.search).toBeUndefined()
+    })
+
+    it('should exclude undefined dateRange from queryKey', async () => {
+      const { useOptimizedLogs } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      useOptimizedLogs({
+        currentPage: 1,
+        pageSize: 10,
+        searchQuery: '',
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        sortBy: 'timestamp',
+        sortOrder: 'desc'
+      })
+      
+      const queryFilters = useQueryCallLog[0].queryKey[1]
+      expect(queryFilters.start_date).toBeUndefined()
+      expect(queryFilters.end_date).toBeUndefined()
+    })
+
+    it('should call queryFn with correct parameters', async () => {
+      const { useOptimizedLogs } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      useOptimizedLogs({
+        currentPage: 2,
+        pageSize: 15,
+        searchQuery: 'error',
+        selectedSeverity: SeverityLevel.WARNING as SeverityFilter,
+        selectedSource: 'worker' as SourceFilter,
+        sortBy: 'message',
+        sortOrder: 'asc'
+      })
+      
+      // Call the queryFn
+      const queryFn = useQueryCallLog[0].queryFn
+      const mockQueryKey = [
+        'logs',
+        {
+          page: 2,
+          page_size: 15,
+          search: 'error',
+          severity: SeverityLevel.WARNING,
+          source: 'worker',
+          sort_by: 'message',
+          sort_order: 'asc'
+        }
+      ]
+      
+      await queryFn({ queryKey: mockQueryKey })
+      
+      expect(mockLogsService.getLogs).toHaveBeenCalledWith(mockQueryKey[1])
+    })
+
+    it('should handle partial dateRange correctly', async () => {
+      const { useOptimizedLogs } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      // Test with only from date
+      useOptimizedLogs({
+        currentPage: 1,
+        pageSize: 10,
+        searchQuery: '',
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        sortBy: 'timestamp',
+        sortOrder: 'desc',
+        dateRange: {
+          from: new Date('2023-01-01'),
+          to: undefined
+        }
+      })
+      
+      const queryFilters = useQueryCallLog[0].queryKey[1]
+      expect(queryFilters.start_date).toBeDefined()
+      expect(queryFilters.end_date).toBeUndefined()
+    })
+
+    it('should return useQuery result directly', async () => {
+      const { useOptimizedLogs } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      mockUseQueryResult = {
+        data: { logs: [], total: 0 },
+        isLoading: false,
+        isError: false,
+        error: null
       }
-
-      const params2 = {
-        ...params1,
-        searchQuery: 'test2'
-      }
-
-      const { result: result1 } = renderHookWithQuery(
-        () => useOptimizedLogs(params1),
-        { queryClient }
-      )
-
-      const { result: result2 } = renderHookWithQuery(
-        () => useOptimizedLogs(params2),
-        { queryClient }
-      )
-
-      // Both should be loading but they're separate queries
-      expect(result1.current.isLoading).toBe(true)
-      expect(result2.current.isLoading).toBe(true)
+      
+      const result = useOptimizedLogs({
+        currentPage: 1,
+        pageSize: 10,
+        searchQuery: '',
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        sortBy: 'timestamp',
+        sortOrder: 'desc'
+      })
+      
+      expect(result).toBe(mockUseQueryResult)
     })
   })
 
-  describe('conditional query key properties', () => {
-    it('should exclude empty search query from query key', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: undefined
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
+  describe('Integration and edge cases', () => {
+    it('should handle all hook parameters correctly', async () => {
+      const { useDashboardData, useOptimizedLogs } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      // Test both hooks can be called
+      expect(typeof useDashboardData).toBe('function')
+      expect(typeof useOptimizedLogs).toBe('function')
+      
+      // Call both hooks to ensure no conflicts
+      useDashboardData({
+        selectedSeverity: SeverityLevel.INFO,
+        selectedSource: 'test',
+        timeGrouping: 'week'
+      })
+      
+      useOptimizedLogs({
+        currentPage: 1,
+        pageSize: 10,
+        searchQuery: '',
+        selectedSeverity: 'all',
+        selectedSource: 'all',
+        sortBy: 'timestamp',
+        sortOrder: 'desc'
+      })
+      
+      expect(useQueryCallLog).toHaveLength(4) // 3 from useDashboardData + 1 from useOptimizedLogs
     })
 
-    it('should exclude "all" severity from query key', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: undefined
-          }),
-        { queryClient }
+    it('should handle different filter combinations', async () => {
+      const { useDashboardData } = await import('@/lib/hooks/query/use-optimized-queries')
+      
+      // Test with mixed filter values
+      useDashboardData({
+        selectedSeverity: SeverityLevel.DEBUG,
+        selectedSource: 'all',
+        timeGrouping: 'month'
+      })
+      
+      expect(mockCreateAggregationFilters).toHaveBeenCalledWith(
+        undefined,
+        SeverityLevel.DEBUG,
+        'all'
       )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-
-    it('should exclude "all" source from query key', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: undefined
-          }),
-        { queryClient }
+      expect(mockCreateChartFilters).toHaveBeenCalledWith(
+        undefined,
+        SeverityLevel.DEBUG,
+        'all',
+        'month'
       )
-
-      expect(result.current.isLoading).toBe(true)
-    })
-
-    it('should exclude undefined date range from query key', () => {
-      const { result } = renderHookWithQuery(
-        () =>
-          useOptimizedLogs({
-            currentPage: 1,
-            pageSize: 20,
-            searchQuery: '',
-            selectedSeverity: 'all' as SeverityFilter,
-            selectedSource: 'all' as SourceFilter,
-            sortBy: 'timestamp' as SortByField,
-            sortOrder: 'desc' as SortOrder,
-            dateRange: undefined
-          }),
-        { queryClient }
-      )
-
-      expect(result.current.isLoading).toBe(true)
     })
   })
 })
