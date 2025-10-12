@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
-import { toast } from 'sonner'
 import { SeverityLevel } from '@/lib/enums/severity'
 import { DEFAULT_PAGE_SIZE } from '@/lib/constants/pagination'
 import type {

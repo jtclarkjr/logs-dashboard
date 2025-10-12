@@ -27,7 +27,7 @@ export function LogsPagination({ logs, onPageChange, onPageSizeChange }: LogsPag
               <span className="text-sm text-muted-foreground">Show:</span>
               <select
                 value={logs.page_size}
-                onChange={(e) => onPageSizeChange(Number(e.target.value))}
+                onChange={(e) => onPageSizeChange ? onPageSizeChange(Number(e.target.value)) : null}
                 className="text-sm border border-input rounded px-2 py-1 bg-background"
               >
                 {PAGE_SIZE_OPTIONS.map((size) => (
