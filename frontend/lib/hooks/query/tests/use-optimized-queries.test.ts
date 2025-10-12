@@ -16,11 +16,23 @@ let mockUseQueryResult = {
   error: null
 }
 
+interface QueryFilters {
+  page?: number
+  page_size?: number
+  search?: string
+  severity?: string
+  source?: string
+  sort_by?: string
+  sort_order?: string
+  start_date?: string
+  end_date?: string
+}
+
 let useQueryCallLog: Array<{
-  queryKey: any
-  queryFn: Function
+  queryKey: [string, QueryFilters] | [string]
+  queryFn: (...args: unknown[]) => Promise<unknown>
   enabled?: boolean
-  select?: Function
+  select?: (data: unknown) => unknown
   staleTime?: number
 }> = []
 
@@ -57,7 +69,7 @@ const mockHealthService = {
 }
 
 // Mock filter helpers
-const mockCreateAggregationFilters = mock((dateRange: any, severity: any, source: any) => {
+const mockCreateAggregationFilters = mock((dateRange: { from?: Date; to?: Date } | undefined, severity: string, source: string) => {
   if (!dateRange) return undefined
   return {
     start_date: dateRange.from?.toISOString(),
@@ -67,7 +79,7 @@ const mockCreateAggregationFilters = mock((dateRange: any, severity: any, source
   }
 })
 
-const mockCreateChartFilters = mock((dateRange: any, severity: any, source: any, groupBy: any) => {
+const mockCreateChartFilters = mock((dateRange: { from?: Date; to?: Date } | undefined, severity: string, source: string, groupBy: string) => {
   if (!dateRange) return undefined
   return {
     start_date: dateRange.from?.toISOString(),
@@ -105,7 +117,13 @@ mock.module('date-fns', () => ({
 
 // Mock React Query useQuery hook
 mock.module('@tanstack/react-query', () => ({
-  useQuery: mock((options: any) => {
+  useQuery: mock((options: {
+    queryKey: [string, QueryFilters] | [string]
+    queryFn: (...args: unknown[]) => Promise<unknown>
+    enabled?: boolean
+    select?: (data: unknown) => unknown
+    staleTime?: number
+  }) => {
     useQueryCallLog.push(options)
     return mockUseQueryResult
   })
@@ -428,7 +446,7 @@ describe('use-optimized-queries', () => {
       expect(useQueryCallLog).toHaveLength(1)
       expect(useQueryCallLog[0].queryKey[0]).toBe('logs')
       
-      const queryFilters = useQueryCallLog[0].queryKey[1]
+      const queryFilters = useQueryCallLog[0].queryKey[1] as QueryFilters
       expect(queryFilters.page).toBe(1)
       expect(queryFilters.page_size).toBe(20)
       expect(queryFilters.search).toBe('test search')
@@ -453,7 +471,7 @@ describe('use-optimized-queries', () => {
         sortOrder: 'desc'
       })
       
-      const queryFilters = useQueryCallLog[0].queryKey[1]
+      const queryFilters = useQueryCallLog[0].queryKey[1] as QueryFilters
       expect(queryFilters.severity).toBeUndefined()
       expect(queryFilters.source).toBeUndefined()
     })
@@ -471,7 +489,7 @@ describe('use-optimized-queries', () => {
         sortOrder: 'desc'
       })
       
-      const queryFilters = useQueryCallLog[0].queryKey[1]
+      const queryFilters = useQueryCallLog[0].queryKey[1] as QueryFilters
       expect(queryFilters.search).toBeUndefined()
     })
 
@@ -488,7 +506,7 @@ describe('use-optimized-queries', () => {
         sortOrder: 'desc'
       })
       
-      const queryFilters = useQueryCallLog[0].queryKey[1]
+      const queryFilters = useQueryCallLog[0].queryKey[1] as QueryFilters
       expect(queryFilters.start_date).toBeUndefined()
       expect(queryFilters.end_date).toBeUndefined()
     })
@@ -544,7 +562,7 @@ describe('use-optimized-queries', () => {
         }
       })
       
-      const queryFilters = useQueryCallLog[0].queryKey[1]
+      const queryFilters = useQueryCallLog[0].queryKey[1] as QueryFilters
       expect(queryFilters.start_date).toBeDefined()
       expect(queryFilters.end_date).toBeUndefined()
     })
