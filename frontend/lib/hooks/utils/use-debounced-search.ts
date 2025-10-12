@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useDebouncedValue } from './use-debounced-value'
 
 interface UseDebouncedSearchOptions {
@@ -12,10 +12,15 @@ export function useDebouncedSearch(
 ) {
   const [searchValue, setSearchValue] = useState(initialValue)
   const debouncedSearchValue = useDebouncedValue(searchValue, { delay })
+  const previousInitialValue = useRef(initialValue)
 
-  // Sync with external changes to initial value
+  // Sync with external changes to initial value (like resets)
   useEffect(() => {
-    setSearchValue(initialValue)
+    // Only update if the initial value actually changed (prevents unnecessary updates)
+    if (previousInitialValue.current !== initialValue) {
+      setSearchValue(initialValue)
+      previousInitialValue.current = initialValue
+    }
   }, [initialValue])
 
   // Call the callback when debounced value changes
