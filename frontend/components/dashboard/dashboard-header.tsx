@@ -1,16 +1,14 @@
 'use client'
 
-import { DownloadIcon, FilterIcon } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import { Button } from '@/components/ui'
 
 interface DashboardHeaderProps {
-  onResetFilters: () => void
   onExportCsv: () => void
   isExporting: boolean
 }
 
 export function DashboardHeader({
-  onResetFilters,
   onExportCsv,
   isExporting
 }: DashboardHeaderProps) {
@@ -23,14 +21,6 @@ export function DashboardHeader({
         </p>
       </div>
       <div className="flex gap-2">
-        <Button
-          variant="outline"
-          onClick={onResetFilters}
-          className="flex items-center gap-2"
-        >
-          <FilterIcon className="h-4 w-4" />
-          Reset Filters
-        </Button>
         <Button
           onClick={onExportCsv}
           disabled={isExporting}

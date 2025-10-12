@@ -14,7 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
   DateRangePicker,
-  SeverityBadge
+  SeverityBadge,
+  Button
 } from '@/components/ui'
 import { SeverityLevel } from '@/lib/enums/severity'
 import type { MetadataResponse } from '@/lib/types/common'
@@ -30,6 +31,7 @@ interface DashboardFiltersProps {
   timeGrouping: GroupBy
   onTimeGroupingChange: (grouping: GroupBy) => void
   metadata?: MetadataResponse
+  onResetFilters: () => void
 }
 
 export function DashboardFilters({
@@ -41,18 +43,32 @@ export function DashboardFilters({
   onSourceChange,
   timeGrouping,
   onTimeGroupingChange,
-  metadata
+  metadata,
+  onResetFilters
 }: DashboardFiltersProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FilterIcon className="h-5 w-5" />
-          Filters
-        </CardTitle>
-        <CardDescription>
-          Select date range, severity, and source to filter log data
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <FilterIcon className="h-5 w-5" />
+              Filters
+            </CardTitle>
+            <CardDescription>
+              Select date range, severity, and source to filter log data
+            </CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onResetFilters}
+            className="flex items-center gap-2"
+          >
+            <FilterIcon className="h-4 w-4" />
+            Reset Filters
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col lg:flex-row gap-4">

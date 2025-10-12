@@ -88,7 +88,6 @@ export function LogsClient({
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <LogsHeader
-        onResetFilters={resetFilters}
         onCreateLog={openCreateDialog}
       />
 
@@ -103,6 +102,7 @@ export function LogsClient({
         sortBy={sortBy}
         sortOrder={sortOrder}
         onSortChange={handleSortChange}
+        onResetFilters={resetFilters}
       />
 
       {/* Results */}

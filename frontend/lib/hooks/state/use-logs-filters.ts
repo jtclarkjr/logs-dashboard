@@ -64,7 +64,6 @@ export function useLogsFilters(initialFilters: InitialLogsFilters = {}) {
     setSortOrder('desc' as SortOrder)
     setCurrentPage(1)
     setDateRange(undefined)
-    toast.info('Filters reset')
   }
 
   // Handle page changes with reset to page 1 when filters change
@@ -74,7 +73,6 @@ export function useLogsFilters(initialFilters: InitialLogsFilters = {}) {
 
   const handleFilterChange = (filterSetter: () => void) => {
     filterSetter()
-    setCurrentPage(1) // Reset to first page when any filter changes
   }
 
   // Safe filter setters that reset pagination
@@ -97,7 +95,6 @@ export function useLogsFilters(initialFilters: InitialLogsFilters = {}) {
   const handleSortChange = (field: SortByField, order: SortOrder) => {
     setSortBy(field)
     setSortOrder(order)
-    setCurrentPage(1) // Reset pagination on sort change
   }
 
   // Generate API filters object

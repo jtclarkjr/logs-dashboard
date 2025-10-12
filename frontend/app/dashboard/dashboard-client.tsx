@@ -117,7 +117,6 @@ export function DashboardClient({
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <DashboardHeader
-        onResetFilters={resetFilters}
         onExportCsv={handleExportCsv}
         isExporting={exportLogsMutation.isPending}
       />
@@ -133,6 +132,7 @@ export function DashboardClient({
         timeGrouping={timeGrouping}
         onTimeGroupingChange={setTimeGrouping}
         metadata={displayMetadata}
+        onResetFilters={resetFilters}
       />
 
       {/* Stats Overview */}

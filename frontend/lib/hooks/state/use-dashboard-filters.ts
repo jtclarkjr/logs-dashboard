@@ -58,7 +58,6 @@ export function useDashboardFilters(
     setSelectedSeverity('all' as FilterAllOption)
     setSelectedSource('all' as FilterAllOption)
     setTimeGrouping('day' as GroupBy)
-    toast.info('Filters reset to default')
   }
 
   // Computed values for API calls using utility functions
