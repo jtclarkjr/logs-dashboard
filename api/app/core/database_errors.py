@@ -24,7 +24,7 @@ class DatabaseErrorAnalyzer:
     
     def __init__(self):
         self.patterns = [
-            # Datetime/timezone errors (highest priority)
+            # Datetime/timezone errors
             ErrorPattern(
                 name="datetime_timezone_mismatch",
                 category="datetime_timezone_mismatch", 
