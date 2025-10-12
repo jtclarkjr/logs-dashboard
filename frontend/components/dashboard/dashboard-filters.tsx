@@ -52,7 +52,6 @@ export function DashboardFilters({
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <FilterIcon className="h-5 w-5" />
               Filters
             </CardTitle>
             <CardDescription>
