@@ -13,7 +13,12 @@ import { Button } from '../button'
 import { Input } from '../input'
 import { Label } from '../label'
 import { Textarea } from '../textarea'
-import { MenuIcon, SettingsIcon, FilterIcon, HelpCircleIcon } from 'lucide-react'
+import {
+  MenuIcon,
+  SettingsIcon,
+  FilterIcon,
+  HelpCircleIcon
+} from 'lucide-react'
 
 const meta: Meta<typeof Sheet> = {
   title: 'UI/Sheet',
@@ -76,11 +81,36 @@ export const FromLeft: Story = {
         </SheetHeader>
         <div className="py-4">
           <nav className="space-y-2">
-            <a href="#" className="block px-3 py-2 rounded-md hover:bg-accent text-sm">Dashboard</a>
-            <a href="#" className="block px-3 py-2 rounded-md hover:bg-accent text-sm">Logs</a>
-            <a href="#" className="block px-3 py-2 rounded-md hover:bg-accent text-sm">Analytics</a>
-            <a href="#" className="block px-3 py-2 rounded-md hover:bg-accent text-sm">Settings</a>
-            <a href="#" className="block px-3 py-2 rounded-md hover:bg-accent text-sm">Help</a>
+            <a
+              href="#"
+              className="block px-3 py-2 rounded-md hover:bg-accent text-sm"
+            >
+              Dashboard
+            </a>
+            <a
+              href="#"
+              className="block px-3 py-2 rounded-md hover:bg-accent text-sm"
+            >
+              Logs
+            </a>
+            <a
+              href="#"
+              className="block px-3 py-2 rounded-md hover:bg-accent text-sm"
+            >
+              Analytics
+            </a>
+            <a
+              href="#"
+              className="block px-3 py-2 rounded-md hover:bg-accent text-sm"
+            >
+              Settings
+            </a>
+            <a
+              href="#"
+              className="block px-3 py-2 rounded-md hover:bg-accent text-sm"
+            >
+              Help
+            </a>
           </nav>
         </div>
       </SheetContent>
@@ -98,17 +128,22 @@ export const FromTop: Story = {
         <SheetHeader>
           <SheetTitle>Notification Center</SheetTitle>
           <SheetDescription>
-            This sheet slides in from the top, great for notifications or announcements.
+            This sheet slides in from the top, great for notifications or
+            announcements.
           </SheetDescription>
         </SheetHeader>
         <div className="py-4 space-y-4">
           <div className="p-4 border rounded-lg">
             <h4 className="font-medium">System Update</h4>
-            <p className="text-sm text-muted-foreground">New features have been deployed.</p>
+            <p className="text-sm text-muted-foreground">
+              New features have been deployed.
+            </p>
           </div>
           <div className="p-4 border rounded-lg">
             <h4 className="font-medium">Maintenance Window</h4>
-            <p className="text-sm text-muted-foreground">Scheduled maintenance tonight at 2 AM EST.</p>
+            <p className="text-sm text-muted-foreground">
+              Scheduled maintenance tonight at 2 AM EST.
+            </p>
           </div>
         </div>
       </SheetContent>
@@ -126,7 +161,8 @@ export const FromBottom: Story = {
         <SheetHeader>
           <SheetTitle>Quick Actions</SheetTitle>
           <SheetDescription>
-            This sheet slides in from the bottom, ideal for mobile-style action sheets.
+            This sheet slides in from the bottom, ideal for mobile-style action
+            sheets.
           </SheetDescription>
         </SheetHeader>
         <div className="py-4 grid grid-cols-3 gap-4">
@@ -172,7 +208,7 @@ export const LogFiltersSheet: Story = {
               <Input type="date" placeholder="To" />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <Label>Log Level</Label>
             <select className="w-full px-3 py-2 border rounded-md">
@@ -184,17 +220,17 @@ export const LogFiltersSheet: Story = {
               <option value="critical">CRITICAL</option>
             </select>
           </div>
-          
+
           <div className="space-y-2">
             <Label>Source Application</Label>
             <Input placeholder="e.g., api-server, database" />
           </div>
-          
+
           <div className="space-y-2">
             <Label>Message Contains</Label>
             <Input placeholder="Search in log messages..." />
           </div>
-          
+
           <div className="space-y-2">
             <Label>User ID</Label>
             <Input placeholder="Filter by user ID" />
@@ -232,30 +268,48 @@ export const MobileMenu: Story = {
                 Main
               </h3>
               <div className="mt-2 space-y-1">
-                <a href="#" className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent">
+                <a
+                  href="#"
+                  className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent"
+                >
                   Dashboard
                 </a>
-                <a href="#" className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent">
+                <a
+                  href="#"
+                  className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent"
+                >
                   Logs
                 </a>
-                <a href="#" className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent">
+                <a
+                  href="#"
+                  className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent"
+                >
                   Analytics
                 </a>
               </div>
             </div>
-            
+
             <div className="px-3 py-2">
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Management
               </h3>
               <div className="mt-2 space-y-1">
-                <a href="#" className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent">
+                <a
+                  href="#"
+                  className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent"
+                >
                   Users
                 </a>
-                <a href="#" className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent">
+                <a
+                  href="#"
+                  className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent"
+                >
                   Sources
                 </a>
-                <a href="#" className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent">
+                <a
+                  href="#"
+                  className="flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent"
+                >
                   Settings
                 </a>
               </div>
@@ -292,42 +346,44 @@ export const CreateLogSheet: Story = {
               <option value="critical">CRITICAL</option>
             </select>
           </div>
-          
+
           <div className="space-y-2">
             <Label>Source *</Label>
             <Input placeholder="e.g., api-server, database, auth-service" />
           </div>
-          
+
           <div className="space-y-2">
             <Label>Thread/Process ID</Label>
             <Input placeholder="Optional thread or process identifier" />
           </div>
-          
+
           <div className="space-y-2">
             <Label>Message *</Label>
-            <Textarea 
+            <Textarea
               placeholder="Enter the detailed log message..."
               className="min-h-[100px]"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label>Stack Trace</Label>
-            <Textarea 
+            <Textarea
               placeholder="Paste stack trace if available..."
               className="min-h-[80px] font-mono text-sm"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label>Timestamp</Label>
             <Input type="datetime-local" />
-            <p className="text-xs text-muted-foreground">Leave empty to use current time</p>
+            <p className="text-xs text-muted-foreground">
+              Leave empty to use current time
+            </p>
           </div>
-          
+
           <div className="space-y-2">
             <Label>Additional Context</Label>
-            <Textarea 
+            <Textarea
               placeholder="Any additional context or metadata..."
               rows={3}
             />

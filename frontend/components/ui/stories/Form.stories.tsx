@@ -37,15 +37,20 @@ type Story = StoryObj<typeof meta>
 
 // Schema definitions for react-hook-form examples
 const loginFormSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
+  email: z.string().email({ message: 'Please enter a valid email address.' }),
+  password: z
+    .string()
+    .min(8, { message: 'Password must be at least 8 characters.' })
 })
 
 const profileFormSchema = z.object({
-  firstName: z.string().min(1, { message: "First name is required." }),
-  lastName: z.string().min(1, { message: "Last name is required." }),
-  bio: z.string().max(500, { message: "Bio must be 500 characters or less." }).optional(),
-  role: z.string().min(1, { message: "Please select a role." }),
+  firstName: z.string().min(1, { message: 'First name is required.' }),
+  lastName: z.string().min(1, { message: 'Last name is required.' }),
+  bio: z
+    .string()
+    .max(500, { message: 'Bio must be 500 characters or less.' })
+    .optional(),
+  role: z.string().min(1, { message: 'Please select a role.' })
 })
 
 // React Hook Form Examples
@@ -54,9 +59,9 @@ export const ReactHookFormLogin: Story = {
     const form = useForm<z.infer<typeof loginFormSchema>>({
       resolver: zodResolver(loginFormSchema),
       defaultValues: {
-        email: "",
-        password: "",
-      },
+        email: '',
+        password: ''
+      }
     })
 
     function onSubmit(values: z.infer<typeof loginFormSchema>) {
@@ -67,9 +72,11 @@ export const ReactHookFormLogin: Story = {
       <div className="w-full max-w-sm mx-auto">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-semibold">Sign In</h2>
-          <p className="text-muted-foreground">Enter your credentials to access your account</p>
+          <p className="text-muted-foreground">
+            Enter your credentials to access your account
+          </p>
         </div>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -79,7 +86,11 @@ export const ReactHookFormLogin: Story = {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="name@example.com" type="email" {...field} />
+                    <Input
+                      placeholder="name@example.com"
+                      type="email"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -93,14 +104,20 @@ export const ReactHookFormLogin: Story = {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your password" type="password" {...field} />
+                    <Input
+                      placeholder="Enter your password"
+                      type="password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button type="submit" className="w-full">Sign In</Button>
+            <Button type="submit" className="w-full">
+              Sign In
+            </Button>
           </form>
         </Form>
       </div>
@@ -113,11 +130,11 @@ export const ReactHookFormProfile: Story = {
     const form = useForm<z.infer<typeof profileFormSchema>>({
       resolver: zodResolver(profileFormSchema),
       defaultValues: {
-        firstName: "",
-        lastName: "",
-        bio: "",
-        role: "",
-      },
+        firstName: '',
+        lastName: '',
+        bio: '',
+        role: ''
+      }
     })
 
     function onSubmit(values: z.infer<typeof profileFormSchema>) {
@@ -128,9 +145,11 @@ export const ReactHookFormProfile: Story = {
       <div className="w-full max-w-2xl mx-auto">
         <div className="mb-6">
           <h2 className="text-2xl font-semibold">Profile Settings</h2>
-          <p className="text-muted-foreground">Update your profile information</p>
+          <p className="text-muted-foreground">
+            Update your profile information
+          </p>
         </div>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
@@ -169,7 +188,10 @@ export const ReactHookFormProfile: Story = {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a role" />
@@ -197,10 +219,10 @@ export const ReactHookFormProfile: Story = {
                 <FormItem>
                   <FormLabel>Bio</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Tell us about yourself..." 
-                      className="resize-none min-h-[100px]" 
-                      {...field} 
+                    <Textarea
+                      placeholder="Tell us about yourself..."
+                      className="resize-none min-h-[100px]"
+                      {...field}
                     />
                   </FormControl>
                   <FormDescription>
@@ -212,7 +234,9 @@ export const ReactHookFormProfile: Story = {
             />
 
             <div className="flex justify-end gap-4">
-              <Button variant="outline" type="button">Cancel</Button>
+              <Button variant="outline" type="button">
+                Cancel
+              </Button>
               <Button type="submit">Save Changes</Button>
             </div>
           </form>

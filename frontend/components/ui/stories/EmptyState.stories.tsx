@@ -67,7 +67,7 @@ export const LogsAppExamples: Story = {
       <EmptyState
         icon={<SearchIcon className="h-16 w-16" />}
         title="No search results"
-        description="We couldn&apos;t find any logs matching your search query. Try using different keywords."
+        description="We couldn't find any logs matching your search query. Try using different keywords."
         action={{
           label: 'Clear Search',
           onClick: () => alert('Clear search clicked')
@@ -103,7 +103,7 @@ export const DifferentStates: Story = {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <EmptyState
           title="No notifications"
-          description="You&apos;re all caught up! No new notifications."
+          description="You're all caught up! No new notifications."
         />
 
         <EmptyState

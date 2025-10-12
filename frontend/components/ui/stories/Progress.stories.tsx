@@ -170,5 +170,5 @@ export const AnimatedProgress: Story = {
         <Progress value={progress} />
       </div>
     )
-  },
+  }
 }

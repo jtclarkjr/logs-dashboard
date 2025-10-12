@@ -79,10 +79,10 @@ export const WithIcon: Story = {
 export const PasswordToggle: Story = {
   render: function PasswordToggleComponent() {
     const [showPassword, setShowPassword] = useState(false)
-    
+
     return (
       <div className="relative">
-        <Input 
+        <Input
           type={showPassword ? 'text' : 'password'}
           placeholder="Enter password..."
           className="pr-9"

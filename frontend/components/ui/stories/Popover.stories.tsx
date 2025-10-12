@@ -1,13 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '../popover'
+import { Popover, PopoverContent, PopoverTrigger } from '../popover'
 import { Button } from '../button'
 import { Input } from '../input'
 import { Label } from '../label'
-import { CalendarIcon, FilterIcon, InfoIcon, SettingsIcon, HelpCircleIcon } from 'lucide-react'
+import {
+  CalendarIcon,
+  FilterIcon,
+  InfoIcon,
+  SettingsIcon,
+  HelpCircleIcon
+} from 'lucide-react'
 
 const meta: Meta<typeof Popover> = {
   title: 'UI/Popover',
@@ -114,7 +116,10 @@ export const QuickFilters: Story = {
             </div>
             <div className="space-y-2">
               <Label className="text-xs">Source</Label>
-              <Input placeholder="Filter by source..." className="h-8 text-sm" />
+              <Input
+                placeholder="Filter by source..."
+                className="h-8 text-sm"
+              />
             </div>
             <Button size="sm" className="w-full">
               Apply Filters
@@ -243,35 +248,45 @@ export const Help: Story = {
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               <div>
                 <p className="text-xs font-medium">DEBUG</p>
-                <p className="text-xs text-muted-foreground">Detailed diagnostic info</p>
+                <p className="text-xs text-muted-foreground">
+                  Detailed diagnostic info
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               <div>
                 <p className="text-xs font-medium">INFO</p>
-                <p className="text-xs text-muted-foreground">General information</p>
+                <p className="text-xs text-muted-foreground">
+                  General information
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
               <div>
                 <p className="text-xs font-medium">WARNING</p>
-                <p className="text-xs text-muted-foreground">Potentially harmful situations</p>
+                <p className="text-xs text-muted-foreground">
+                  Potentially harmful situations
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <div>
                 <p className="text-xs font-medium">ERROR</p>
-                <p className="text-xs text-muted-foreground">Error events but app continues</p>
+                <p className="text-xs text-muted-foreground">
+                  Error events but app continues
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-700 rounded-full"></div>
               <div>
                 <p className="text-xs font-medium">CRITICAL</p>
-                <p className="text-xs text-muted-foreground">Very severe error events</p>
+                <p className="text-xs text-muted-foreground">
+                  Very severe error events
+                </p>
               </div>
             </div>
           </div>
@@ -342,21 +357,39 @@ export const UserActions: Story = {
         <div className="space-y-3">
           <div className="space-y-1">
             <h4 className="font-medium text-sm">John Doe</h4>
-            <p className="text-xs text-muted-foreground">john.doe@company.com</p>
+            <p className="text-xs text-muted-foreground">
+              john.doe@company.com
+            </p>
           </div>
           <div className="space-y-1">
-            <Button variant="ghost" size="sm" className="w-full justify-start h-8">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start h-8"
+            >
               View Profile
             </Button>
-            <Button variant="ghost" size="sm" className="w-full justify-start h-8">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start h-8"
+            >
               Account Settings
             </Button>
-            <Button variant="ghost" size="sm" className="w-full justify-start h-8">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start h-8"
+            >
               Activity Log
             </Button>
           </div>
           <div className="border-t pt-2">
-            <Button variant="ghost" size="sm" className="w-full justify-start h-8">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start h-8"
+            >
               Sign Out
             </Button>
           </div>
