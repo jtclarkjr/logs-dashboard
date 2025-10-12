@@ -5,7 +5,7 @@ import type {
 } from '@/lib/types/filters'
 
 /**
- * Helper function to extract data from settled promises
+ * Extract data from settled promises
  * Handles the common pattern of checking if a promise fulfilled successfully
  * and extracting data from API responses
  */
@@ -18,7 +18,7 @@ export const extractDataFromSettledResponse = <T>(
 }
 
 /**
- * Helper function to build aggregation API parameters
+ * Build aggregation API parameters
  * Filters out 'all' values and builds clean parameter object for API calls
  */
 export const buildAggregationParams = (filters: {

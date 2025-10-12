@@ -22,7 +22,6 @@ export const getInitialLogs = async (
 
     return response.data!
   } catch {
-    // Error is already logged in base-client, just return empty data structure
     return {
       logs: [],
       total: 0,

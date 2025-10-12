@@ -1,7 +1,3 @@
-/**
- * Utility functions for handling API errors on the frontend
- */
-
 import { ApiError, ValidationErrorDetail } from '@/lib/clients/errors'
 
 export interface ErrorDisplayInfo {
