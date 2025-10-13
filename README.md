@@ -207,6 +207,11 @@ Run quick validation tests:
 make test-fast
 ```
 
+Run integration tests:
+```bash
+make test-integration
+```
+
 #### Component-Specific Testing
 
 API tests only:
