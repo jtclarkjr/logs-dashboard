@@ -5,7 +5,8 @@ import type {
   SourceFilter,
   GroupBy,
   SortByField,
-  SortOrder
+  SortOrder,
+  LogFilters
 } from '@/lib/types/filters'
 
 // Mock query results
@@ -16,20 +17,8 @@ let mockUseQueryResult = {
   error: null
 }
 
-interface QueryFilters {
-  page?: number
-  page_size?: number
-  search?: string
-  severity?: string
-  source?: string
-  sort_by?: string
-  sort_order?: string
-  start_date?: string
-  end_date?: string
-}
-
 let useQueryCallLog: Array<{
-  queryKey: [string, QueryFilters] | [string]
+  queryKey: [string, LogFilters] | [string]
   queryFn: (...args: unknown[]) => Promise<unknown>
   enabled?: boolean
   select?: (data: unknown) => unknown
@@ -118,7 +107,7 @@ mock.module('date-fns', () => ({
 // Mock React Query useQuery hook
 mock.module('@tanstack/react-query', () => ({
   useQuery: mock((options: {
-    queryKey: [string, QueryFilters] | [string]
+    queryKey: [string, LogFilters] | [string]
     queryFn: (...args: unknown[]) => Promise<unknown>
     enabled?: boolean
     select?: (data: unknown) => unknown
@@ -446,7 +435,7 @@ describe('use-optimized-queries', () => {
       expect(useQueryCallLog).toHaveLength(1)
       expect(useQueryCallLog[0].queryKey[0]).toBe('logs')
       
-      const queryFilters = useQueryCallLog[0].queryKey[1] as QueryFilters
+      const queryFilters = useQueryCallLog[0].queryKey[1] as LogFilters
       expect(queryFilters.page).toBe(1)
       expect(queryFilters.page_size).toBe(20)
       expect(queryFilters.search).toBe('test search')
@@ -471,7 +460,7 @@ describe('use-optimized-queries', () => {
         sortOrder: 'desc'
       })
       
-      const queryFilters = useQueryCallLog[0].queryKey[1] as QueryFilters
+      const queryFilters = useQueryCallLog[0].queryKey[1] as LogFilters
       expect(queryFilters.severity).toBeUndefined()
       expect(queryFilters.source).toBeUndefined()
     })
@@ -489,7 +478,7 @@ describe('use-optimized-queries', () => {
         sortOrder: 'desc'
       })
       
-      const queryFilters = useQueryCallLog[0].queryKey[1] as QueryFilters
+      const queryFilters = useQueryCallLog[0].queryKey[1] as LogFilters
       expect(queryFilters.search).toBeUndefined()
     })
 
@@ -506,7 +495,7 @@ describe('use-optimized-queries', () => {
         sortOrder: 'desc'
       })
       
-      const queryFilters = useQueryCallLog[0].queryKey[1] as QueryFilters
+      const queryFilters = useQueryCallLog[0].queryKey[1] as LogFilters
       expect(queryFilters.start_date).toBeUndefined()
       expect(queryFilters.end_date).toBeUndefined()
     })
@@ -562,7 +551,7 @@ describe('use-optimized-queries', () => {
         }
       })
       
-      const queryFilters = useQueryCallLog[0].queryKey[1] as QueryFilters
+      const queryFilters = useQueryCallLog[0].queryKey[1] as LogFilters
       expect(queryFilters.start_date).toBeDefined()
       expect(queryFilters.end_date).toBeUndefined()
     })
