@@ -48,31 +48,31 @@ case $TEST_SUITE in
         ;;
     "hooks")
         echo "Running hooks tests with Docker..."
-        run_docker_tests "Hooks" "lib/hooks/**/*.test.*" || ((FAILED_TESTS++))
+        run_docker_tests "Hooks" "lib/hooks" || ((FAILED_TESTS++))
         ;;
     "utils")
         echo "Running utility tests with Docker..."
-        run_docker_tests "Utils" "lib/utils/**/*.test.*" || ((FAILED_TESTS++))
+        run_docker_tests "Utils" "lib/utils" || ((FAILED_TESTS++))
         ;;
     "services")
         echo "Running service tests with Docker..."
-        run_docker_tests "Services" "lib/services/**/*.test.*" || ((FAILED_TESTS++))
+        run_docker_tests "Services" "lib/services" || ((FAILED_TESTS++))
         ;;
     "components")
         echo "Running component tests with Docker..."
-        run_docker_tests "Components" "components/**/*.test.*" || ((FAILED_TESTS++))
+        run_docker_tests "Components" "components" || ((FAILED_TESTS++))
         ;;
     "pages")
         echo "Running page tests with Docker..."
-        run_docker_tests "Pages" "app/**/tests/*.test.*" || ((FAILED_TESTS++))
+        run_docker_tests "Pages" "app" || ((FAILED_TESTS++))
         ;;
     "state")
         echo "Running state management tests with Docker..."
-        run_docker_tests "State" "lib/hooks/state/**/*.test.*" || ((FAILED_TESTS++))
+        run_docker_tests "State" "lib/hooks/state" || ((FAILED_TESTS++))
         ;;
     "query")
         echo "Running query hooks tests with Docker..."
-        run_docker_tests "Query" "lib/hooks/query/**/*.test.*" || ((FAILED_TESTS++))
+        run_docker_tests "Query" "lib/hooks/query" || ((FAILED_TESTS++))
         ;;
     "optimized")
         echo "Running optimized queries tests with Docker..."
@@ -80,15 +80,15 @@ case $TEST_SUITE in
         ;;
     "debounced")
         echo "Running debounced hooks tests with Docker..."
-        run_docker_tests "Debounced" "lib/hooks/utils/tests/use-debounced*.test.*" || ((FAILED_TESTS++))
+        run_docker_tests "Debounced" "lib/hooks/utils/tests" || ((FAILED_TESTS++))
         ;;
     "unit")
         echo "Running unit tests with Docker..."
-        run_docker_tests "Unit" "lib/**/*.test.*" || ((FAILED_TESTS++))
+        run_docker_tests "Unit" "lib" || ((FAILED_TESTS++))
         ;;
     "integration")
         echo "Running integration tests with Docker..."
-        run_docker_tests "Integration" "app/**/tests/*.test.*" || ((FAILED_TESTS++))
+        run_docker_tests "Integration" "app" || ((FAILED_TESTS++))
         ;;
     "lint")
         echo "Running linting with Docker..."
@@ -169,13 +169,13 @@ case $TEST_SUITE in
         echo ""
         echo "  Test Suites:"
         echo "    all         - Run all tests (default)"
-        echo "    unit        - Run unit tests (lib/**/*.test.*)"
-        echo "    integration - Run integration tests (app/**/tests/*.test.*)"
+        echo "    unit        - Run unit tests (lib directory)"
+        echo "    integration - Run integration tests (app directory)"
         echo "    hooks       - Run hooks tests only"
         echo "    utils       - Run utility tests only"
         echo "    services    - Run service tests only"
         echo "    components  - Run component tests only"
-        echo "    pages       - Run page tests only"
+        echo "    pages       - Run page tests only (app directory)"
         echo "    state       - Run state management tests"
         echo "    query       - Run query hooks tests"
         echo "    optimized   - Run optimized queries tests"
