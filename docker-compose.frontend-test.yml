@@ -1,0 +1,11 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.test  # Use dedicated frontend test Dockerfile
+    environment:
+      - NODE_ENV=test
+      - BUN_RUNTIME_TRANSPILER_CACHE_PATH=0
+    volumes:
+      - ./frontend:/app  # Mount source code for development
+    entrypoint: []  # Override the entrypoint

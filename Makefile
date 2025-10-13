@@ -15,7 +15,8 @@ NC := \033[0m # No Color
 
 # Docker Compose files
 COMPOSE_FILE := docker-compose.yml
-TEST_COMPOSE_FILE := docker-compose.test.yml
+API_TEST_COMPOSE_FILE := docker-compose.api-test.yml
+FRONTEND_TEST_COMPOSE_FILE := docker-compose.frontend-test.yml
 
 # Helper function to ensure .env files exist
 define ensure-env-files
@@ -137,7 +138,7 @@ test-api: ## Run API tests only
 test-frontend: ## Run frontend tests only
 	@echo "$(YELLOW)Running frontend tests...$(NC)"
 	@chmod +x ./test-frontend.sh
-	./test-frontend.sh all
+	./test-frontend.sh
 
 test-unit: ## Run unit tests for both API and frontend
 	@echo "$(YELLOW)Running unit tests...$(NC)"
@@ -172,19 +173,22 @@ coverage: ## Run tests with coverage reports
 
 ## Frontend-specific testing
 test-hooks: ## Run frontend hooks tests
-	@echo "$(YELLOW)Running frontend hooks tests...$(NC)"
+	@echo "$(YELLOW)Running frontend hooks tests with Docker...$(NC)"
+	@echo "$(CYAN)Note: Using 'docker' mode for all tests in containerized environment$(NC)"
 	@chmod +x ./test-frontend.sh
-	./test-frontend.sh hooks
+	./test-frontend.sh docker
 
 test-components: ## Run frontend component tests
-	@echo "$(YELLOW)Running frontend component tests...$(NC)"
+	@echo "$(YELLOW)Running frontend component tests with Docker...$(NC)"
+	@echo "$(CYAN)Note: Using 'docker' mode for all tests in containerized environment$(NC)"
 	@chmod +x ./test-frontend.sh
-	./test-frontend.sh components
+	./test-frontend.sh docker
 
 test-utils: ## Run frontend utility tests
-	@echo "$(YELLOW)Running frontend utility tests...$(NC)"
+	@echo "$(YELLOW)Running frontend utility tests with Docker...$(NC)"
+	@echo "$(CYAN)Note: Using 'docker' mode for all tests in containerized environment$(NC)"
 	@chmod +x ./test-frontend.sh
-	./test-frontend.sh utils
+	./test-frontend.sh docker
 
 ## API-specific testing
 test-api-unit: ## Run API unit tests
@@ -204,26 +208,29 @@ test-crud: ## Run API CRUD tests
 
 ## Development Tools
 watch-tests: ## Start frontend test watcher
-	@echo "$(YELLOW)Starting test watcher...$(NC)"
+	@echo "$(YELLOW)Starting test watcher with Docker...$(NC)"
 	@chmod +x ./test-frontend.sh
-	./test-frontend.sh watch
+	./test-frontend.sh docker-watch
 
 format: ## Format frontend code with Prettier
-	@echo "$(YELLOW)Formatting code...$(NC)"
+	@echo "$(YELLOW)Formatting code with Docker...$(NC)"
 	@chmod +x ./test-frontend.sh
-	./test-frontend.sh format
+	./test-frontend.sh docker-shell -c "bun run prettier"
 
 type-check: ## Run TypeScript type checking
-	@echo "$(YELLOW)Running type checking...$(NC)"
+	@echo "$(YELLOW)Running type checking with Docker...$(NC)"
 	@chmod +x ./test-frontend.sh
-	./test-frontend.sh type-check
+	./test-frontend.sh docker-shell -c "bun run lint"
 
 ## Maintenance
 clean: ## Clean up Docker containers, volumes, and test environments
 	@echo "$(YELLOW)Cleaning up Docker environment...$(NC)"
 	docker compose -f $(COMPOSE_FILE) down -v --remove-orphans
-	@if [ -f "$(TEST_COMPOSE_FILE)" ]; then \
-		docker compose -f $(TEST_COMPOSE_FILE) down -v --remove-orphans; \
+	@if [ -f "$(API_TEST_COMPOSE_FILE)" ]; then \
+		docker compose -f $(API_TEST_COMPOSE_FILE) down -v --remove-orphans; \
+	fi
+	@if [ -f "$(FRONTEND_TEST_COMPOSE_FILE)" ]; then \
+		docker compose -f $(FRONTEND_TEST_COMPOSE_FILE) down -v --remove-orphans; \
 	fi
 	docker system prune -f
 	@echo "$(YELLOW)Cleaning up test environments...$(NC)"
@@ -232,14 +239,14 @@ clean: ## Clean up Docker containers, volumes, and test environments
 	@echo "$(GREEN)✓ Cleanup completed!$(NC)"
 
 clean-frontend: ## Clean frontend dependencies and reinstall
-	@echo "$(YELLOW)Cleaning frontend dependencies...$(NC)"
+	@echo "$(YELLOW)Cleaning frontend dependencies with Docker...$(NC)"
 	@chmod +x ./test-frontend.sh
-	./test-frontend.sh clean
+	./test-frontend.sh docker-clean
 
 install-frontend: ## Install/update frontend dependencies
-	@echo "$(YELLOW)Installing frontend dependencies...$(NC)"
+	@echo "$(YELLOW)Installing frontend dependencies with Docker...$(NC)"
 	@chmod +x ./test-frontend.sh
-	./test-frontend.sh install
+	./test-frontend.sh docker-build
 
 env-setup: ## Create .env files from .env.example if they don't exist
 	$(call ensure-env-files)

@@ -2,7 +2,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile.test  # Use dedicated test Dockerfile
+      dockerfile: Dockerfile.api.test  # Use dedicated API test Dockerfile
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/logs_dashboard_test
       - DEBUG=true

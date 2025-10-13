@@ -1,0 +1,24 @@
+# Frontend test-focused Dockerfile for running tests with Bun
+FROM oven/bun:1.3.0-slim
+
+# Set environment variables
+ENV NODE_ENV=test \
+    BUN_RUNTIME_TRANSPILER_CACHE_PATH=0 \
+    PATH="/usr/local/bin:$PATH"
+
+# Set work directory
+WORKDIR /app
+
+# Copy package.json and bun.lockb (if exists) for dependency installation
+COPY frontend/package.json ./
+COPY frontend/bun.lockb* ./
+
+# Install dependencies
+RUN bun install --frozen-lockfile
+
+# Copy the frontend source code
+COPY frontend/ ./
+
+# Override entrypoint and set command to run tests
+ENTRYPOINT []
+CMD ["bun", "test"]
