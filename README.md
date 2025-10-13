@@ -2,6 +2,17 @@
 
 A full-stack application for monitoring and analyzing logs.
 
+## About This Project
+
+This project uses a **Makefile** to simplify Docker Compose commands and script management. Instead of remembering complex `docker compose` commands or script paths, you can use simple `make` commands for all development workflows.
+
+**Why Makefile?**
+- **Simplified Commands:** `make up` instead of `docker compose up --build -d`
+- **Consistent Interface:** All commands follow the same `make <action>` pattern
+- **Script Integration:** Automatically handles test scripts with proper permissions
+- **Better Discoverability:** `make help` shows all available commands
+- **Workflow-Oriented:** Commands grouped by development tasks
+
 ## Project Structure
 
 ```
@@ -12,35 +23,120 @@ logs-dashboard/
 
 ## Getting Started
 
-### Quick Start with Docker
+### Quick Start with Makefile
 
-Run the entire application stack with Docker Compose:
+> **Note:** This project uses a Makefile to wrap Docker Compose commands and test scripts for easier management. All `docker compose` commands and script executions are handled through `make` targets.
+
+Run the entire application stack:
 
 ```bash
-docker compose up --build -d
+make up
 ```
 
-Remove the entire application stack with Docker Compose:
+Remove the entire application stack:
 
 ```bash
-docker compose down -v
+make down
 ```
 
-Show api docker logs:
+Show API logs:
 ```bash
-docker compose logs api -f --tail=20
+make logs-api
 ```
 
-Show frontend docker logs: 
+Show frontend logs:
 ```bash
-docker compose logs frontend -f --tail=20
+make logs-frontend
 ```
 
 This will start both the frontend and API services. The application will be available at:
 - Frontend: `http://localhost:3000`
 - API: `http://localhost:8000`
 
+### Available Makefile Commands
+
+For a complete list of available commands, run:
+```bash
+make help
+```
+
+#### What the Makefile Manages
+
+The Makefile wraps and simplifies these underlying commands:
+
+**Docker Compose Commands:**
+- `make up` → `docker compose up --build -d`
+- `make down` → `docker compose down -v`
+- `make logs-api` → `docker compose logs api -f --tail=20`
+- `make build` → `docker compose build`
+- `make restart` → `docker compose restart`
+
+**Test Script Execution:**
+- `make test` → `chmod +x ./test-all.sh && ./test-all.sh all`
+- `make test-api` → `chmod +x ./test-api.sh && ./test-api.sh all`
+- `make test-frontend` → `chmod +x ./test-frontend.sh && ./test-frontend.sh all`
+
+**Combined Workflows:**
+- `make dev-reset` → Full cleanup, build, and startup sequence
+- `make clean` → Docker cleanup + test environment cleanup
+- `make health` → Service health checks using curl and Docker commands
+
+### Common Development Workflows
+
+#### Full Development Setup
+```bash
+# Start all services
+make up
+
+# View logs
+make logs
+```
+
+#### Development Reset (Clean Slate)
+```bash
+# Complete reset - stops services, cleans up, rebuilds, and starts
+make dev-reset
+```
+
+#### Service Management
+```bash
+# Start individual services
+make api          # API only
+make frontend     # Frontend only
+make db           # Database only
+
+# View service-specific logs
+make logs-api     # API logs
+make logs-frontend # Frontend logs
+make logs-db      # Database logs
+
+# Stop all services
+make down
+```
+
+#### Quick Testing Workflow
+```bash
+# Fast validation
+make quick-test
+
+# Complete test suite with coverage
+make full-test
+
+# Continuous testing
+make watch-tests
+```
+
+#### Maintenance
+```bash
+# Clean up everything
+make clean
+
+# Update frontend dependencies
+make install-frontend
+
 ### Manual Setup
+
+> **Note:** While the Makefile is the recommended approach, you can still use Docker Compose commands directly or run scripts manually if needed. The Makefile simply provides a more convenient interface.
 
 #### Prerequisites (For non-docker options)
 
@@ -49,9 +145,9 @@ This will start both the frontend and API services. The application will be avai
 
 #### Frontend Setup
 
-**Option 1: Docker Compose**
+**Option 1: Using Makefile (Recommended)**
 ```bash
-docker-compose up --build frontend
+make frontend
 ```
 
 **Option 2: Manual Setup**
@@ -63,17 +159,17 @@ bun dev
 
 The frontend will be available at `http://localhost:3000`
 
+**Storybook Development**
 ```bash
-cd frontend
-bun storybook
+make storybook
 ```
-The frontend storybook on local only will be available at `http://localhost:6006`
+The frontend storybook will be available at `http://localhost:6006`
 
 #### API Setup
 
-**Option 1: Docker Compose**
+**Option 1: Using Makefile (Recommended)**
 ```bash
-docker-compose up --build api
+make api
 ```
 
 **Option 2: Manual Setup**
@@ -93,17 +189,46 @@ python main.py
 The API will be available at `http://localhost:8000`
 
 ### Testing
-To run all tests for api and frontend together, run script which is ran with docker from root
+
+#### Quick Testing Commands
+
+Run all tests (API + Frontend):
 ```bash
-./test-all.sh all
+make test
 ```
-or
+
+Run tests in parallel for faster execution:
 ```bash
-chmod +x ./test-all.sh && ./test-all.sh all
+make test-parallel
 ```
-To run individual: 
 
-API: `./test-all.sh api-only` or `./test-api.sh`; Frontend: `./test-all.sh frontend-only` or `./test-frontend.sh`
+Run quick validation tests:
+```bash
+make test-fast
+```
 
+#### Component-Specific Testing
 
-Run `./test-all.sh help`, `./test-api.sh help`, or `./test-frontend.sh help` to to check which commands are available.  
+API tests only:
+```bash
+make test-api
+```
+
+Frontend tests only:
+```bash
+make test-frontend
+```
+
+#### Getting Help
+
+For all available test commands:
+```bash
+make help
+```
+
+For script-specific options (if needed):
+```bash
+./test-all.sh help
+./test-api.sh help
+./test-frontend.sh help
+```

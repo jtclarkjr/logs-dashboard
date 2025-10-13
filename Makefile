@@ -1,0 +1,256 @@
+# Logs Dashboard Makefile
+# Manages Docker Compose and testing workflows
+
+.PHONY: help up down build restart logs clean test test-api test-frontend dev shell lint coverage
+
+# Default target
+.DEFAULT_GOAL := help
+
+# Colors for output
+CYAN := \033[0;36m
+GREEN := \033[0;32m
+YELLOW := \033[1;33m
+RED := \033[0;31m
+NC := \033[0m # No Color
+
+# Docker Compose files
+COMPOSE_FILE := docker-compose.yml
+TEST_COMPOSE_FILE := docker-compose.test.yml
+
+## Help
+help: ## Show this help message
+	@echo "$(CYAN)Logs Dashboard - Makefile Commands$(NC)"
+	@echo "=================================="
+	@echo ""
+	@echo "$(GREEN)Development:$(NC)"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST) | grep -E "(up|down|build|restart|logs|dev|shell)"
+	@echo ""
+	@echo "$(GREEN)Testing:$(NC)"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST) | grep -E "(test|lint|coverage)"
+	@echo ""
+	@echo "$(GREEN)Maintenance:$(NC)"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST) | grep -E "(clean|install|format)"
+	@echo ""
+
+## Development Commands
+up: ## Start all services (frontend, API, database)
+	@echo "$(YELLOW)Starting all services...$(NC)"
+	docker compose -f $(COMPOSE_FILE) up --build -d
+	@echo "$(GREEN)✓ Services started!$(NC)"
+	@echo "$(CYAN)Frontend: http://localhost:3000$(NC)"
+	@echo "$(CYAN)API: http://localhost:8000$(NC)"
+
+down: ## Stop and remove all services
+	@echo "$(YELLOW)Stopping all services...$(NC)"
+	docker compose -f $(COMPOSE_FILE) down -v
+	@echo "$(GREEN)✓ Services stopped and volumes removed!$(NC)"
+
+build: ## Build all Docker images
+	@echo "$(YELLOW)Building all Docker images...$(NC)"
+	docker compose -f $(COMPOSE_FILE) build
+	@echo "$(GREEN)✓ All images built!$(NC)"
+
+restart: ## Restart all services
+	@echo "$(YELLOW)Restarting all services...$(NC)"
+	docker compose -f $(COMPOSE_FILE) restart
+	@echo "$(GREEN)✓ Services restarted!$(NC)"
+
+dev: up ## Start development environment (alias for up)
+
+## Service-specific commands
+api: ## Start only the API service
+	@echo "$(YELLOW)Starting API service...$(NC)"
+	docker compose -f $(COMPOSE_FILE) up --build api -d
+	@echo "$(GREEN)✓ API service started!$(NC)"
+	@echo "$(CYAN)API: http://localhost:8000$(NC)"
+
+frontend: ## Start only the frontend service
+	@echo "$(YELLOW)Starting frontend service...$(NC)"
+	docker compose -f $(COMPOSE_FILE) up --build frontend -d
+	@echo "$(GREEN)✓ Frontend service started!$(NC)"
+	@echo "$(CYAN)Frontend: http://localhost:3000$(NC)"
+
+db: ## Start only the database service
+	@echo "$(YELLOW)Starting database service...$(NC)"
+	docker compose -f $(COMPOSE_FILE) up db -d
+	@echo "$(GREEN)✓ Database service started!$(NC)"
+	@echo "$(CYAN)Database: localhost:5432$(NC)"
+
+## Logs
+logs: ## Show logs for all services
+	docker compose -f $(COMPOSE_FILE) logs -f --tail=20
+
+logs-api: ## Show API logs
+	docker compose -f $(COMPOSE_FILE) logs api -f --tail=20
+
+logs-frontend: ## Show frontend logs
+	docker compose -f $(COMPOSE_FILE) logs frontend -f --tail=20
+
+logs-db: ## Show database logs
+	docker compose -f $(COMPOSE_FILE) logs db -f --tail=20
+
+## Shell access
+shell-api: ## Open shell in API container
+	docker compose -f $(COMPOSE_FILE) exec api sh
+
+shell-frontend: ## Open shell in frontend container
+	docker compose -f $(COMPOSE_FILE) exec frontend sh
+
+shell-db: ## Open PostgreSQL shell
+	docker compose -f $(COMPOSE_FILE) exec db psql -U postgres -d logs_dashboard
+
+## Testing Commands
+test: ## Run all tests (API + Frontend)
+	@echo "$(YELLOW)Running all tests...$(NC)"
+	@chmod +x ./test-all.sh
+	./test-all.sh all
+
+test-parallel: ## Run all tests in parallel
+	@echo "$(YELLOW)Running all tests in parallel...$(NC)"
+	@chmod +x ./test-all.sh
+	./test-all.sh parallel
+
+test-api: ## Run API tests only
+	@echo "$(YELLOW)Running API tests...$(NC)"
+	@chmod +x ./test-api.sh
+	./test-api.sh all
+
+test-frontend: ## Run frontend tests only
+	@echo "$(YELLOW)Running frontend tests...$(NC)"
+	@chmod +x ./test-frontend.sh
+	./test-frontend.sh all
+
+test-unit: ## Run unit tests for both API and frontend
+	@echo "$(YELLOW)Running unit tests...$(NC)"
+	@chmod +x ./test-all.sh
+	./test-all.sh unit
+
+test-integration: ## Run integration tests for both API and frontend
+	@echo "$(YELLOW)Running integration tests...$(NC)"
+	@chmod +x ./test-all.sh
+	./test-all.sh integration
+
+test-fast: ## Run fast tests (quick validation)
+	@echo "$(YELLOW)Running fast tests...$(NC)"
+	@chmod +x ./test-all.sh
+	./test-all.sh fast
+
+test-ci: ## Run full CI pipeline tests
+	@echo "$(YELLOW)Running CI pipeline tests...$(NC)"
+	@chmod +x ./test-all.sh
+	./test-all.sh ci
+
+## Code Quality
+lint: ## Run linting for both API and frontend
+	@echo "$(YELLOW)Running linting...$(NC)"
+	@chmod +x ./test-all.sh
+	./test-all.sh lint
+
+coverage: ## Run tests with coverage reports
+	@echo "$(YELLOW)Running coverage tests...$(NC)"
+	@chmod +x ./test-all.sh
+	./test-all.sh coverage
+
+## Frontend-specific testing
+test-hooks: ## Run frontend hooks tests
+	@echo "$(YELLOW)Running frontend hooks tests...$(NC)"
+	@chmod +x ./test-frontend.sh
+	./test-frontend.sh hooks
+
+test-components: ## Run frontend component tests
+	@echo "$(YELLOW)Running frontend component tests...$(NC)"
+	@chmod +x ./test-frontend.sh
+	./test-frontend.sh components
+
+test-utils: ## Run frontend utility tests
+	@echo "$(YELLOW)Running frontend utility tests...$(NC)"
+	@chmod +x ./test-frontend.sh
+	./test-frontend.sh utils
+
+## API-specific testing
+test-api-unit: ## Run API unit tests
+	@echo "$(YELLOW)Running API unit tests...$(NC)"
+	@chmod +x ./test-api.sh
+	./test-api.sh unit
+
+test-api-integration: ## Run API integration tests
+	@echo "$(YELLOW)Running API integration tests...$(NC)"
+	@chmod +x ./test-api.sh
+	./test-api.sh integration
+
+test-crud: ## Run API CRUD tests
+	@echo "$(YELLOW)Running API CRUD tests...$(NC)"
+	@chmod +x ./test-api.sh
+	./test-api.sh crud
+
+## Development Tools
+watch-tests: ## Start frontend test watcher
+	@echo "$(YELLOW)Starting test watcher...$(NC)"
+	@chmod +x ./test-frontend.sh
+	./test-frontend.sh watch
+
+format: ## Format frontend code with Prettier
+	@echo "$(YELLOW)Formatting code...$(NC)"
+	@chmod +x ./test-frontend.sh
+	./test-frontend.sh format
+
+type-check: ## Run TypeScript type checking
+	@echo "$(YELLOW)Running type checking...$(NC)"
+	@chmod +x ./test-frontend.sh
+	./test-frontend.sh type-check
+
+## Maintenance
+clean: ## Clean up Docker containers, volumes, and test environments
+	@echo "$(YELLOW)Cleaning up Docker environment...$(NC)"
+	docker compose -f $(COMPOSE_FILE) down -v --remove-orphans
+	@if [ -f "$(TEST_COMPOSE_FILE)" ]; then \
+		docker compose -f $(TEST_COMPOSE_FILE) down -v --remove-orphans; \
+	fi
+	docker system prune -f
+	@echo "$(YELLOW)Cleaning up test environments...$(NC)"
+	@chmod +x ./test-all.sh
+	./test-all.sh clean
+	@echo "$(GREEN)✓ Cleanup completed!$(NC)"
+
+clean-frontend: ## Clean frontend dependencies and reinstall
+	@echo "$(YELLOW)Cleaning frontend dependencies...$(NC)"
+	@chmod +x ./test-frontend.sh
+	./test-frontend.sh clean
+
+install-frontend: ## Install/update frontend dependencies
+	@echo "$(YELLOW)Installing frontend dependencies...$(NC)"
+	@chmod +x ./test-frontend.sh
+	./test-frontend.sh install
+
+## Status and Health
+status: ## Show status of all services
+	@echo "$(CYAN)Service Status:$(NC)"
+	docker compose -f $(COMPOSE_FILE) ps
+
+health: ## Check health of all services
+	@echo "$(CYAN)Health Check:$(NC)"
+	@echo "Frontend: $$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 2>/dev/null || echo "DOWN")"
+	@echo "API: $$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/v1/health 2>/dev/null || echo "DOWN")"
+	@echo "Database: $$(docker compose -f $(COMPOSE_FILE) exec -T db pg_isready -U postgres 2>/dev/null || echo "DOWN")"
+
+## Quick Development Workflows
+dev-reset: ## Full development reset (clean + build + up)
+	@echo "$(YELLOW)Performing full development reset...$(NC)"
+	$(MAKE) clean
+	$(MAKE) build
+	$(MAKE) up
+	@echo "$(GREEN)✓ Development environment reset complete!$(NC)"
+
+quick-test: ## Quick test run (fast tests only)
+	@echo "$(YELLOW)Running quick tests...$(NC)"
+	$(MAKE) test-fast
+
+full-test: ## Complete test suite with coverage
+	@echo "$(YELLOW)Running complete test suite...$(NC)"
+	$(MAKE) coverage
+
+## Storybook
+storybook: ## Start Storybook development server
+	@echo "$(YELLOW)Starting Storybook...$(NC)"
+	cd frontend && bun storybook
+	@echo "$(CYAN)Storybook: http://localhost:6006$(NC)"
