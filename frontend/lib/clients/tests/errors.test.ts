@@ -1,11 +1,15 @@
 import { describe, it, expect } from 'bun:test'
-import { ApiError, type ApiErrorResponse, type ValidationErrorDetail } from '../errors'
+import {
+  ApiError,
+  type ApiErrorResponse,
+  type ValidationErrorDetail
+} from '../errors'
 
 describe('ApiError', () => {
   describe('Constructor', () => {
     it('should create ApiError with minimal parameters', () => {
       const error = new ApiError('Test error', 400)
-      
+
       expect(error.name).toBe('ApiError')
       expect(error.message).toBe('Test error')
       expect(error.status).toBe(400)
@@ -22,7 +26,11 @@ describe('ApiError', () => {
           code: 1001,
           details: {
             validation_errors: [
-              { field: 'email', value: 'invalid', reason: 'Invalid email format' },
+              {
+                field: 'email',
+                value: 'invalid',
+                reason: 'Invalid email format'
+              },
               { field: 'age', value: '-1', reason: 'Must be positive' }
             ],
             total_errors: 2,
@@ -34,7 +42,7 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Validation failed', 422, errorResponse)
-      
+
       expect(error.name).toBe('ApiError')
       expect(error.message).toBe('Validation failed')
       expect(error.status).toBe(422)
@@ -57,8 +65,12 @@ describe('ApiError', () => {
         }
       }
 
-      const error = new ApiError('Server error', 500, errorResponse as ApiErrorResponse)
-      
+      const error = new ApiError(
+        'Server error',
+        500,
+        errorResponse as ApiErrorResponse
+      )
+
       expect(error.code).toBe(5001)
       expect(error.details).toEqual({})
       expect(error.validationErrors).toEqual([])
@@ -72,7 +84,7 @@ describe('ApiError', () => {
       } as ApiErrorResponse
 
       const error = new ApiError('Unknown error', 500, errorResponse)
-      
+
       expect(error.code).toBe(0)
       expect(error.details).toEqual({})
       expect(error.requestId).toBe('req-456')
@@ -82,7 +94,7 @@ describe('ApiError', () => {
   describe('getDetailedMessage', () => {
     it('should return basic message when no validation errors', () => {
       const error = new ApiError('Basic error', 400)
-      
+
       expect(error.getDetailedMessage()).toBe('Basic error')
     })
 
@@ -102,7 +114,7 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Validation failed', 422, errorResponse)
-      
+
       expect(error.getDetailedMessage()).toBe(
         'Validation failed. Validation errors: name: Required field; email: Invalid format'
       )
@@ -123,7 +135,7 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Invalid input', 422, errorResponse)
-      
+
       expect(error.getDetailedMessage()).toBe(
         'Invalid input. Validation errors: password: Too short'
       )
@@ -142,7 +154,7 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Error occurred', 400, errorResponse)
-      
+
       expect(error.getDetailedMessage()).toBe('Error occurred')
     })
   })
@@ -159,7 +171,7 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Validation error', 422, errorResponse)
-      
+
       expect(error.isValidationError()).toBe(true)
     })
 
@@ -178,13 +190,13 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Error', 400, errorResponse)
-      
+
       expect(error.isValidationError()).toBe(true)
     })
 
     it('should return false when no validation indicators', () => {
       const error = new ApiError('Generic error', 500)
-      
+
       expect(error.isValidationError()).toBe(false)
     })
 
@@ -199,7 +211,7 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Server error', 500, errorResponse)
-      
+
       expect(error.isValidationError()).toBe(false)
     })
   })
@@ -207,7 +219,7 @@ describe('ApiError', () => {
   describe('isNotFoundError', () => {
     it('should return true when status is 404', () => {
       const error = new ApiError('Not found', 404)
-      
+
       expect(error.isNotFoundError()).toBe(true)
     })
 
@@ -222,7 +234,7 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Resource not found', 400, errorResponse)
-      
+
       expect(error.isNotFoundError()).toBe(true)
     })
 
@@ -237,13 +249,13 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Not found', 404, errorResponse)
-      
+
       expect(error.isNotFoundError()).toBe(true)
     })
 
     it('should return false when neither status nor code indicate not found', () => {
       const error = new ApiError('Generic error', 400)
-      
+
       expect(error.isNotFoundError()).toBe(false)
     })
   })
@@ -251,19 +263,19 @@ describe('ApiError', () => {
   describe('isServerError', () => {
     it('should return true for 500 status', () => {
       const error = new ApiError('Internal server error', 500)
-      
+
       expect(error.isServerError()).toBe(true)
     })
 
     it('should return true for 502 status', () => {
       const error = new ApiError('Bad gateway', 502)
-      
+
       expect(error.isServerError()).toBe(true)
     })
 
     it('should return true for 503 status', () => {
       const error = new ApiError('Service unavailable', 503)
-      
+
       expect(error.isServerError()).toBe(true)
     })
 
@@ -271,7 +283,7 @@ describe('ApiError', () => {
       const error400 = new ApiError('Bad request', 400)
       const error404 = new ApiError('Not found', 404)
       const error422 = new ApiError('Validation error', 422)
-      
+
       expect(error400.isServerError()).toBe(false)
       expect(error404.isServerError()).toBe(false)
       expect(error422.isServerError()).toBe(false)
@@ -280,7 +292,7 @@ describe('ApiError', () => {
     it('should return false for 2xx and 3xx status codes', () => {
       const error200 = new ApiError('Success', 200)
       const error302 = new ApiError('Redirect', 302)
-      
+
       expect(error200.isServerError()).toBe(false)
       expect(error302.isServerError()).toBe(false)
     })
@@ -289,9 +301,9 @@ describe('ApiError', () => {
   describe('toJSON', () => {
     it('should serialize basic error to JSON', () => {
       const error = new ApiError('Basic error', 400)
-      
+
       const json = error.toJSON()
-      
+
       expect(json).toEqual({
         name: 'ApiError',
         message: 'Basic error',
@@ -320,18 +332,16 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Complex error', 422, errorResponse)
-      
+
       const json = error.toJSON()
-      
+
       expect(json).toEqual({
         name: 'ApiError',
         message: 'Complex error',
         status: 422,
         code: 1001,
         details: {
-          validation_errors: [
-            { field: 'name', value: '', reason: 'Required' }
-          ],
+          validation_errors: [{ field: 'name', value: '', reason: 'Required' }],
           total_errors: 1,
           resource_id: 'res-123'
         },
@@ -357,9 +367,9 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Validation failed', 422, errorResponse)
-      
+
       const json = error.toJSON()
-      
+
       expect(json.details.validation_errors).toEqual([
         { field: 'email', value: 'test@', reason: 'Invalid email' },
         { field: 'phone', value: '123', reason: 'Too short' }
@@ -381,9 +391,9 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Error', 500, errorResponse)
-      
+
       const json = error.toJSON()
-      
+
       expect(json.details).toEqual({
         resource_id: 'res-789',
         original_error: 'Database connection failed'
@@ -395,9 +405,9 @@ describe('ApiError', () => {
   describe('toString', () => {
     it('should create string representation with minimal data', () => {
       const error = new ApiError('Basic error', 400)
-      
+
       const str = error.toString()
-      
+
       expect(str).toBe('ApiError: Basic error (Status: 400, Code: 0)')
     })
 
@@ -413,9 +423,9 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Error with request ID', 400, errorResponse)
-      
+
       const str = error.toString()
-      
+
       expect(str).toContain('[Request ID: req-123]')
     })
 
@@ -433,9 +443,9 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Error with details', 404, errorResponse)
-      
+
       const str = error.toString()
-      
+
       expect(str).toContain('Details: {')
       expect(str).toContain('"resource_id": "user-456"')
       expect(str).toContain('"total_errors": 1')
@@ -456,9 +466,9 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Validation error', 422, errorResponse)
-      
+
       const str = error.toString()
-      
+
       expect(str).toContain('Validation Errors: [')
       expect(str).toContain('"field": "email"')
       expect(str).toContain('"reason": "Bad format"')
@@ -481,9 +491,9 @@ describe('ApiError', () => {
       }
 
       const error = new ApiError('Complex error', 422, errorResponse)
-      
+
       const str = error.toString()
-      
+
       expect(str).toContain('ApiError: Complex error (Status: 422, Code: 1001)')
       expect(str).toContain('[Request ID: req-999]')
       expect(str).toContain('Details: {')
@@ -502,9 +512,9 @@ describe('ApiError', () => {
 
       const error = new ApiError('Simple error', 500, errorResponse)
       error.validationErrors = []
-      
+
       const str = error.toString()
-      
+
       expect(str).toBe('ApiError: Simple error (Status: 500, Code: 5001)')
       expect(str).not.toContain('Details:')
       expect(str).not.toContain('Validation Errors:')
@@ -517,15 +527,15 @@ describe('ApiError', () => {
         error: {
           message: 'Error',
           code: 1001,
-        details: {
-          validation_errors: undefined
-        }
+          details: {
+            validation_errors: undefined
+          }
         },
         success: false
       }
 
       const error = new ApiError('Error', 400, errorResponse)
-      
+
       expect(error.validationErrors).toEqual([])
       expect(error.isValidationError()).toBe(true) // Because code is 1001
     })
@@ -535,34 +545,34 @@ describe('ApiError', () => {
         error: {
           message: 'Error',
           code: 2001,
-        details: {
-          validation_errors: null
-        }
+          details: {
+            validation_errors: null
+          }
         },
         success: false
       }
 
       const error = new ApiError('Error', 400, errorResponse)
-      
+
       expect(error.validationErrors).toEqual([])
       expect(error.isValidationError()).toBe(false) // Code is not 1001 and no valid validation errors
     })
 
     it('should inherit from Error correctly', () => {
       const error = new ApiError('Test error', 400)
-      
+
       expect(error instanceof Error).toBe(true)
       expect(error instanceof ApiError).toBe(true)
     })
 
     it('should work with JSON.stringify', () => {
       const error = new ApiError('Serializable error', 400)
-      
+
       expect(() => JSON.stringify(error)).not.toThrow()
-      
+
       const serialized = JSON.stringify(error)
       const parsed = JSON.parse(serialized)
-      
+
       expect(parsed.name).toBe('ApiError')
       expect(parsed.message).toBe('Serializable error')
       expect(parsed.status).toBe(400)

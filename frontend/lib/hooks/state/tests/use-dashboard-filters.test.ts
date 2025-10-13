@@ -116,13 +116,13 @@ describe('useDashboardFilters', () => {
   describe('Filter methods', () => {
     it('should return correct aggregation filters', () => {
       const { result } = renderHook(() => useDashboardFilters())
-      
+
       // Set specific values to test
       act(() => {
         result.current.setSelectedSeverity(SeverityLevel.ERROR)
         result.current.setSelectedSource('api')
       })
-      
+
       const filters = result.current.getAggregationFilters()
       expect(filters).toBeDefined()
       expect(filters?.severity).toBe(SeverityLevel.ERROR)
@@ -131,14 +131,14 @@ describe('useDashboardFilters', () => {
 
     it('should return correct chart data filters', () => {
       const { result } = renderHook(() => useDashboardFilters())
-      
+
       // Set specific values to test
       act(() => {
         result.current.setSelectedSeverity(SeverityLevel.WARNING)
         result.current.setSelectedSource('database')
         result.current.setTimeGrouping('hour')
       })
-      
+
       const filters = result.current.getChartDataFilters()
       expect(filters).toBeDefined()
       expect(filters?.severity).toBe(SeverityLevel.WARNING)
@@ -149,28 +149,30 @@ describe('useDashboardFilters', () => {
     it('should return null export filters when no valid date range', () => {
       // Create a hook with a manually set invalid date range
       const { result } = renderHook(() => useDashboardFilters())
-      
+
       // Manually set an invalid date range
       act(() => {
         result.current.setDateRange(undefined)
       })
-      
+
       const filters = result.current.getExportFilters()
       expect(filters).toBe(null)
     })
 
     it('should return correct export filters with valid date range', () => {
       const mockDateRange = createMockDateRange()
-      const { result } = renderHook(() => useDashboardFilters({
-        dateRange: mockDateRange
-      }))
-      
+      const { result } = renderHook(() =>
+        useDashboardFilters({
+          dateRange: mockDateRange
+        })
+      )
+
       // Set specific values to test
       act(() => {
         result.current.setSelectedSeverity(SeverityLevel.INFO)
         result.current.setSelectedSource('cache')
       })
-      
+
       const filters = result.current.getExportFilters()
       expect(filters).toBeDefined()
       expect(filters?.start_date).toBeDefined()
@@ -181,10 +183,12 @@ describe('useDashboardFilters', () => {
 
     it('should exclude "all" values from export filters', () => {
       const mockDateRange = createMockDateRange()
-      const { result } = renderHook(() => useDashboardFilters({
-        dateRange: mockDateRange
-      }))
-      
+      const { result } = renderHook(() =>
+        useDashboardFilters({
+          dateRange: mockDateRange
+        })
+      )
+
       // Keep default "all" values
       const filters = result.current.getExportFilters()
       expect(filters).toBeDefined()
@@ -194,7 +198,7 @@ describe('useDashboardFilters', () => {
 
     it('should generate correct export filename', () => {
       const { result } = renderHook(() => useDashboardFilters())
-      
+
       const filename = result.current.getExportFilename()
       expect(filename).toMatch(/^logs-export-\d{4}-\d{2}-\d{2}\.csv$/)
       expect(filename).toContain('logs-export-')
@@ -205,37 +209,43 @@ describe('useDashboardFilters', () => {
   describe('canExport validation', () => {
     it('should return true when both from and to dates are present', () => {
       const mockDateRange = createMockDateRange()
-      const { result } = renderHook(() => useDashboardFilters({
-        dateRange: mockDateRange
-      }))
-      
+      const { result } = renderHook(() =>
+        useDashboardFilters({
+          dateRange: mockDateRange
+        })
+      )
+
       expect(result.current.canExport).toBe(true)
     })
 
     it('should return false when dateRange is undefined', () => {
       // Create a hook and manually set dateRange to undefined
       const { result } = renderHook(() => useDashboardFilters())
-      
+
       act(() => {
         result.current.setDateRange(undefined)
       })
-      
+
       expect(result.current.canExport).toBe(false)
     })
 
     it('should return false when from date is missing', () => {
-      const { result } = renderHook(() => useDashboardFilters({
-        dateRange: { to: new Date() } as { from?: Date; to: Date }
-      }))
-      
+      const { result } = renderHook(() =>
+        useDashboardFilters({
+          dateRange: { to: new Date() } as { from?: Date; to: Date }
+        })
+      )
+
       expect(result.current.canExport).toBe(false)
     })
 
     it('should return false when to date is missing', () => {
-      const { result } = renderHook(() => useDashboardFilters({
-        dateRange: { from: new Date() } as { from: Date; to?: Date }
-      }))
-      
+      const { result } = renderHook(() =>
+        useDashboardFilters({
+          dateRange: { from: new Date() } as { from: Date; to?: Date }
+        })
+      )
+
       expect(result.current.canExport).toBe(false)
     })
   })
@@ -243,19 +253,19 @@ describe('useDashboardFilters', () => {
   describe('State management integration', () => {
     it('should update filters and reflect in computed methods', () => {
       const { result } = renderHook(() => useDashboardFilters())
-      
+
       // Update multiple filters
       act(() => {
         result.current.setSelectedSeverity(SeverityLevel.CRITICAL)
         result.current.setSelectedSource('auth')
         result.current.setTimeGrouping('hour')
       })
-      
+
       // Check aggregation filters
       const aggFilters = result.current.getAggregationFilters()
       expect(aggFilters?.severity).toBe(SeverityLevel.CRITICAL)
       expect(aggFilters?.source).toBe('auth')
-      
+
       // Check chart data filters
       const chartFilters = result.current.getChartDataFilters()
       expect(chartFilters?.severity).toBe(SeverityLevel.CRITICAL)
@@ -265,24 +275,24 @@ describe('useDashboardFilters', () => {
 
     it('should handle severity filter edge cases', () => {
       const { result } = renderHook(() => useDashboardFilters())
-      
+
       // Test with "all" severity
       act(() => {
         result.current.setSelectedSeverity('all')
       })
-      
+
       const aggFilters = result.current.getAggregationFilters()
       expect(aggFilters?.severity).toBeUndefined()
     })
 
     it('should handle source filter edge cases', () => {
       const { result } = renderHook(() => useDashboardFilters())
-      
+
       // Test with "all" source
       act(() => {
         result.current.setSelectedSource('all')
       })
-      
+
       const aggFilters = result.current.getAggregationFilters()
       expect(aggFilters?.source).toBeUndefined()
     })
