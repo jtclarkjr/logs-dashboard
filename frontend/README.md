@@ -50,7 +50,7 @@ built with Next.js and a comprehensive design system approach.
   characteristics
 
 **Testing Performance Comparison** (lower is better):
-[Benchmark article]( https://dev.to/kcsujeet/your-tests-are-slow-you-need-to-migrate-to-bun-9hh)
+[Benchmark article](https://dev.to/kcsujeet/your-tests-are-slow-you-need-to-migrate-to-bun-9hh)
 
 - **Jest**: ~17,000ms average test suite execution
 - **Vitest**: ~12,000ms average test suite execution
@@ -170,7 +170,8 @@ frontend/
 
 - **Component testing** with Testing Library
 - **Happy DOM** for fast, lightweight test environment
-- **Storybook** for component development and visual testing of components (instead of unit tests)
+- **Storybook** for component development and visual testing of components
+  (instead of unit tests)
 - **Coverage reporting** integrated with Bun test runner
 
 #### Code Quality
