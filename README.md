@@ -220,7 +220,8 @@ make format
 make type-check
 ```
 
-#### Getting Help
+### Getting Help
 ```bash
 # All available make commands
 make help
+```
