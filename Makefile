@@ -44,7 +44,7 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST) | grep -E "(test|lint|coverage)"
 	@echo ""
 	@echo "$(GREEN)Maintenance:$(NC)"
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST) | grep -E "(clean|install|format)"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-15s$(NC) %s\\n", $$1, $$2}' $(MAKEFILE_LIST) | grep -E "(setup|clean|install|format)"
 	@echo ""
 
 ## Development Commands
@@ -250,6 +250,18 @@ install-frontend: ## Install/update frontend dependencies
 
 env-setup: ## Create .env files from .env.example if they don't exist
 	$(call ensure-env-files)
+
+setup-test: ## Initial setup for test environment (build Docker images with no cache)
+	@echo "$(YELLOW)Setting up test environment...$(NC)"
+	@echo "$(CYAN)This will build fresh Docker images for testing$(NC)"
+	@echo "$(YELLOW)Building API test image...$(NC)"
+	docker compose -f $(API_TEST_COMPOSE_FILE) build --no-cache api
+	@echo "$(YELLOW)Building Frontend test image...$(NC)"
+	docker compose -f $(FRONTEND_TEST_COMPOSE_FILE) build --no-cache frontend
+	@echo "$(GREEN)✓ Test environment setup complete!$(NC)"
+	@echo "$(CYAN)Verifying Bun installation in frontend container...$(NC)"
+	docker compose -f $(FRONTEND_TEST_COMPOSE_FILE) run --rm frontend bun --version
+	@echo "$(GREEN)✓ All test images ready! You can now run 'make test'$(NC)"
 
 ## Status and Health
 status: ## Show status of all services

@@ -178,6 +178,13 @@ The API will be available at `http://localhost:8000`
 
 ### Testing
 
+#### Set up test environment 
+Builds Docker images with fresh dependencies for test environment. The point is to not need to locally install deps like Bun to run tests.
+
+```bash
+make setup-test
+```
+
 #### Quick Testing Commands
 ```bash
 # Run all tests (API + Frontend)
