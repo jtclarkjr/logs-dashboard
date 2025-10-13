@@ -17,6 +17,20 @@ NC := \033[0m # No Color
 COMPOSE_FILE := docker-compose.yml
 TEST_COMPOSE_FILE := docker-compose.test.yml
 
+# Helper function to ensure .env files exist
+define ensure-env-files
+	@echo "$(YELLOW)Checking for .env files...$(NC)"
+	@if [ ! -f api/.env ] && [ -f api/.env.example ]; then \
+		echo "$(CYAN)Creating api/.env from api/.env.example$(NC)"; \
+		cp api/.env.example api/.env; \
+	fi
+	@if [ ! -f frontend/.env ] && [ -f frontend/.env.example ]; then \
+		echo "$(CYAN)Creating frontend/.env from frontend/.env.example$(NC)"; \
+		cp frontend/.env.example frontend/.env; \
+	fi
+	@echo "$(GREEN)✓ Environment files ready$(NC)"
+endef
+
 ## Help
 help: ## Show this help message
 	@echo "$(CYAN)Logs Dashboard - Makefile Commands$(NC)"
@@ -35,6 +49,7 @@ help: ## Show this help message
 ## Development Commands
 up: ## Start all services (frontend, API, database)
 	@echo "$(YELLOW)Starting all services...$(NC)"
+	$(call ensure-env-files)
 	docker compose -f $(COMPOSE_FILE) up --build -d
 	@echo "$(GREEN)✓ Services started!$(NC)"
 	@echo "$(CYAN)Frontend: http://localhost:3000$(NC)"
@@ -47,11 +62,13 @@ down: ## Stop and remove all services
 
 build: ## Build all Docker images
 	@echo "$(YELLOW)Building all Docker images...$(NC)"
+	$(call ensure-env-files)
 	docker compose -f $(COMPOSE_FILE) build
 	@echo "$(GREEN)✓ All images built!$(NC)"
 
 restart: ## Restart all services
 	@echo "$(YELLOW)Restarting all services...$(NC)"
+	$(call ensure-env-files)
 	docker compose -f $(COMPOSE_FILE) restart
 	@echo "$(GREEN)✓ Services restarted!$(NC)"
 
@@ -60,12 +77,14 @@ dev: up ## Start development environment (alias for up)
 ## Service-specific commands
 api: ## Start only the API service
 	@echo "$(YELLOW)Starting API service...$(NC)"
+	$(call ensure-env-files)
 	docker compose -f $(COMPOSE_FILE) up --build api -d
 	@echo "$(GREEN)✓ API service started!$(NC)"
 	@echo "$(CYAN)API: http://localhost:8000$(NC)"
 
 frontend: ## Start only the frontend service
 	@echo "$(YELLOW)Starting frontend service...$(NC)"
+	$(call ensure-env-files)
 	docker compose -f $(COMPOSE_FILE) up --build frontend -d
 	@echo "$(GREEN)✓ Frontend service started!$(NC)"
 	@echo "$(CYAN)Frontend: http://localhost:3000$(NC)"
@@ -221,6 +240,9 @@ install-frontend: ## Install/update frontend dependencies
 	@echo "$(YELLOW)Installing frontend dependencies...$(NC)"
 	@chmod +x ./test-frontend.sh
 	./test-frontend.sh install
+
+env-setup: ## Create .env files from .env.example if they don't exist
+	$(call ensure-env-files)
 
 ## Status and Health
 status: ## Show status of all services
