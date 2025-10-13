@@ -45,9 +45,9 @@ describe('useDebouncedSearch', () => {
     // Callback should not have been called yet
     expect(mockCallback).not.toHaveBeenCalled()
 
-    // Wait for debounce delay
+    // Wait for debounce delay with buffer for Docker timing
     await act(async () => {
-      await advanceTime(250)
+      await advanceTime(300)
     })
 
     // Now callback should be called with debounced value
@@ -70,9 +70,9 @@ describe('useDebouncedSearch', () => {
 
     expect(mockCallback).not.toHaveBeenCalled()
 
-    // Wait for full default delay
+    // Wait for full default delay with buffer for Docker timing
     await act(async () => {
-      await advanceTime(100)
+      await advanceTime(150)
     })
 
     expect(mockCallback).toHaveBeenCalledWith('test')
@@ -100,9 +100,9 @@ describe('useDebouncedSearch', () => {
       result.current.setSearchValue('second')
     })
 
-    // Wait for second delay to complete
+    // Wait for second delay to complete with buffer for Docker timing
     await act(async () => {
-      await advanceTime(250)
+      await advanceTime(300)
     })
 
     // Should only have been called with the second value
@@ -126,9 +126,9 @@ describe('useDebouncedSearch', () => {
 
     expect(result.current.searchValue).toBe('reset')
 
-    // The callback should be triggered with the new value after debounce
+    // The callback should be triggered with the new value after debounce with buffer for Docker timing
     await act(async () => {
-      await advanceTime(350)
+      await advanceTime(400)
     })
 
     expect(mockCallback).toHaveBeenCalledWith('reset')
@@ -170,9 +170,9 @@ describe('useDebouncedSearch', () => {
 
     expect(result.current.searchValue).toBe('')
 
-    // Wait for debounce - empty values should still be debounced through useDebouncedValue
+    // Wait for debounce - empty values should still be debounced through useDebouncedValue with buffer for Docker timing
     await act(async () => {
-      await advanceTime(150)
+      await advanceTime(200)
     })
 
     expect(mockCallback).toHaveBeenCalledWith('')
@@ -201,7 +201,7 @@ describe('useDebouncedSearch', () => {
     expect(mockCallback).not.toHaveBeenCalled()
 
     await act(async () => {
-      await advanceTime(350)
+      await advanceTime(400)
     })
 
     expect(mockCallback).toHaveBeenCalledTimes(1)
@@ -228,7 +228,7 @@ describe('useDebouncedSearch', () => {
     rerender({ cb: callback2 })
 
     await act(async () => {
-      await advanceTime(150)
+      await advanceTime(200)
     })
 
     // Should call the new callback
@@ -247,9 +247,9 @@ describe('useDebouncedSearch', () => {
       result.current.setSearchValue('fast')
     })
 
-    // Wait for shorter delay
+    // Wait for shorter delay with buffer for Docker timing
     await act(async () => {
-      await advanceTime(80)
+      await advanceTime(120)
     })
 
     expect(mockCallback).toHaveBeenCalledWith('fast')

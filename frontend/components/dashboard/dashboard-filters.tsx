@@ -100,7 +100,7 @@ export function DashboardFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Sources</SelectItem>
-              {metadata?.sources.map((source) => (
+              {metadata?.sources?.map((source) => (
                 <SelectItem key={source} value={source}>
                   {source}
                 </SelectItem>

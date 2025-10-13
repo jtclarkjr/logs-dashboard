@@ -29,13 +29,13 @@ export function DashboardMetadata({
     <Alert>
       <InfoIcon className="h-4 w-4" />
       <AlertDescription>
-        Dashboard showing data from {metadata.total_logs.toLocaleString()} total
-        logs across {metadata.sources.length} sources. Data range:{' '}
-        {metadata.date_range.earliest
+        Dashboard showing data from {metadata?.total_logs?.toLocaleString() || 'N/A'} total
+        logs across {metadata?.sources?.length || 0} sources. Data range:{' '}
+        {metadata?.date_range?.earliest
           ? format(new Date(metadata.date_range.earliest), 'MMM dd, yyyy')
           : 'N/A'}{' '}
         to{' '}
-        {metadata.date_range.latest
+        {metadata?.date_range?.latest
           ? format(new Date(metadata.date_range.latest), 'MMM dd, yyyy')
           : 'N/A'}
       </AlertDescription>

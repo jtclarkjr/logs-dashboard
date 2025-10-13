@@ -7,5 +7,13 @@ services:
       - NODE_ENV=test
       - BUN_RUNTIME_TRANSPILER_CACHE_PATH=0
     volumes:
-      - ./frontend:/app  # Mount source code for development
+      # Mount source files but preserve container's node_modules
+      - ./frontend/app:/app/app
+      - ./frontend/lib:/app/lib
+      - ./frontend/components:/app/components
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/bun.config.ts:/app/bun.config.ts
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/tailwind.config.ts:/app/tailwind.config.ts
+      - ./frontend/next.config.mjs:/app/next.config.mjs
     entrypoint: []  # Override the entrypoint
