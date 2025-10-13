@@ -113,26 +113,16 @@ function getUserErrorMessage(error: unknown, fallback: string): string {
 }
 
 // Mock React Query hooks to simulate their behavior
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const mockUseQuery = mock(
-  (options: {
-    queryKey: readonly unknown[]
-    queryFn: () => Promise<unknown>
-    enabled?: boolean
-    placeholderData?: (data: unknown) => unknown
-    staleTime?: number
-    select?: (data: unknown) => unknown
-  }) => {
-    // Simulate basic useQuery behavior for testing
-    return {
-      data: undefined,
-      isLoading: true,
-      isError: false,
-      error: null,
-      refetch: mock(() => Promise.resolve())
-    }
+const mockUseQuery = mock(() => {
+  // Simulate basic useQuery behavior for testing
+  return {
+    data: undefined,
+    isLoading: true,
+    isError: false,
+    error: null,
+    refetch: mock(() => Promise.resolve())
   }
-)
+})
 
 const mockUseMutation = mock(
   (options: {
