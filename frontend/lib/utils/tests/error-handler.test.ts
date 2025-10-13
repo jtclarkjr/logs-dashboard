@@ -290,5 +290,135 @@ describe('error-handler', () => {
 
       expect(mockConsoleWarn).toHaveBeenCalledWith('Test message', error)
     })
+
+    it('should log ApiError instances as warnings', () => {
+      const apiError = new MockApiError('API Error', 400)
+      apiError.toJSON = jest.fn().mockReturnValue({ error: 'formatted' })
+
+      logWarning('Test message', apiError)
+
+      expect(mockConsoleWarn).toHaveBeenCalledWith('Test message', { error: 'formatted' })
+    })
+  })
+
+  describe('Additional getErrorDisplayInfo cases', () => {
+    it('should handle not found errors', () => {
+      const apiError = new MockApiError('Not Found', 404, 2001)
+      const result = getErrorDisplayInfo(apiError)
+
+      expect(result).toEqual({
+        title: 'Not Found',
+        message: 'Not Found',
+        canRetry: false,
+        details: [],
+        suggestedAction: 'The requested resource could not be found. Please check the URL or navigate back.'
+      })
+    })
+
+    it('should handle server errors', () => {
+      const apiError = new MockApiError('Internal Server Error', 500)
+      const result = getErrorDisplayInfo(apiError)
+
+      expect(result).toEqual({
+        title: 'Server Error',
+        message: 'Internal Server Error',
+        canRetry: true,
+        details: [],
+        suggestedAction: 'This is a server-side issue. Please try again later.'
+      })
+    })
+
+    it('should handle client errors (4xx)', () => {
+      const apiError = new MockApiError('Bad Request', 400)
+      const result = getErrorDisplayInfo(apiError)
+
+      expect(result).toEqual({
+        title: 'Request Error',
+        message: 'Bad Request',
+        canRetry: true,
+        details: [],
+        suggestedAction: 'There was an issue with your request. Please check your input and try again.'
+      })
+    })
+  })
+
+  describe('Additional isRetryableError cases', () => {
+    it('should return false for ApiError validation errors', () => {
+      const validationErrors: ValidationErrorDetail[] = [
+        { field: 'email', reason: 'Invalid' }
+      ]
+      const apiError = new MockApiError('Validation Error', 422, 1001, undefined, validationErrors)
+      
+      const result = isRetryableError(apiError)
+      
+      expect(result).toBe(false)
+    })
+
+    it('should return false for ApiError not found errors', () => {
+      const apiError = new MockApiError('Not Found', 404, 2001)
+      
+      const result = isRetryableError(apiError)
+      
+      expect(result).toBe(false)
+    })
+
+    it('should return true for ApiError server errors', () => {
+      const apiError = new MockApiError('Server Error', 500)
+      
+      const result = isRetryableError(apiError)
+      
+      expect(result).toBe(true)
+    })
+  })
+
+  describe('Additional getErrorMessage cases', () => {
+    it('should get detailed message from ApiError', () => {
+      const apiError = new MockApiError('API Error', 400)
+      apiError.getDetailedMessage = jest.fn().mockReturnValue('Detailed API error message')
+      
+      const result = getErrorMessage(apiError)
+      
+      expect(result).toBe('Detailed API error message')
+      expect(apiError.getDetailedMessage).toHaveBeenCalled()
+    })
+  })
+
+  describe('Additional logError cases', () => {
+    it('should log ApiError instances with JSON', () => {
+      const apiError = new MockApiError('API Error', 400)
+      apiError.toJSON = jest.fn().mockReturnValue({ error: 'api error data' })
+
+      logError('Test message', apiError)
+
+      expect(mockConsoleError).toHaveBeenCalledWith('Test message', { error: 'api error data' })
+    })
+
+    it('should log Error instances with cause when present', () => {
+      const error = new Error('Test error')
+      ;(error as Error & { cause?: string }).cause = 'Root cause'
+      error.stack = 'Error stack'
+
+      logError('Test message', error)
+
+      expect(mockConsoleError).toHaveBeenCalledWith('Test message', {
+        name: 'Error',
+        message: 'Test error',
+        stack: 'Error stack',
+        cause: 'Root cause'
+      })
+    })
+
+    it('should log Error instances without cause', () => {
+      const error = new Error('Test error')
+      error.stack = 'Error stack'
+
+      logError('Test message', error)
+
+      expect(mockConsoleError).toHaveBeenCalledWith('Test message', {
+        name: 'Error',
+        message: 'Test error',
+        stack: 'Error stack'
+      })
+    })
   })
 })
