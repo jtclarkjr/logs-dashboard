@@ -195,9 +195,6 @@ make test-parallel
 
 # Quick validation tests
 make test-fast
-
-# Full CI pipeline simulation
-make test-ci
 ```
 
 #### Test Types
@@ -210,6 +207,7 @@ make test-integration
 
 # Tests with coverage reports
 make coverage
+```
 
 #### Component-Specific Testing
 ```bash
@@ -220,20 +218,22 @@ make test-api
 make test-frontend
 ```
 
-#### Development Testing
-```bash
-# Continuous testing (frontend)
-make watch-tests
+## Docker Configuration
 
-# Code formatting
-make format
+### Dockerfiles
+- `Dockerfile.api` - Multi-stage API image (development/production)
+- `Dockerfile.api.test` - Isolated test environment for API with pytest
+- `Dockerfile.frontend` - Production-optimized Next.js build using Bun
+- `Dockerfile.frontend.test` - Test environment for frontend with Bun runtime
 
-# TypeScript type checking
-make type-check
-```
+### Docker Compose Files
+- `docker-compose.yml` - Main development stack (API + Frontend + PostgreSQL)
+- `docker-compose.api-test.yml` - API test environment with isolated test database
+- `docker-compose.frontend-test.yml` - Frontend test environment
 
-### Getting Help
-```bash
-# All available make commands
-make help
-```
+### Scripts
+- `api/entrypoint.sh` - Database initialization and seeding for API container
+- `api/test_runner.sh` - Configurable test runner supporting multiple test modes
+- `test-all.sh` - Master test orchestrator for both API and frontend
+- `test-api.sh` - Docker-based API test runner with cleanup
+- `test-frontend.sh` - Docker-based frontend test runner with Bun
