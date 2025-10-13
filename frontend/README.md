@@ -50,9 +50,10 @@ built with Next.js and a comprehensive design system approach.
   characteristics
 
 **Testing Performance Comparison** (lower is better):
+[Benchmark article]( https://dev.to/kcsujeet/your-tests-are-slow-you-need-to-migrate-to-bun-9hh)
 
 - **Jest**: ~17,000ms average test suite execution
-- **Vitest**: ~14,000ms average test suite execution
+- **Vitest**: ~12,000ms average test suite execution
 - **Bun**: ~4,500ms average test suite execution
 
 **Performance Advantage**: Bun's JS runtime built with Zig provides ~3-4x faster
