@@ -224,20 +224,3 @@ make type-check
 ```bash
 # All available make commands
 make help
-
-**Docker Compose Commands:**
-- `make up` → `docker compose up --build -d`
-- `make down` → `docker compose down -v`
-- `make logs-api` → `docker compose logs api -f --tail=20`
-- `make build` → `docker compose build`
-- `make restart` → `docker compose restart`
-
-**Test Script Execution:**
-- `make test` → `chmod +x ./test-all.sh && ./test-all.sh all`
-- `make test-api` → `chmod +x ./test-api.sh && ./test-api.sh all`
-- `make test-frontend` → `chmod +x ./test-frontend.sh && ./test-frontend.sh all`
-
-**Combined Workflows:**
-- `make dev-reset` → Full cleanup, build, and startup sequence
-- `make clean` → Docker cleanup + test environment cleanup
-- `make health` → Service health checks using curl and Docker commands
