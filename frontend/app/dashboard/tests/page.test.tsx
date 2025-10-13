@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test'
-import { render } from '@testing-library/react'
+import { render, cleanup } from '@testing-library/react'
 import { subDays } from 'date-fns'
 import DashboardPage from '../page'
 import type { LogAggregationResponse } from '@/lib/types/log'

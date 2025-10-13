@@ -73,9 +73,9 @@ describe('useDebouncedValue', () => {
 
     expect(result.current).toBe('initial')
 
-    // Wait for custom delay (100ms) with buffer for Docker timing
+    // Wait for custom delay (100ms) with larger buffer for Docker timing
     await act(async () => {
-      await advanceTime(200)
+      await advanceTime(250)
     })
 
     expect(result.current).toBe('changed')

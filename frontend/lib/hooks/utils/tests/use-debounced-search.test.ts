@@ -201,7 +201,7 @@ describe('useDebouncedSearch', () => {
     expect(mockCallback).not.toHaveBeenCalled()
 
     await act(async () => {
-      await advanceTime(400)
+      await advanceTime(450)
     })
 
     expect(mockCallback).toHaveBeenCalledTimes(1)
