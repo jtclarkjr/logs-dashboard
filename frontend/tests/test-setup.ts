@@ -1,7 +1,32 @@
 /// <reference lib="dom" />
-import '@testing-library/jest-dom'
 import { cleanup } from '@testing-library/react'
-import { afterEach } from 'bun:test'
+import { afterEach, expect } from 'bun:test'
+import { toHaveAccessibleDescription, toHaveAccessibleName, toHaveAttribute, toHaveClass, toHaveDisplayValue, toHaveFocus, toHaveFormValues, toHaveStyle, toHaveTextContent, toHaveValue, toBeChecked, toBeDisabled, toBeEmptyDOMElement, toBeEnabled, toBeInTheDocument, toBeInvalid, toBePartiallyChecked, toBeRequired, toBeValid, toBeVisible, toHaveErrorMessage } from '@testing-library/jest-dom/matchers'
+
+// Extend expect with jest-dom matchers
+expect.extend({
+  toHaveAccessibleDescription,
+  toHaveAccessibleName,
+  toHaveAttribute,
+  toHaveClass,
+  toHaveDisplayValue,
+  toHaveFocus,
+  toHaveFormValues,
+  toHaveStyle,
+  toHaveTextContent,
+  toHaveValue,
+  toBeChecked,
+  toBeDisabled,
+  toBeEmptyDOMElement,
+  toBeEnabled,
+  toBeInTheDocument,
+  toBeInvalid,
+  toBePartiallyChecked,
+  toBeRequired,
+  toBeValid,
+  toBeVisible,
+  toHaveErrorMessage
+})
 
 // Cleanup after each test case
 afterEach(() => {

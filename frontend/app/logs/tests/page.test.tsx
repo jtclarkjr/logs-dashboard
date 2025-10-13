@@ -7,26 +7,6 @@ import type { SortOrder, SortByField } from '@/lib/types/filters'
 import { SeverityLevel } from '@/lib/enums/severity'
 import { DEFAULT_PAGE_SIZE } from '@/lib/constants/pagination'
 
-// Mock the logs client component
-mock.module('../logs-client', () => ({
-  LogsClient: ({
-    initialData,
-    initialFilters
-  }: {
-    initialData: unknown
-    initialFilters: unknown
-  }) => (
-    <div data-testid="logs-client">
-      <div data-testid="initial-data">{JSON.stringify(initialData)}</div>
-      <div data-testid="initial-filters">{JSON.stringify(initialFilters)}</div>
-    </div>
-  )
-}))
-
-// Mock the initial logs data API
-mock.module('@/lib/clients/initial/logs-api', () => ({
-  getInitialLogs: mock(async () => mockLogListResponse)
-}))
 
 // Mock data
 const mockLogListResponse: LogListResponse = {
@@ -54,6 +34,27 @@ const mockLogListResponse: LogListResponse = {
   total_pages: 3
 }
 
+// Mock the logs client component
+mock.module('../logs-client', () => ({
+  LogsClient: ({
+    initialData,
+    initialFilters
+  }: {
+    initialData: unknown
+    initialFilters: unknown
+  }) => (
+    <div data-testid="logs-client">
+      <div data-testid="initial-data">{JSON.stringify(initialData)}</div>
+      <div data-testid="initial-filters">{JSON.stringify(initialFilters)}</div>
+    </div>
+  )
+}))
+
+// Mock the initial logs data API
+mock.module('@/lib/clients/initial/logs-api', () => ({
+  getInitialLogs: mock(async () => mockLogListResponse)
+}))
+
 describe('LogsPage', () => {
   beforeEach(() => {
     // Reset mocks
@@ -67,13 +68,13 @@ describe('LogsPage', () => {
   describe('Default behavior', () => {
     it('should render with default parameters when no search params provided', async () => {
       const searchParams = Promise.resolve({})
-      const { getByTestId } = render(await LogsPage({ searchParams }))
+      const { container, getByTestId } = render(await LogsPage({ searchParams }))
 
       const clientComponent = getByTestId('logs-client')
       expect(clientComponent).toBeTruthy()
 
       const initialFilters = JSON.parse(
-        getByTestId('initial-filters').textContent || '{}'
+        container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
       )
 
       // Check default filters
@@ -88,13 +89,13 @@ describe('LogsPage', () => {
 
     it('should use default pagination settings', async () => {
       const searchParams = Promise.resolve({})
-      const { getByTestId } = render(await LogsPage({ searchParams }))
+      const { container } = render(await LogsPage({ searchParams }))
 
       const initialData = JSON.parse(
-        getByTestId('initial-data').textContent || '{}'
+        container.querySelector('[data-testid="initial-data"]')?.textContent || '{}'
       )
       const initialFilters = JSON.parse(
-        getByTestId('initial-filters').textContent || '{}'
+        container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
       )
 
       expect(initialFilters.currentPage).toBe(1)
@@ -109,10 +110,10 @@ describe('LogsPage', () => {
           page: '3'
         })
 
-        const { getByTestId } = render(await LogsPage({ searchParams }))
+        const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          getByTestId('initial-filters').textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
         )
         expect(initialFilters.currentPage).toBe(3)
       })
@@ -123,6 +124,7 @@ describe('LogsPage', () => {
         })
 
         const mockGetInitialLogs = mock(async () => mockLogListResponse)
+        // Override the beforeEach mock for this specific test
         mock.module('@/lib/clients/initial/logs-api', () => ({
           getInitialLogs: mockGetInitialLogs
         }))
@@ -143,10 +145,10 @@ describe('LogsPage', () => {
           search: 'error message'
         })
 
-        const { getByTestId } = render(await LogsPage({ searchParams }))
+        const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          getByTestId('initial-filters').textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
         )
         expect(initialFilters.searchQuery).toBe('error message')
       })
@@ -156,10 +158,10 @@ describe('LogsPage', () => {
           severity: 'error'
         })
 
-        const { getByTestId } = render(await LogsPage({ searchParams }))
+        const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          getByTestId('initial-filters').textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
         )
         expect(initialFilters.selectedSeverity).toBe('error')
       })
@@ -169,16 +171,17 @@ describe('LogsPage', () => {
           source: 'web-server'
         })
 
-        const { getByTestId } = render(await LogsPage({ searchParams }))
+        const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          getByTestId('initial-filters').textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
         )
         expect(initialFilters.selectedSource).toBe('web-server')
       })
 
       it('should ignore all severity filter and not include in API call', async () => {
         const mockGetInitialLogs = mock(async () => mockLogListResponse)
+        // Override the beforeEach mock for this specific test
         mock.module('@/lib/clients/initial/logs-api', () => ({
           getInitialLogs: mockGetInitialLogs
         }))
@@ -195,6 +198,7 @@ describe('LogsPage', () => {
 
       it('should ignore all source filter and not include in API call', async () => {
         const mockGetInitialLogs = mock(async () => mockLogListResponse)
+        // Override the beforeEach mock for this specific test
         mock.module('@/lib/clients/initial/logs-api', () => ({
           getInitialLogs: mockGetInitialLogs
         }))
@@ -216,10 +220,10 @@ describe('LogsPage', () => {
           sort_by: 'severity'
         })
 
-        const { getByTestId } = render(await LogsPage({ searchParams }))
+        const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          getByTestId('initial-filters').textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
         )
         expect(initialFilters.sortBy).toBe('severity')
       })
@@ -229,10 +233,10 @@ describe('LogsPage', () => {
           sort_order: 'asc' as SortOrder
         })
 
-        const { getByTestId } = render(await LogsPage({ searchParams }))
+        const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          getByTestId('initial-filters').textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
         )
         expect(initialFilters.sortOrder).toBe('asc')
       })
@@ -248,10 +252,10 @@ describe('LogsPage', () => {
           end_date: endDate
         })
 
-        const { getByTestId } = render(await LogsPage({ searchParams }))
+        const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          getByTestId('initial-filters').textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
         )
 
         expect(initialFilters.dateRange).toBeTruthy()
@@ -268,10 +272,10 @@ describe('LogsPage', () => {
           start_date: '2024-01-01T00:00:00Z'
         })
 
-        const { getByTestId } = render(await LogsPage({ searchParams }))
+        const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          getByTestId('initial-filters').textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
         )
         expect(initialFilters.dateRange).toBeUndefined()
       })
@@ -281,10 +285,10 @@ describe('LogsPage', () => {
           end_date: '2024-01-08T00:00:00Z'
         })
 
-        const { getByTestId } = render(await LogsPage({ searchParams }))
+        const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          getByTestId('initial-filters').textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
         )
         expect(initialFilters.dateRange).toBeUndefined()
       })
@@ -304,10 +308,10 @@ describe('LogsPage', () => {
           end_date: '2024-01-08T00:00:00Z'
         })
 
-        const { getByTestId } = render(await LogsPage({ searchParams }))
+        const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          getByTestId('initial-filters').textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
         )
 
         expect(initialFilters.currentPage).toBe(2)
@@ -360,10 +364,10 @@ describe('LogsPage', () => {
 
     it('should pass initial data to client component', async () => {
       const searchParams = Promise.resolve({})
-      const { getByTestId } = render(await LogsPage({ searchParams }))
+      const { container } = render(await LogsPage({ searchParams }))
 
       const initialData = JSON.parse(
-        getByTestId('initial-data').textContent || '{}'
+        container.querySelector('[data-testid="initial-data"]')?.textContent || '{}'
       )
 
       expect(initialData.logs).toBeTruthy()
@@ -485,9 +489,9 @@ describe('LogsPage', () => {
       const searchParams = Promise.resolve({})
 
       // Should render without throwing an error
-      const { getByTestId } = render(await LogsPage({ searchParams }))
+      const { container } = render(await LogsPage({ searchParams }))
 
-      expect(getByTestId('logs-client')).toBeTruthy()
+      expect(container.querySelector('[data-testid="logs-client"]')).toBeTruthy()
     })
   })
 
@@ -500,16 +504,16 @@ describe('LogsPage', () => {
         source: 'web-server'
       })
 
-      const { getByTestId } = render(await LogsPage({ searchParams }))
+      const { container } = render(await LogsPage({ searchParams }))
 
-      const clientComponent = getByTestId('logs-client')
+      const clientComponent = container.querySelector('[data-testid="logs-client"]')
       expect(clientComponent).toBeTruthy()
 
       const initialData = JSON.parse(
-        getByTestId('initial-data').textContent || '{}'
+        container.querySelector('[data-testid="initial-data"]')?.textContent || '{}'
       )
       const initialFilters = JSON.parse(
-        getByTestId('initial-filters').textContent || '{}'
+        container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
       )
 
       expect(initialData).toBeTruthy()
