@@ -143,12 +143,6 @@ class TestPytestFeatures:
         response = test_client.get("/api/v1/logs/aggregation")
         assert response.status_code == 200
     
-    @pytest.mark.xfail(reason="Feature not implemented yet")
-    def test_future_feature(self, test_client: TestClient):
-        """Example of expected failure for future features."""
-        # This test is expected to fail until the feature is implemented
-        response = test_client.get("/api/v1/logs/future-endpoint")
-        assert response.status_code == 200
 
 
 class TestPytestMarkers:
