@@ -13,34 +13,34 @@ echo ""
 case "${1:-all}" in
     "coverage")
         echo "Running tests with coverage..."
-        python -m pytest tests/ -v --cov=app --cov-report=html:htmlcov --cov-report=term-missing --cov-report=xml
+        python -m pytest tests/ --cov-report=xml
         ;;
     "fast")
         echo "Running fast tests (excluding slow tests)..."
-        python -m pytest tests/ -v -m "not slow" --tb=short
+        python -m pytest tests/ -m "not slow"
         ;;
     "integration")
         echo "Running integration tests only..."
-        python -m pytest tests/integration/ -v --tb=short
+        python -m pytest tests/integration/
         ;;
     "unit")
         echo "Running unit tests only..."
-        python -m pytest tests/ -v -k "not integration" --tb=short
+        python -m pytest tests/ -k "not integration"
         ;;
     "api")
         echo "Running API tests only..."
-        python -m pytest tests/api/ -v --tb=short
+        python -m pytest tests/api/
         ;;
     "debug")
         echo "Running tests with debug info..."
-        python -m pytest tests/ -v -s --tb=long
+        python -m pytest tests/ -s --tb=long
         ;;
     *)
         echo "Running all tests..."
         if [ $# -eq 0 ] || [ "$1" = "all" ]; then
-            python -m pytest tests/ -v --tb=short
+            python -m pytest tests/
         else
-            python -m pytest tests/ -v --tb=short "$@"
+            python -m pytest tests/ "$@"
         fi
         ;;
 esac
