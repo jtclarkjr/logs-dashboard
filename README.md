@@ -64,23 +64,6 @@ make help
 
 The Makefile wraps and simplifies these underlying commands:
 
-**Docker Compose Commands:**
-- `make up` → `docker compose up --build -d`
-- `make down` → `docker compose down -v`
-- `make logs-api` → `docker compose logs api -f --tail=20`
-- `make build` → `docker compose build`
-- `make restart` → `docker compose restart`
-
-**Test Script Execution:**
-- `make test` → `chmod +x ./test-all.sh && ./test-all.sh all`
-- `make test-api` → `chmod +x ./test-api.sh && ./test-api.sh all`
-- `make test-frontend` → `chmod +x ./test-frontend.sh && ./test-frontend.sh all`
-
-**Combined Workflows:**
-- `make dev-reset` → Full cleanup, build, and startup sequence
-- `make clean` → Docker cleanup + test environment cleanup
-- `make health` → Service health checks using curl and Docker commands
-
 ### Common Development Workflows
 
 #### Full Development Setup
@@ -191,49 +174,70 @@ The API will be available at `http://localhost:8000`
 ### Testing
 
 #### Quick Testing Commands
-
-Run all tests (API + Frontend):
 ```bash
+# Run all tests (API + Frontend)
 make test
-```
 
-Run tests in parallel for faster execution:
-```bash
+# Run tests in parallel for faster execution
 make test-parallel
-```
 
-Run quick validation tests:
-```bash
+# Quick validation tests
 make test-fast
+
+# Full CI pipeline simulation
+make test-ci
 ```
 
-Run integration tests:
+#### Test Types
 ```bash
+# Unit tests only
+make test-unit
+
+# Integration tests only
 make test-integration
-```
+
+# Tests with coverage reports
+make coverage
 
 #### Component-Specific Testing
-
-API tests only:
 ```bash
+# API tests only
 make test-api
-```
 
-Frontend tests only:
-```bash
+# Frontend tests only
 make test-frontend
 ```
 
+#### Development Testing
+```bash
+# Continuous testing (frontend)
+make watch-tests
+
+# Code formatting
+make format
+
+# TypeScript type checking
+make type-check
+```
+
 #### Getting Help
-
-For all available test commands:
 ```bash
+# All available make commands
 make help
-```
 
-For script-specific options (if needed):
-```bash
-./test-all.sh help
-./test-api.sh help
-./test-frontend.sh help
-```
+**Docker Compose Commands:**
+- `make up` → `docker compose up --build -d`
+- `make down` → `docker compose down -v`
+- `make logs-api` → `docker compose logs api -f --tail=20`
+- `make build` → `docker compose build`
+- `make restart` → `docker compose restart`
+
+**Test Script Execution:**
+- `make test` → `chmod +x ./test-all.sh && ./test-all.sh all`
+- `make test-api` → `chmod +x ./test-api.sh && ./test-api.sh all`
+- `make test-frontend` → `chmod +x ./test-frontend.sh && ./test-frontend.sh all`
+
+**Combined Workflows:**
+- `make dev-reset` → Full cleanup, build, and startup sequence
+- `make clean` → Docker cleanup + test environment cleanup
+- `make health` → Service health checks using curl and Docker commands
