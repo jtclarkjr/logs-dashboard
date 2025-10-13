@@ -21,6 +21,11 @@ logs-dashboard/
 └── frontend/     # Next.js frontend application
 ```
 
+Folder related Descisions and tech have seperate README files.
+
+- [API README](/api/README.md)
+- [Frontend README](/frontend/README.md)
+
 ## Getting Started
 
 ### Quick Start with Makefile
