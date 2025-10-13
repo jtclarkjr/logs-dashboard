@@ -137,7 +137,7 @@ case $TEST_SUITE in
         ;;
     "pages")
         echo "Running page tests only..."
-        run_tests "Pages" "app/**/*.test.*" || ((FAILED_TESTS++))
+        run_tests "Pages" "app/**/tests/*.test.*" || ((FAILED_TESTS++))
         ;;
     "state")
         echo "Running state management tests..."
@@ -161,7 +161,7 @@ case $TEST_SUITE in
         ;;
     "integration")
         echo "Running integration tests..."
-        run_tests "Integration" "app/**/*.test.*" || ((FAILED_TESTS++))
+        run_tests "Integration" "app/**/tests/*.test.*" || ((FAILED_TESTS++))
         ;;
     "lint")
         echo "Running linting only..."
@@ -236,7 +236,7 @@ case $TEST_SUITE in
         echo "  Test Suites:"
         echo "    all         - Run all tests with linting (default)"
         echo "    unit        - Run unit tests (lib/**/*.test.*)"
-        echo "    integration - Run integration tests (app/**/*.test.*)"
+        echo "    integration - Run integration tests (app/**/tests/*.test.*)"
         echo "    hooks       - Run hooks tests only"
         echo "    utils       - Run utility tests only"
         echo "    services    - Run service tests only"
