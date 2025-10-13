@@ -1,5 +1,5 @@
 # Use Python 3.11 slim image
-FROM python:3.11-slim as base
+FROM python:3.11-slim AS base
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -18,7 +18,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Development stage
-FROM base as development
+FROM base AS development
 
 # Copy requirements first for better caching
 COPY api/requirements.txt .
@@ -40,7 +40,7 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 # Production stage
-FROM base as production
+FROM base AS production
 
 # Copy requirements and install dependencies
 COPY api/requirements.txt .
