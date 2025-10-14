@@ -102,21 +102,9 @@ make logs-db      # Database logs
 make down
 ```
 
-#### Quick Testing Workflow
-```bash
-# Fast validation
-make quick-test
-
-# Complete test suite with coverage
-make full-test
-
-# Continuous testing
-make watch-tests
-```
-
 #### Maintenance
 ```bash
-# Clean up everything
+# Clean up everything (warning removes all containers and images)
 make clean
 
 # Update frontend dependencies
