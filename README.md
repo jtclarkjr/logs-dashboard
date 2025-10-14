@@ -30,7 +30,7 @@ Folder related Descisions and tech have seperate README files.
 
 ### Quick Start with Makefile
 
-> **Note:** This project uses a Makefile to wrap Docker Compose commands and test scripts for easier management. All `docker compose` commands and script executions are handled through `make` targets. First initial docker build can take up to 140s with cpu limit 8 and memory limit 4GB after that it averages at 2s.
+> **Note:** This project uses a Makefile to wrap Docker Compose commands and test scripts for easier management. All `docker compose` commands and script executions are handled through `make` targets. First initial docker build can take up to 140s with cpu limit 8 and memory limit 4GB after that it averages at 2s. Scripts use docker compose instead of docker-compose this should be ok if using Docker desktop.
 
 Run the entire application stack:
 
