@@ -20,7 +20,7 @@ run_docker_tests() {
     echo -e "\n${YELLOW}Running $test_type tests with Docker...${NC}"
     
     # Build and run tests using internal script
-    if docker-compose -f docker-compose.api-test.yml run --rm api /app/test_runner.sh $extra_args; then
+    if docker compose -f docker-compose.api-test.yml run --rm api /app/test_runner.sh $extra_args; then
         echo -e "${GREEN} $test_type tests passed!${NC}"
         return 0
     else
@@ -34,7 +34,7 @@ TEST_SUITE=${1:-"all"}
 
 # Start test database
 echo -e "${YELLOW}Starting test database...${NC}"
-docker-compose -f docker-compose.api-test.yml up -d db
+docker compose -f docker-compose.api-test.yml up -d db
 
 # Wait for database to be ready
 echo -e "${YELLOW}Waiting for database to be ready...${NC}"
@@ -84,7 +84,7 @@ case $TEST_SUITE in
         ;;
     "build-only")
         echo "Building test image only..."
-        if docker-compose -f docker-compose.api-test.yml build api; then
+        if docker compose -f docker-compose.api-test.yml build api; then
             echo -e "${GREEN} Test image built successfully!${NC}"
         else
             echo -e "${RED} Failed to build test image!${NC}"
@@ -93,11 +93,11 @@ case $TEST_SUITE in
         ;;
     "shell")
         echo "Opening shell in test container..."
-        docker-compose -f docker-compose.api-test.yml run --rm api sh
+        docker compose -f docker-compose.api-test.yml run --rm api sh
         ;;
     "clean")
         echo "Cleaning up test containers and volumes..."
-        docker-compose -f docker-compose.api-test.yml down -v --remove-orphans
+        docker compose -f docker-compose.api-test.yml down -v --remove-orphans
         docker system prune -f
         echo -e "${GREEN} Cleanup completed!${NC}"
         ;;
@@ -126,7 +126,7 @@ esac
 # Cleanup
 if [ "$TEST_SUITE" != "shell" ] && [ "$TEST_SUITE" != "build-only" ] && [ "$TEST_SUITE" != "clean" ]; then
     echo -e "\n${YELLOW}Cleaning up...${NC}"
-    docker-compose -f docker-compose.api-test.yml down
+    docker compose -f docker-compose.api-test.yml down
 fi
 
 # Final summary
