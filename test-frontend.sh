@@ -29,7 +29,7 @@ run_docker_tests() {
     echo -e "\n${YELLOW}Running $test_type tests with Docker...${NC}"
     
     # Build and run tests using Docker Compose
-    if docker-compose -f docker-compose.frontend-test.yml run --rm frontend bun test $extra_args; then
+    if docker compose -f docker-compose.frontend-test.yml run --rm frontend bun test $extra_args; then
         echo -e "${GREEN}✓ $test_type tests passed!${NC}"
         return 0
     else
@@ -92,7 +92,7 @@ case $TEST_SUITE in
         ;;
     "lint")
         echo "Running linting with Docker..."
-        docker-compose -f docker-compose.frontend-test.yml run --rm frontend bun run lint || ((FAILED_TESTS++))
+        docker compose -f docker-compose.frontend-test.yml run --rm frontend bun run lint || ((FAILED_TESTS++))
         ;;
     "coverage")
         echo "Running tests with coverage report using Docker..."
@@ -100,7 +100,7 @@ case $TEST_SUITE in
         ;;
     "watch")
         echo "Starting test watcher with Docker..."
-        docker-compose -f docker-compose.frontend-test.yml run --rm frontend bun test --watch
+        docker compose -f docker-compose.frontend-test.yml run --rm frontend bun test --watch
         ;;
     "fast")
         echo "Running fast tests with Docker..."
@@ -120,11 +120,11 @@ case $TEST_SUITE in
         ;;
     "shell")
         echo "Opening shell in frontend Docker container..."
-        docker-compose -f docker-compose.frontend-test.yml run --rm frontend sh
+        docker compose -f docker-compose.frontend-test.yml run --rm frontend sh
         ;;
     "build")
         echo "Building frontend test image..."
-        if docker-compose -f docker-compose.frontend-test.yml build frontend; then
+        if docker compose -f docker-compose.frontend-test.yml build frontend; then
             echo -e "${GREEN}✓ Frontend test image built successfully!${NC}"
         else
             echo -e "${RED}✗ Failed to build frontend test image!${NC}"
@@ -133,13 +133,13 @@ case $TEST_SUITE in
         ;;
     "clean")
         echo "Cleaning up frontend test containers..."
-        docker-compose -f docker-compose.frontend-test.yml down -v --remove-orphans
+        docker compose -f docker-compose.frontend-test.yml down -v --remove-orphans
         docker system prune -f
         echo -e "${GREEN}✓ Docker cleanup completed!${NC}"
         ;;
     "install")
         echo "Building frontend test image (installs dependencies)..."
-        if docker-compose -f docker-compose.frontend-test.yml build frontend; then
+        if docker compose -f docker-compose.frontend-test.yml build frontend; then
             echo -e "${GREEN}✓ Dependencies installed in Docker image!${NC}"
         else
             echo -e "${RED}✗ Failed to install dependencies!${NC}"
@@ -148,7 +148,7 @@ case $TEST_SUITE in
         ;;
     "type-check")
         echo "Running TypeScript type checking with Docker..."
-        if docker-compose -f docker-compose.frontend-test.yml run --rm frontend bun run lint; then
+        if docker compose -f docker-compose.frontend-test.yml run --rm frontend bun run lint; then
             echo -e "${GREEN}✓ Type checking passed!${NC}"
         else
             echo -e "${RED}✗ Type checking failed!${NC}"
@@ -157,7 +157,7 @@ case $TEST_SUITE in
         ;;
     "format")
         echo "Running code formatting with Docker..."
-        if docker-compose -f docker-compose.frontend-test.yml run --rm frontend bun run prettier; then
+        if docker compose -f docker-compose.frontend-test.yml run --rm frontend bun run prettier; then
             echo -e "${GREEN}✓ Code formatting completed!${NC}"
         else
             echo -e "${RED}✗ Code formatting failed!${NC}"
