@@ -231,9 +231,8 @@ class TestLogUpdateValidation:
         }
         
         response = test_client.put(f"/api/v1/logs/{log_id}", json=update_data)
-        
-        # Should fail with database error due to NOT NULL constraints in PostgreSQL
-        # In SQLite this might succeed, but PostgreSQL enforces constraints strictly
+
+        # Should fail with database error due to NOT NULL constraints
         assert response.status_code == 500  # Database integrity error
 
 

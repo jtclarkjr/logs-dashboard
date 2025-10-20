@@ -15,19 +15,19 @@ from app.models.log import SeverityLevel
 from app.schemas.log import LogCreate
 
 
-# Test database URL - prefer environment variable, fallback to SQLite
-TEST_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test_logs_dashboard.db")
+# Test database URL - PostgreSQL
+_database_url = os.getenv("DATABASE_URL")
+if not _database_url:
+    raise ValueError("DATABASE_URL environment variable must be set for testing")
+
+TEST_DATABASE_URL: str = _database_url
 
 
 @pytest.fixture(scope="session")
 def test_engine():
     """Create test database engine."""
-    # Different connection args for SQLite vs PostgreSQL
-    connect_args = {}
-    if "sqlite" in TEST_DATABASE_URL:
-        connect_args["check_same_thread"] = False  # Needed for SQLite
-    
-    engine = create_engine(TEST_DATABASE_URL, connect_args=connect_args)
+    # PostgreSQL connection
+    engine = create_engine(TEST_DATABASE_URL)
     return engine
 
 
@@ -59,7 +59,7 @@ def test_db_session(test_engine, test_session_factory) -> Generator[Session, Non
 
 
 @pytest.fixture(scope="function")
-def test_client(test_db_session: Session) -> TestClient:
+def test_client(test_db_session: Session) -> Generator[TestClient, None, None]:
     """
     Create a test client with dependency override for database session.
     """
@@ -92,7 +92,8 @@ def sample_log_create_data() -> LogCreate:
     return LogCreate(
         message="Test log message for creation",
         severity=SeverityLevel.INFO,
-        source="test-service-create"
+        source="test-service-create",
+        timestamp=datetime.now()
     )
 
 
@@ -191,6 +192,3 @@ class TestData:
 def cleanup_test_db():
     """Clean up test database after all tests."""
     yield
-    # Clean up test database file if it exists
-    if os.path.exists("test_logs_dashboard.db"):
-        os.remove("test_logs_dashboard.db")
