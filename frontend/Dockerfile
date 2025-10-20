@@ -11,7 +11,7 @@ RUN apt-get -y update && \
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY frontend/package.json frontend/bun.lock* ./
+COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile
 
 # Test stage
@@ -26,14 +26,14 @@ ENV NODE_ENV=test \
 WORKDIR /app
 
 # Copy package.json and bun.lockb for dependency installation
-COPY frontend/package.json ./
-COPY frontend/bun.lockb* ./
+COPY package.json ./
+COPY bun.lockb* ./
 
 # Install dependencies
 RUN bun install --frozen-lockfile
 
 # Copy the frontend source code
-COPY frontend/ ./
+COPY . ./
 
 # Override entrypoint and set command to run tests
 ENTRYPOINT []
@@ -44,10 +44,10 @@ FROM base AS builder
 WORKDIR /app
 
 # Copy environment file for build
-COPY frontend/.env* ./
+COPY .env* ./
 
 # Copy source code
-COPY frontend/ .
+COPY . .
 
 # Build the app
 RUN bun run build

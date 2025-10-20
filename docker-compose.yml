@@ -3,8 +3,8 @@ services:
   api:
     profiles: ["dev", "development"]
     build:
-      context: .
-      dockerfile: Dockerfile.api
+      context: ./api
+      dockerfile: Dockerfile
       target: development
     ports:
       - "8000:8000"
@@ -33,8 +33,8 @@ services:
   api-test:
     profiles: ["test", "api-test"]
     build:
-      context: .
-      dockerfile: Dockerfile.api
+      context: ./api
+      dockerfile: Dockerfile
       target: test
     environment:
       - DATABASE_URL=postgresql://postgres:password@db-test:5432/logs_dashboard_test
@@ -51,8 +51,8 @@ services:
   frontend:
     profiles: ["dev", "development"]
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ./frontend
+      dockerfile: Dockerfile
       target: production
     container_name: frontend
     ports:
@@ -78,8 +78,8 @@ services:
   frontend-test:
     profiles: ["test", "frontend-test"]
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ./frontend
+      dockerfile: Dockerfile
       target: test
     environment:
       - NODE_ENV=test

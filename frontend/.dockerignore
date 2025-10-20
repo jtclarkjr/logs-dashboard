@@ -3,6 +3,16 @@
 .gitignore
 README.md
 
+# Node.js (Frontend)
+frontend/node_modules
+frontend/npm-debug.log
+frontend/.next
+frontend/.env*.local
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend/.vite/
+
 # IDEs
 .vscode/
 .idea/
