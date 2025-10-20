@@ -13,6 +13,15 @@ This project uses a **Makefile** to simplify Docker Compose commands and script 
 - **Better Discoverability:** `make help` shows all available commands
 - **Workflow-Oriented:** Commands grouped by development tasks
 
+## Deployment
+
+The application is deployed on Google Cloud Platform using Cloud Run:
+
+- **Frontend**: https://logs-dashboard-1056575639677.asia-northeast1.run.app/
+- **API**: https://logs-dashboard-api-1056575639677.asia-northeast1.run.app/
+
+[Pull Request](https://github.com/jtclarkjr/logs-dashboard/pull/1) with details and comments regarding deployment
+
 ## Project Structure
 
 ```
@@ -189,8 +198,8 @@ make test-frontend
 ## Docker Configuration
 
 ### Dockerfiles (Multi-stage)
-- `Dockerfile.api` - Multi-stage API image with `base`, `development`, `test`, and `production` stages
-- `Dockerfile.frontend` - Multi-stage frontend image with `base`, `test`, `builder`, and `production` stages
+- `api/Dockerfile` - Multi-stage API image with `base`, `development`, `test`, and `production` stages
+- `frontend/Dockerfile` - Multi-stage frontend image with `base`, `test`, `builder`, and `production` stages
 
 ### Docker Compose File (Consolidated)
 - `docker-compose.yml` - Single file with profiles for all environments:
@@ -201,6 +210,6 @@ make test-frontend
 ### Scripts
 - `api/entrypoint.sh` - Database initialization and seeding for API container
 - `api/test_runner.sh` - Configurable test runner supporting multiple test modes
+- `api/test-api.sh` - Docker-based API test runner with cleanup
+- `frontend/test-frontend.sh` - Docker-based frontend test runner with Bun
 - `test-all.sh` - Master test orchestrator for both API and frontend
-- `test-api.sh` - Docker-based API test runner with cleanup
-- `test-frontend.sh` - Docker-based frontend test runner with Bun

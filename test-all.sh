@@ -26,12 +26,12 @@ run_api_tests() {
     local test_type="$1"
     print_section "API Tests ($test_type)"
     
-    if [ ! -f "./test-api.sh" ]; then
+    if [ ! -f "./api/test-api.sh" ]; then
         echo -e "${RED}Error: test-api.sh not found${NC}"
         return 1
     fi
     
-    if ./test-api.sh "$test_type"; then
+    if ./api/test-api.sh "$test_type"; then
         echo -e "${GREEN}✓ API tests ($test_type) passed!${NC}"
         return 0
     else
@@ -45,12 +45,12 @@ run_frontend_tests() {
     local test_type="$1"
     print_section "Frontend Tests ($test_type)"
     
-    if [ ! -f "./test-frontend.sh" ]; then
+    if [ ! -f "./frontend/test-frontend.sh" ]; then
         echo -e "${RED}Error: test-frontend.sh not found${NC}"
         return 1
     fi
     
-    if ./test-frontend.sh "$test_type"; then
+    if ./frontend/test-frontend.sh "$test_type"; then
         echo -e "${GREEN}✓ Frontend tests ($test_type) passed!${NC}"
         return 0
     else
@@ -99,21 +99,21 @@ run_parallel_tests() {
 
 # Check if required scripts exist
 check_scripts() {
-    if [ ! -f "./test-api.sh" ]; then
-        echo -e "${RED}Error: test-api.sh not found in current directory${NC}"
+    if [ ! -f "./api/test-api.sh" ]; then
+        echo -e "${RED}Error: test-api.sh not found in api directory${NC}"
         echo "Make sure you're running this from the project root"
         exit 1
     fi
     
-    if [ ! -f "./test-frontend.sh" ]; then
-        echo -e "${RED}Error: test-frontend.sh not found in current directory${NC}"
+    if [ ! -f "./frontend/test-frontend.sh" ]; then
+        echo -e "${RED}Error: test-frontend.sh not found in frontend directory${NC}"
         echo "Make sure you're running this from the project root"
         exit 1
     fi
     
     # Make sure scripts are executable
-    chmod +x ./test-api.sh
-    chmod +x ./test-frontend.sh
+    chmod +x ./api/test-api.sh
+    chmod +x ./frontend/test-frontend.sh
 }
 
 # Default test suite
@@ -198,10 +198,10 @@ case $TEST_SUITE in
     "clean")
         echo "Cleaning up test environments..."
         print_section "Cleaning API Test Environment"
-        ./test-api.sh clean
+        ./api/test-api.sh clean
         
         print_section "Cleaning Frontend Test Environment"
-        ./test-frontend.sh clean
+        ./frontend/test-frontend.sh clean
         
         echo -e "${GREEN}✓ Cleanup completed for both environments${NC}"
         ;;
@@ -236,8 +236,8 @@ case $TEST_SUITE in
         echo "    ./test-all.sh quick              # Quick validation"
         echo ""
         echo "  Individual Test Scripts:"
-        echo "    ./test-api.sh help               # API-specific options"
-        echo "    ./test-frontend.sh help          # Frontend-specific options"
+        echo "    ./api/test-api.sh help           # API-specific options"
+        echo "    ./frontend/test-frontend.sh help # Frontend-specific options"
         ;;
     *)
         echo -e "${RED}Unknown command: $TEST_SUITE${NC}"
@@ -265,7 +265,7 @@ elif [ "$TEST_SUITE" != "help" ] && [ "$TEST_SUITE" != "clean" ]; then
     fi
     
     echo -e "${CYAN} Run individual test scripts for detailed debugging:${NC}"
-    echo -e "${CYAN}   ./test-api.sh debug${NC}"
-    echo -e "${CYAN}   ./test-frontend.sh debug${NC}"
+    echo -e "${CYAN}   ./api/test-api.sh debug${NC}"
+    echo -e "${CYAN}   ./frontend/test-frontend.sh debug${NC}"
     exit 1
 fi

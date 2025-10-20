@@ -18,7 +18,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
-COPY api/requirements.txt .
+COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -27,7 +27,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 FROM base AS development
 
 # Copy application code
-COPY api/ .
+COPY . .
 
 # Make entrypoint script executable
 RUN chmod +x /app/entrypoint.sh
@@ -47,11 +47,11 @@ ENV DEBUG=true \
     PYTHONPATH=/app
 
 # Copy application code
-COPY api/ .
+COPY . .
 
 # Copy pytest configuration and test runner
-COPY api/pytest.ini ./
-COPY api/test_runner.sh /app/test_runner.sh
+COPY pytest.ini ./
+COPY test_runner.sh /app/test_runner.sh
 RUN chmod +x /app/test_runner.sh
 
 # Override entrypoint and set command to run tests
@@ -62,7 +62,7 @@ CMD ["/app/test_runner.sh"]
 FROM base AS production
 
 # Copy application code
-COPY api/ .
+COPY . .
 
 # Make entrypoint script executable
 RUN chmod +x /app/entrypoint.sh

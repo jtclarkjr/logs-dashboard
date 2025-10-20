@@ -133,13 +133,13 @@ test-parallel: ## Run all tests in parallel
 
 test-api: ## Run API tests only
 	@echo "$(YELLOW)Running API tests...$(NC)"
-	@chmod +x ./test-api.sh
-	./test-api.sh all
+	@chmod +x ./api/test-api.sh
+	./api/test-api.sh all
 
 test-frontend: ## Run frontend tests only
 	@echo "$(YELLOW)Running frontend tests...$(NC)"
-	@chmod +x ./test-frontend.sh
-	./test-frontend.sh
+	@chmod +x ./frontend/test-frontend.sh
+	./frontend/test-frontend.sh
 
 test-unit: ## Run unit tests for both API and frontend
 	@echo "$(YELLOW)Running unit tests...$(NC)"
@@ -176,52 +176,52 @@ coverage: ## Run tests with coverage reports
 test-hooks: ## Run frontend hooks tests
 	@echo "$(YELLOW)Running frontend hooks tests with Docker...$(NC)"
 	@echo "$(CYAN)Note: Using 'docker' mode for all tests in containerized environment$(NC)"
-	@chmod +x ./test-frontend.sh
-	./test-frontend.sh docker
+	@chmod +x ./frontend/test-frontend.sh
+	./frontend/test-frontend.sh docker
 
 test-components: ## Run frontend component tests
 	@echo "$(YELLOW)Running frontend component tests with Docker...$(NC)"
 	@echo "$(CYAN)Note: Using 'docker' mode for all tests in containerized environment$(NC)"
-	@chmod +x ./test-frontend.sh
-	./test-frontend.sh docker
+	@chmod +x ./frontend/test-frontend.sh
+	./frontend/test-frontend.sh docker
 
 test-utils: ## Run frontend utility tests
 	@echo "$(YELLOW)Running frontend utility tests with Docker...$(NC)"
 	@echo "$(CYAN)Note: Using 'docker' mode for all tests in containerized environment$(NC)"
-	@chmod +x ./test-frontend.sh
-	./test-frontend.sh docker
+	@chmod +x ./frontend/test-frontend.sh
+	./frontend/test-frontend.sh docker
 
 ## API-specific testing
 test-api-unit: ## Run API unit tests
 	@echo "$(YELLOW)Running API unit tests...$(NC)"
-	@chmod +x ./test-api.sh
-	./test-api.sh unit
+	@chmod +x ./api/test-api.sh
+	./api/test-api.sh unit
 
 test-api-integration: ## Run API integration tests
 	@echo "$(YELLOW)Running API integration tests...$(NC)"
-	@chmod +x ./test-api.sh
-	./test-api.sh integration
+	@chmod +x ./api/test-api.sh
+	./api/test-api.sh integration
 
 test-crud: ## Run API CRUD tests
 	@echo "$(YELLOW)Running API CRUD tests...$(NC)"
-	@chmod +x ./test-api.sh
-	./test-api.sh crud
+	@chmod +x ./api/test-api.sh
+	./api/test-api.sh crud
 
 ## Development Tools
 watch-tests: ## Start frontend test watcher
 	@echo "$(YELLOW)Starting test watcher with Docker...$(NC)"
-	@chmod +x ./test-frontend.sh
-	./test-frontend.sh docker-watch
+	@chmod +x ./frontend/test-frontend.sh
+	./frontend/test-frontend.sh docker-watch
 
 format: ## Format frontend code with Prettier
 	@echo "$(YELLOW)Formatting code with Docker...$(NC)"
-	@chmod +x ./test-frontend.sh
-	./test-frontend.sh docker-shell -c "bun run prettier"
+	@chmod +x ./frontend/test-frontend.sh
+	./frontend/test-frontend.sh docker-shell -c "bun run prettier"
 
 type-check: ## Run TypeScript type checking
 	@echo "$(YELLOW)Running type checking with Docker...$(NC)"
-	@chmod +x ./test-frontend.sh
-	./test-frontend.sh docker-shell -c "bun run lint"
+	@chmod +x ./frontend/test-frontend.sh
+	./frontend/test-frontend.sh docker-shell -c "bun run lint"
 
 ## Maintenance
 clean: ## Clean up Docker containers, volumes, and test environments
@@ -241,13 +241,13 @@ clean: ## Clean up Docker containers, volumes, and test environments
 
 clean-frontend: ## Clean frontend dependencies and reinstall
 	@echo "$(YELLOW)Cleaning frontend dependencies with Docker...$(NC)"
-	@chmod +x ./test-frontend.sh
-	./test-frontend.sh docker-clean
+	@chmod +x ./frontend/test-frontend.sh
+	./frontend/test-frontend.sh docker-clean
 
 install-frontend: ## Install/update frontend dependencies
 	@echo "$(YELLOW)Installing frontend dependencies with Docker...$(NC)"
-	@chmod +x ./test-frontend.sh
-	./test-frontend.sh docker-build
+	@chmod +x ./frontend/test-frontend.sh
+	./frontend/test-frontend.sh docker-build
 
 env-setup: ## Create .env files from .env.example if they don't exist
 	$(call ensure-env-files)
