@@ -13,6 +13,13 @@ This project uses a **Makefile** to simplify Docker Compose commands and script 
 - **Better Discoverability:** `make help` shows all available commands
 - **Workflow-Oriented:** Commands grouped by development tasks
 
+## Deployment
+
+The application is deployed on Google Cloud Platform using Cloud Run:
+
+- **Frontend**: https://logs-dashboard-1056575639677.asia-northeast1.run.app/
+- **API**: https://logs-dashboard-api-1056575639677.asia-northeast1.run.app/
+
 ## Project Structure
 
 ```
