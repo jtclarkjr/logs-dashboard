@@ -266,7 +266,7 @@ class TestCSVExportEndpoint:
             "severity": SeverityLevel.ERROR.value,
             "source": "special-service"
         }
-        test_client.post("/api/v1/logs/", json=log_data)
+        test_client.post("/api/v1/logs", json=log_data)
         
         response = test_client.get("/api/v1/logs/export/csv")
         
@@ -285,7 +285,7 @@ class TestCSVExportEndpoint:
             "severity": SeverityLevel.INFO.value,
             "source": "unicode-service"
         }
-        test_client.post("/api/v1/logs/", json=log_data)
+        test_client.post("/api/v1/logs", json=log_data)
         
         response = test_client.get("/api/v1/logs/export/csv")
         
@@ -353,7 +353,7 @@ class TestUtilitiesEdgeCases:
                 "severity": SeverityLevel.INFO.value,
                 "source": f"service-{i}"
             }
-            test_client.post("/api/v1/logs/", json=log_data)
+            test_client.post("/api/v1/logs", json=log_data)
         
         response = test_client.get("/api/v1/logs/export/csv")
         

@@ -92,7 +92,7 @@ def generate_csv_content(logs: List[Any]) -> str:
     output.close()
     return csv_content
 
-@router.get("/metadata", summary="Get metadata for frontend")
+@router.get("/logs/metadata", summary="Get metadata for frontend")
 def get_metadata(db: Session = Depends(get_db)) -> Dict[str, Any]:
     """Get metadata for frontend dropdowns and filters"""
     try:
@@ -134,7 +134,7 @@ def get_metadata(db: Session = Depends(get_db)) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail=f"Error fetching metadata: {str(e)}")
 
 
-@router.get("/export/csv", summary="Export logs as CSV")
+@router.get("/logs/export/csv", summary="Export logs as CSV")
 def export_logs_csv(
     severity: Optional[SeverityLevel] = Query(None, description="Filter by severity"),
     source: Optional[str] = Query(None, description="Filter by source"),

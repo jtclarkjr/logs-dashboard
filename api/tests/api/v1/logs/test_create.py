@@ -20,7 +20,7 @@ class TestLogCreate:
             "source": "test-service"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         
         assert response.status_code == 201
         data = response.json()
@@ -50,7 +50,7 @@ class TestLogCreate:
             "timestamp": custom_timestamp
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         
         assert response.status_code == 201
         data = response.json()
@@ -66,7 +66,7 @@ class TestLogCreate:
             "source": "test-service"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         
         assert response.status_code == 201
         data = response.json()
@@ -84,7 +84,7 @@ class TestLogCreate:
                 "source": f"{severity.value.lower()}-service"
             }
             
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             
             assert response.status_code == 201
             data = response.json()
@@ -98,7 +98,7 @@ class TestLogCreate:
             "source": TestData.LONG_SOURCE  # 99 chars
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         
         assert response.status_code == 201
         data = response.json()
@@ -112,21 +112,21 @@ class TestLogCreateValidation:
     def test_create_log_missing_required_fields(self, test_client: TestClient):
         """Test creating log with missing required fields."""
         # Missing message
-        response = test_client.post("/api/v1/logs/", json={
+        response = test_client.post("/api/v1/logs", json={
             "severity": SeverityLevel.INFO.value,
             "source": "test-service"
         })
         assert response.status_code == 422
         
         # Missing severity
-        response = test_client.post("/api/v1/logs/", json={
+        response = test_client.post("/api/v1/logs", json={
             "message": "Test message",
             "source": "test-service"
         })
         assert response.status_code == 422
         
         # Missing source
-        response = test_client.post("/api/v1/logs/", json={
+        response = test_client.post("/api/v1/logs", json={
             "message": "Test message",
             "severity": SeverityLevel.INFO.value
         })
@@ -140,7 +140,7 @@ class TestLogCreateValidation:
             "source": "test-service"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         assert response.status_code == 422
     
     def test_create_log_empty_message(self, test_client: TestClient):
@@ -151,7 +151,7 @@ class TestLogCreateValidation:
             "source": "test-service"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         assert response.status_code == 422
     
     def test_create_log_empty_source(self, test_client: TestClient):
@@ -162,7 +162,7 @@ class TestLogCreateValidation:
             "source": ""
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         assert response.status_code == 422
     
     def test_create_log_message_too_long(self, test_client: TestClient):
@@ -173,7 +173,7 @@ class TestLogCreateValidation:
             "source": "test-service"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         assert response.status_code == 422
     
     def test_create_log_source_too_long(self, test_client: TestClient):
@@ -184,7 +184,7 @@ class TestLogCreateValidation:
             "source": TestData.INVALID_LONG_SOURCE  # 101 chars
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         assert response.status_code == 422
     
     def test_create_log_invalid_timestamp_format(self, test_client: TestClient):
@@ -196,7 +196,7 @@ class TestLogCreateValidation:
             "timestamp": "invalid-timestamp"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         assert response.status_code == 422
     
     def test_create_log_null_values(self, test_client: TestClient):
@@ -207,7 +207,7 @@ class TestLogCreateValidation:
             "source": "test-service"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         assert response.status_code == 422
     
     def test_create_log_wrong_data_types(self, test_client: TestClient):
@@ -219,7 +219,7 @@ class TestLogCreateValidation:
             "source": "test-service"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         assert response.status_code == 422
     
     def test_create_log_malformed_json(self, test_client: TestClient):
@@ -230,7 +230,7 @@ class TestLogCreateValidation:
         )
         
         response = test_client.post(
-            "/api/v1/logs/",
+            "/api/v1/logs",
             data=malformed_json,  # noqa: E501
             headers={"Content-Type": "application/json"}
         )
@@ -251,7 +251,7 @@ class TestLogCreateEdgeCases:
                 "source": f"rapid-service-{i}"
             }
             
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             assert response.status_code == 201
             created_logs.append(response.json())
         
@@ -267,7 +267,7 @@ class TestLogCreateEdgeCases:
             "source": "unicode-service"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         
         assert response.status_code == 201
         data = response.json()
@@ -281,7 +281,7 @@ class TestLogCreateEdgeCases:
             "source": "special-service"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         
         assert response.status_code == 201
         data = response.json()
@@ -296,7 +296,7 @@ class TestLogCreateEdgeCases:
             "source": "b"  # Minimum valid source (1 character)
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         
         assert response.status_code == 201
         data = response.json()

@@ -320,7 +320,7 @@ class TestLogDelete:
             assert response.status_code == 200
         
         # Verify logs list is empty
-        list_response = test_client.get("/api/v1/logs/")
+        list_response = test_client.get("/api/v1/logs")
         assert list_response.status_code == 200
         data = list_response.json()
         assert data["total"] == 0

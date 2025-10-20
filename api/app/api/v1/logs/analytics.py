@@ -23,7 +23,7 @@ from .utilities import validate_date_range, get_time_group_expression, format_ch
 router = APIRouter()
 
 
-@router.get("/aggregation", response_model=LogAggregationResponse, summary="Get aggregated log data")
+@router.get("/logs/aggregation", response_model=LogAggregationResponse, summary="Get aggregated log data")
 def get_log_aggregation(
     start_date: Optional[datetime] = Query(None, description="Start date for aggregation"),
     end_date: Optional[datetime] = Query(None, description="End date for aggregation"),
@@ -67,7 +67,7 @@ def get_log_aggregation(
         raise_database_error("aggregation generation", original_error=e)
 
 
-@router.get("/chart-data", summary="Get chart data for time series")
+@router.get("/logs/chart-data", summary="Get chart data for time series")
 def get_chart_data(
     start_date: Optional[datetime] = Query(None, description="Start date for chart data"),
     end_date: Optional[datetime] = Query(None, description="End date for chart data"),

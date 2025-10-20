@@ -13,15 +13,15 @@ from app.core.errors import (
     raise_not_found_error, raise_database_error,
     NotFoundError, ValidationError, DatabaseError
 )
-from app.validators.log_validators import validate_log_query_params, validate_log_id
+from app.validators.log_validators import validate_log_query_params, validate_log_id, validate_log_creation
 from app.crud.log import log_crud
-from app.schemas.log import LogResponse, LogListResponse
+from app.schemas.log import LogResponse, LogListResponse, LogCreate
 from app.models.log import SeverityLevel
 
 router = APIRouter()
 
 
-@router.get("/", response_model=LogListResponse, summary="Get logs with filtering")
+@router.get("/logs", response_model=LogListResponse, summary="Get logs with filtering")
 def get_logs(
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(settings.DEFAULT_PAGE_SIZE, ge=1, le=settings.MAX_PAGE_SIZE, description="Items per page"),
@@ -67,7 +67,7 @@ def get_logs(
         raise_database_error("log querying", original_error=e)
 
 
-@router.get("/{log_id}", response_model=LogResponse, summary="Get log by ID")
+@router.get("/logs/{log_id}", response_model=LogResponse, summary="Get log by ID")
 def get_log(log_id: int, db: Session = Depends(get_db)) -> LogResponse:
     """Get a specific log by ID"""
     validate_log_id(log_id)
