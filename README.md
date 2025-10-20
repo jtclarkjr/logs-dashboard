@@ -104,29 +104,21 @@ make down
 
 #### Maintenance
 ```bash
-# Clean up everything (warning removes all containers and images)
+# Clean up everything (warning removes all containers)
 make clean
-
-# Update frontend dependencies
-make install-frontend
-
-### Manual Setup
-
-> **Note:** While the Makefile is the recommended approach, you can still use Docker Compose commands directly or run scripts manually if needed. The Makefile simply provides a more convenient interface.
+```
 
 #### Prerequisites (For non-docker options)
 
 - Python 3.x
 - Bun (Works as a runtime, package manager and testing)
 
+
+
+### Manual Setup
+
 #### Frontend Setup
 
-**Option 1: Using Makefile (Recommended)**
-```bash
-make frontend
-```
-
-**Option 2: Manual Setup**
 ```bash
 cd frontend
 bun install
@@ -135,20 +127,8 @@ bun dev
 
 The frontend will be available at `http://localhost:3000`
 
-**Storybook Development**
-```bash
-make storybook
-```
-The frontend storybook will be available at `http://localhost:6006`
-
 #### API Setup
 
-**Option 1: Using Makefile (Recommended)**
-```bash
-make api
-```
-
-**Option 2: Manual Setup**
 ```bash
 cd api
 # Create virtual environment
