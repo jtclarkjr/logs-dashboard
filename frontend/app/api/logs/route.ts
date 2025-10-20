@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     )
 
     const response = await serverApiClient.get<LogListResponse>(
-      '/logs',
+      '/logs/',
       cleanedFilters
     )
 
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: LogCreate = await request.json()
 
-    const response = await serverApiClient.post<LogResponse>('/logs', body)
+    const response = await serverApiClient.post<LogResponse>('/logs/', body)
 
     if (response.error) {
       return NextResponse.json(
