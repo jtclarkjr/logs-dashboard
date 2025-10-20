@@ -48,7 +48,7 @@ class TestPytestFeatures:
         expected_field: str
     ):
         """Test various validation errors with parametrized data."""
-        response = test_client.post("/api/v1/logs/", json=invalid_data)
+        response = test_client.post("/api/v1/logs", json=invalid_data)
         
         assert response.status_code == 422
         error_detail = response.json()
@@ -66,7 +66,7 @@ class TestPytestFeatures:
                 "severity": SeverityLevel.INFO.value,
                 "source": f"service-{i % 10}"
             }
-            test_client.post("/api/v1/logs/", json=log_data)
+            test_client.post("/api/v1/logs", json=log_data)
         
         # Test that listing still works efficiently
         response = test_client.get("/api/v1/logs/?page_size=50")
@@ -96,7 +96,7 @@ class TestPytestFeatures:
         }
         
         # Create
-        create_response = test_client.post("/api/v1/logs/", json=create_data)
+        create_response = test_client.post("/api/v1/logs", json=create_data)
         assert create_response.status_code == 201
         log_id = create_response.json()["id"]
         
@@ -121,7 +121,7 @@ class TestPytestFeatures:
             "source": "error-service"
         }
         
-        response = test_client.post("/api/v1/logs/", json=log_data)
+        response = test_client.post("/api/v1/logs", json=log_data)
         assert response.status_code == 201
         return response.json()["id"]
     
@@ -158,7 +158,7 @@ class TestPytestMarkers:
     @pytest.mark.crud
     def test_crud_marker_example(self, test_client: TestClient):
         """CRUD operations test."""
-        response = test_client.post("/api/v1/logs/", json={
+        response = test_client.post("/api/v1/logs", json={
             "message": "CRUD test",
             "severity": SeverityLevel.INFO.value,
             "source": "crud-service"

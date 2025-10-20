@@ -14,7 +14,7 @@ class TestLogsList:
     
     def test_get_logs_empty_database(self, test_client: TestClient):
         """Test getting logs from empty database."""
-        response = test_client.get("/api/v1/logs/")
+        response = test_client.get("/api/v1/logs")
         
         assert response.status_code == 200
         data = response.json()
@@ -35,7 +35,7 @@ class TestLogsList:
     
     def test_get_logs_with_data(self, test_client: TestClient, create_sample_logs):
         """Test getting logs with existing data."""
-        response = test_client.get("/api/v1/logs/")
+        response = test_client.get("/api/v1/logs")
         
         assert response.status_code == 200
         data = response.json()
@@ -283,7 +283,7 @@ class TestLogsReadEdgeCases:
             "severity": SeverityLevel.ERROR.value,
             "source": "test-service"
         }
-        test_client.post("/api/v1/logs/", json=log_data)
+        test_client.post("/api/v1/logs", json=log_data)
         
         # Search for the special characters
         response = test_client.get("/api/v1/logs/?search=[CRITICAL]")
@@ -298,7 +298,7 @@ class TestLogsReadEdgeCases:
         
         # Make multiple requests
         for _ in range(5):
-            response = test_client.get("/api/v1/logs/")
+            response = test_client.get("/api/v1/logs")
             responses.append(response)
         
         # All should succeed and return consistent results

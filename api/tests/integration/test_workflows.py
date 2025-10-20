@@ -23,7 +23,7 @@ class TestCompleteLogWorkflow:
             "source": "lifecycle-service"
         }
         
-        create_response = test_client.post("/api/v1/logs/", json=create_data)
+        create_response = test_client.post("/api/v1/logs", json=create_data)
         assert create_response.status_code == 201
         created_log = create_response.json()
         log_id = created_log["id"]
@@ -37,7 +37,7 @@ class TestCompleteLogWorkflow:
         assert retrieved_log["source"] == create_data["source"]
         
         # 3. Verify it appears in the list
-        list_response = test_client.get("/api/v1/logs/")
+        list_response = test_client.get("/api/v1/logs")
         assert list_response.status_code == 200
         logs_list = list_response.json()
         assert logs_list["total"] >= 1
@@ -82,12 +82,12 @@ class TestCompleteLogWorkflow:
                 "source": f"bulk-service-{i}"
             }
             
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             assert response.status_code == 201
             created_log_ids.append(response.json()["id"])
         
         # Verify all logs exist in list
-        list_response = test_client.get("/api/v1/logs/")
+        list_response = test_client.get("/api/v1/logs")
         assert list_response.status_code == 200
         logs_data = list_response.json()
         assert logs_data["total"] >= 5
@@ -116,7 +116,7 @@ class TestCompleteLogWorkflow:
             assert delete_response.status_code == 200
         
         # Verify deletion
-        final_list_response = test_client.get("/api/v1/logs/")
+        final_list_response = test_client.get("/api/v1/logs")
         final_logs_data = final_list_response.json()
         assert final_logs_data["total"] >= 3  # At least 3 remaining logs
         
@@ -193,7 +193,7 @@ class TestCompleteLogWorkflow:
         
         created_ids = []
         for log_data in test_logs:
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             assert response.status_code == 201
             created_ids.append(response.json()["id"])
         
@@ -241,7 +241,7 @@ class TestErrorHandlingWorkflow:
         assert delete_response.status_code == 404
         
         # Try invalid create with empty message
-        invalid_create = test_client.post("/api/v1/logs/", json={
+        invalid_create = test_client.post("/api/v1/logs", json={
             "message": "",  # Empty message
             "severity": SeverityLevel.INFO.value,
             "source": "test"
@@ -249,7 +249,7 @@ class TestErrorHandlingWorkflow:
         assert invalid_create.status_code == 422
         
         # Try invalid create with None values
-        invalid_none = test_client.post("/api/v1/logs/", json={
+        invalid_none = test_client.post("/api/v1/logs", json={
             "message": None,
             "severity": SeverityLevel.INFO.value,
             "source": "test"
@@ -257,14 +257,14 @@ class TestErrorHandlingWorkflow:
         assert invalid_none.status_code == 422
         
         # Try invalid create with missing fields
-        invalid_missing = test_client.post("/api/v1/logs/", json={
+        invalid_missing = test_client.post("/api/v1/logs", json={
             "severity": SeverityLevel.INFO.value
             # Missing message and source
         })
         assert invalid_missing.status_code == 422
         
         # Try invalid create with wrong data types
-        invalid_types = test_client.post("/api/v1/logs/", json={
+        invalid_types = test_client.post("/api/v1/logs", json={
             "message": 123,  # Should be string
             "severity": SeverityLevel.INFO.value,
             "source": "test"
@@ -272,7 +272,7 @@ class TestErrorHandlingWorkflow:
         assert invalid_types.status_code == 422
         
         # Try invalid create with very long message
-        invalid_long = test_client.post("/api/v1/logs/", json={
+        invalid_long = test_client.post("/api/v1/logs", json={
             "message": "x" * 1001,  # Too long
             "severity": SeverityLevel.INFO.value,
             "source": "test"
@@ -280,7 +280,7 @@ class TestErrorHandlingWorkflow:
         assert invalid_long.status_code == 422
         
         # Try invalid create with very long source
-        invalid_long_source = test_client.post("/api/v1/logs/", json={
+        invalid_long_source = test_client.post("/api/v1/logs", json={
             "message": "test",
             "severity": SeverityLevel.INFO.value,
             "source": "x" * 101  # Too long
@@ -288,7 +288,7 @@ class TestErrorHandlingWorkflow:
         assert invalid_long_source.status_code == 422
         
         # Try invalid create with invalid severity
-        invalid_sev = test_client.post("/api/v1/logs/", json={
+        invalid_sev = test_client.post("/api/v1/logs", json={
             "message": "test",
             "severity": "INVALID_SEVERITY",
             "source": "test"
@@ -297,7 +297,7 @@ class TestErrorHandlingWorkflow:
         
         # Try invalid create with future timestamp
         future_time = (datetime.now() + timedelta(days=1)).isoformat()
-        invalid_future = test_client.post("/api/v1/logs/", json={
+        invalid_future = test_client.post("/api/v1/logs", json={
             "message": "test",
             "severity": SeverityLevel.INFO.value,
             "source": "test",
@@ -307,7 +307,7 @@ class TestErrorHandlingWorkflow:
         
         # Try invalid update with empty message
         # First create a valid log
-        create_resp = test_client.post("/api/v1/logs/", json={
+        create_resp = test_client.post("/api/v1/logs", json={
             "message": "valid log",
             "severity": SeverityLevel.INFO.value,
             "source": "test"
@@ -376,12 +376,12 @@ class TestErrorHandlingWorkflow:
             "source": "consistency-service"
         }
         
-        create_response = test_client.post("/api/v1/logs/", json=log_data)
+        create_response = test_client.post("/api/v1/logs", json=log_data)
         assert create_response.status_code == 201
         log_id = create_response.json()["id"]
         
         # Get initial total count
-        initial_list = test_client.get("/api/v1/logs/")
+        initial_list = test_client.get("/api/v1/logs")
         initial_count = initial_list.json()["total"]
         
         # Update log multiple times
@@ -396,7 +396,7 @@ class TestErrorHandlingWorkflow:
             assert update_response.status_code == 200
         
         # Verify count hasn't changed
-        after_updates_list = test_client.get("/api/v1/logs/")
+        after_updates_list = test_client.get("/api/v1/logs")
         assert after_updates_list.json()["total"] == initial_count
         
         # Verify final state
@@ -409,7 +409,7 @@ class TestErrorHandlingWorkflow:
         delete_response = test_client.delete(f"/api/v1/logs/{log_id}")
         assert delete_response.status_code == 200
         
-        final_list = test_client.get("/api/v1/logs/")
+        final_list = test_client.get("/api/v1/logs")
         assert final_list.json()["total"] == initial_count - 1
 
 
@@ -429,7 +429,7 @@ class TestPerformanceWorkflow:
                 "source": f"perf-service-{i % 5}"  # 5 different services
             }
             
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             assert response.status_code == 201
             created_ids.append(response.json()["id"])
         
@@ -473,7 +473,7 @@ class TestPerformanceWorkflow:
                 "timestamp": timestamp.isoformat()
             }
             
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             assert response.status_code == 201
         
         # Test different time groupings
@@ -518,14 +518,14 @@ class TestConcurrencyWorkflow:
                 "source": f"concurrent-service-{i}"
             }
             
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             assert response.status_code == 201
             base_logs.append(response.json())
         
         # Simulate concurrent reads
         read_responses = []
         for _ in range(10):
-            response = test_client.get("/api/v1/logs/")
+            response = test_client.get("/api/v1/logs")
             read_responses.append(response)
         
         # All reads should succeed and be consistent
@@ -605,13 +605,13 @@ class TestAPIHealthAndGeneralWorkflow:
             "source": "coverage-service"
         }
         
-        create_response = test_client.post("/api/v1/logs/", json=test_log)
+        create_response = test_client.post("/api/v1/logs", json=test_log)
         assert create_response.status_code == 201
         log_id = create_response.json()["id"]
         
         # Test various endpoints with different parameters
         endpoints_to_test = [
-            "/api/v1/logs/",
+            "/api/v1/logs",
             f"/api/v1/logs/{log_id}",
             "/api/v1/logs/metadata",
             "/api/v1/logs/aggregation",
@@ -657,7 +657,7 @@ class TestAPIHealthAndGeneralWorkflow:
         
         created_ids = []
         for log_data in test_logs:
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             assert response.status_code == 201
             created_ids.append(response.json()["id"])
         
@@ -738,7 +738,7 @@ class TestDataValidationAndEdgeCases:
         
         created_ids = []
         for log_data in special_logs:
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             assert response.status_code == 201
             created_log = response.json()
             created_ids.append(created_log["id"])
@@ -810,7 +810,7 @@ class TestDataValidationAndEdgeCases:
         
         created_ids = []
         for log_data in boundary_logs:
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             assert response.status_code == 201
             created_log = response.json()
             created_ids.append(created_log["id"])
@@ -831,7 +831,7 @@ class TestDataValidationAndEdgeCases:
             "timestamp": "2024-01-01T00:00:00Z"  # Specific timestamp
         }
         
-        timestamp_response = test_client.post("/api/v1/logs/", json=timestamp_log)
+        timestamp_response = test_client.post("/api/v1/logs", json=timestamp_log)
         assert timestamp_response.status_code == 201
         timestamp_id = timestamp_response.json()["id"]
         created_ids.append(timestamp_id)
@@ -856,7 +856,7 @@ class TestDataValidationAndEdgeCases:
                 "severity": SeverityLevel.INFO.value if i % 2 == 0 else SeverityLevel.ERROR.value,
                 "source": f"update-service-{i}"
             }
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             assert response.status_code == 201
             test_logs.append(response.json())
         
@@ -919,18 +919,18 @@ class TestDataValidationAndEdgeCases:
     def test_malformed_requests_workflow(self, test_client: TestClient):
         """Test handling of malformed requests in workflows."""
         # Test malformed JSON
-        malformed_response = test_client.post("/api/v1/logs/", 
+        malformed_response = test_client.post("/api/v1/logs", 
             data="{invalid json}", 
             headers={"content-type": "application/json"}
         )
         assert malformed_response.status_code == 422
         
         # Test empty request body
-        empty_response = test_client.post("/api/v1/logs/", json={})
+        empty_response = test_client.post("/api/v1/logs", json={})
         assert empty_response.status_code == 422
         
         # Test request with extra fields
-        extra_fields_response = test_client.post("/api/v1/logs/", json={
+        extra_fields_response = test_client.post("/api/v1/logs", json={
             "message": "Test with extra fields",
             "severity": SeverityLevel.INFO.value,
             "source": "extra-service",
@@ -964,7 +964,7 @@ class TestDatabaseAndErrorHandlingIntegration:
                 "severity": SeverityLevel.INFO.value,
                 "source": f"rapid-service-{i % 5}"
             }
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             if response.status_code == 201:
                 rapid_operations.append(response.json()["id"])
         
@@ -1012,7 +1012,7 @@ class TestDatabaseAndErrorHandlingIntegration:
         ]
         
         for i, test_case in enumerate(validation_tests):
-            response = test_client.post("/api/v1/logs/", json=test_case["data"])
+            response = test_client.post("/api/v1/logs", json=test_case["data"])
             
             if test_case["should_fail"]:
                 assert response.status_code == 422, f"Test case {i} should have failed but got {response.status_code}"
@@ -1065,7 +1065,7 @@ class TestDatabaseAndErrorHandlingIntegration:
             "source": "crud-error-service"
         }
         
-        create_response = test_client.post("/api/v1/logs/", json=test_log)
+        create_response = test_client.post("/api/v1/logs", json=test_log)
         assert create_response.status_code == 201
         log_id = create_response.json()["id"]
         
@@ -1119,7 +1119,7 @@ class TestDatabaseAndErrorHandlingIntegration:
                 "source": f"analytics-service-{i % 3}",
                 "timestamp": (datetime.now() - timedelta(hours=i)).isoformat()
             }
-            response = test_client.post("/api/v1/logs/", json=log_data)
+            response = test_client.post("/api/v1/logs", json=log_data)
             if response.status_code == 201:
                 test_data.append(response.json()["id"])
         

@@ -16,7 +16,7 @@ from app.crud.log import log_crud
 router = APIRouter()
 
 
-@router.delete("/{log_id}", summary="Delete log entry")
+@router.delete("/logs/{log_id}", summary="Delete log entry")
 def delete_log(log_id: int, db: Session = Depends(get_db)) -> Dict[str, str]:
     """Delete a specific log by ID"""
     try:

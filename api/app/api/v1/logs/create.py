@@ -16,7 +16,7 @@ from app.schemas.log import LogCreate, LogResponse
 router = APIRouter()
 
 
-@router.post("/", response_model=LogResponse, status_code=201, summary="Create log entry")
+@router.post("/logs", response_model=LogResponse, status_code=201, summary="Create log entry")
 def create_log(
     log_data: LogCreate,
     db: Session = Depends(get_db)

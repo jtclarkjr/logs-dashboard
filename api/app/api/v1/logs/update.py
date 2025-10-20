@@ -16,7 +16,7 @@ from app.schemas.log import LogUpdate, LogResponse
 router = APIRouter()
 
 
-@router.put("/{log_id}", response_model=LogResponse, summary="Update log entry")
+@router.put("/logs/{log_id}", response_model=LogResponse, summary="Update log entry")
 def update_log(
     log_id: int,
     log_update: LogUpdate,
