@@ -39,13 +39,13 @@ help: ## Show this help message
 	@echo "=================================="
 	@echo ""
 	@echo "$(GREEN)Development:$(NC)"
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST) | grep -E "(up|down|build|restart|logs|dev|shell)"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / && $$1 ~ /^(up|down|build|restart|dev|api|frontend|db|logs|logs-api|logs-frontend|logs-db|shell-api|shell-frontend|shell-db)$$/ {printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 	@echo "$(GREEN)Testing:$(NC)"
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST) | grep -E "(test|lint|coverage)"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / && $$1 ~ /^(test|test-parallel|test-api|test-frontend|test-unit|test-integration|test-fast|test-ci|lint|coverage|test-hooks|test-components|test-utils|test-api-unit|test-api-integration|test-crud|watch-tests|type-check)$$/ {printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 	@echo "$(GREEN)Maintenance:$(NC)"
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-15s$(NC) %s\\n", $$1, $$2}' $(MAKEFILE_LIST) | grep -E "(setup|clean|install|format)"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / && $$1 ~ /^(format|clean|clean-frontend|install-frontend|env-setup|setup-test|status|health|dev-reset|quick-test|full-test|storybook)$$/ {printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 
 ## Development Commands
