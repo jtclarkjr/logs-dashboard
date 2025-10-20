@@ -1,6 +1,7 @@
 services:
-  # API Service
+  # API Service - Development
   api:
+    profiles: ["dev", "development"]
     build:
       context: .
       dockerfile: Dockerfile.api
@@ -28,11 +29,31 @@ services:
       retries: 3
       start_period: 40s
 
-  # Frontend Service
+  # API Service - Testing
+  api-test:
+    profiles: ["test", "api-test"]
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+      target: test
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db-test:5432/logs_dashboard_test
+      - DEBUG=true
+      - ENVIRONMENT=test
+    depends_on:
+      db-test:
+        condition: service_healthy
+    volumes:
+      - ./api:/app  # Mount source code for development
+    entrypoint: []  # Override the entrypoint to avoid database seeding
+
+  # Frontend Service - Development
   frontend:
+    profiles: ["dev", "development"]
     build:
       context: .
       dockerfile: Dockerfile.frontend
+      target: production
     container_name: frontend
     ports:
       - "3000:3000"
@@ -53,8 +74,31 @@ services:
       retries: 3
       start_period: 30s
 
-  # PostgreSQL database service
+  # Frontend Service - Testing
+  frontend-test:
+    profiles: ["test", "frontend-test"]
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: test
+    environment:
+      - NODE_ENV=test
+      - BUN_RUNTIME_TRANSPILER_CACHE_PATH=0
+    volumes:
+      # Mount source files but preserve container's node_modules
+      - ./frontend/app:/app/app
+      - ./frontend/lib:/app/lib
+      - ./frontend/components:/app/components
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/bun.config.ts:/app/bun.config.ts
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/tailwind.config.ts:/app/tailwind.config.ts
+      - ./frontend/next.config.mjs:/app/next.config.mjs
+    command: ["bun", "test"]  # Default command for running tests
+
+  # PostgreSQL database service - Development
   db:
+    profiles: ["dev", "development"]
     image: postgres:15
     environment:
       POSTGRES_DB: logs_dashboard
@@ -71,9 +115,29 @@ services:
       timeout: 5s
       retries: 5
 
+  # PostgreSQL database service - Testing
+  db-test:
+    profiles: ["test", "api-test"]
+    image: postgres:15
+    environment:
+      POSTGRES_DB: logs_dashboard_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"  # Different port to avoid conflicts with main db
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   python_cache:
   postgres_data:
+  postgres_test_data:
   node_modules:
 
 networks:

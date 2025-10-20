@@ -15,16 +15,17 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
         curl \
+        sqlite3 \
     && rm -rf /var/lib/apt/lists/*
-
-# Development stage
-FROM base AS development
 
 # Copy requirements first for better caching
 COPY api/requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Development stage
+FROM base AS development
 
 # Copy application code
 COPY api/ .
@@ -39,12 +40,27 @@ EXPOSE 8000
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
+# Test stage
+FROM base AS test
+
+# Set test-specific environment variables
+ENV DEBUG=true \
+    PYTHONPATH=/app
+
+# Copy application code
+COPY api/ .
+
+# Copy pytest configuration and test runner
+COPY api/pytest.ini ./
+COPY api/test_runner.sh /app/test_runner.sh
+RUN chmod +x /app/test_runner.sh
+
+# Override entrypoint and set command to run tests
+ENTRYPOINT []
+CMD ["/app/test_runner.sh"]
+
 # Production stage
 FROM base AS production
-
-# Copy requirements and install dependencies
-COPY api/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY api/ .

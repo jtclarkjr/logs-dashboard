@@ -13,10 +13,11 @@ YELLOW := \033[1;33m
 RED := \033[0;31m
 NC := \033[0m # No Color
 
-# Docker Compose files
+# Docker Compose files (consolidated)
 COMPOSE_FILE := docker-compose.yml
-API_TEST_COMPOSE_FILE := docker-compose.api-test.yml
-FRONTEND_TEST_COMPOSE_FILE := docker-compose.frontend-test.yml
+DEV_PROFILE := --profile dev
+API_TEST_PROFILE := --profile api-test
+FRONTEND_TEST_PROFILE := --profile frontend-test
 
 # Helper function to ensure .env files exist
 define ensure-env-files
@@ -51,14 +52,14 @@ help: ## Show this help message
 up: ## Start all services (frontend, API, database)
 	@echo "$(YELLOW)Starting all services...$(NC)"
 	$(call ensure-env-files)
-	docker compose -f $(COMPOSE_FILE) up --build -d
+	docker compose -f $(COMPOSE_FILE) $(DEV_PROFILE) up --build -d
 	@echo "$(GREEN)✓ Services started!$(NC)"
 	@echo "$(CYAN)Frontend: http://localhost:3000$(NC)"
 	@echo "$(CYAN)API: http://localhost:8000$(NC)"
 
 down: ## Stop and remove all services
 	@echo "$(YELLOW)Stopping all services...$(NC)"
-	docker compose -f $(COMPOSE_FILE) down -v
+	docker compose -f $(COMPOSE_FILE) --profile "*" down -v
 	@echo "$(GREEN)✓ Services stopped and volumes removed!$(NC)"
 
 build: ## Build all Docker images
@@ -254,14 +255,14 @@ env-setup: ## Create .env files from .env.example if they don't exist
 setup-test: ## Initial setup for test environment (build Docker images with no cache)
 	@echo "$(YELLOW)Setting up test environment...$(NC)"
 	@echo "$(CYAN)This will build fresh Docker images for testing$(NC)"
-	@echo "$(YELLOW)Building API test image...$(NC)"
-	docker compose -f $(API_TEST_COMPOSE_FILE) build --no-cache api
-	@echo "$(YELLOW)Building Frontend test image...$(NC)"
-	docker compose -f $(FRONTEND_TEST_COMPOSE_FILE) build --no-cache frontend
-	@echo "$(GREEN)✓ Test environment setup complete!$(NC)"
+	@echo "$(YELLOW)Building API test image (multi-stage)...$(NC)"
+	docker compose -f $(COMPOSE_FILE) $(API_TEST_PROFILE) build --no-cache api-test
+	@echo "$(YELLOW)Building Frontend test image (multi-stage)...$(NC)"
+	docker compose -f $(COMPOSE_FILE) $(FRONTEND_TEST_PROFILE) build --no-cache frontend-test
+	@echo "$(GREEN)\u2713 Test environment setup complete!$(NC)"
 	@echo "$(CYAN)Verifying Bun installation in frontend container...$(NC)"
-	docker compose -f $(FRONTEND_TEST_COMPOSE_FILE) run --rm frontend bun --version
-	@echo "$(GREEN)✓ All test images ready! You can now run 'make test'$(NC)"
+	docker compose -f $(COMPOSE_FILE) $(FRONTEND_TEST_PROFILE) run --rm frontend-test bun --version
+	@echo "$(GREEN)\u2713 All test images ready! You can now run 'make test'$(NC)"
 
 ## Status and Health
 status: ## Show status of all services

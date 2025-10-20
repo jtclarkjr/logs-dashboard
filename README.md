@@ -208,16 +208,15 @@ make test-frontend
 
 ## Docker Configuration
 
-### Dockerfiles
-- `Dockerfile.api` - Multi-stage API image (development/production)
-- `Dockerfile.api.test` - Isolated test environment for API with pytest
-- `Dockerfile.frontend` - Production-optimized Next.js build using Bun
-- `Dockerfile.frontend.test` - Test environment for frontend with Bun runtime
+### Dockerfiles (Multi-stage)
+- `Dockerfile.api` - Multi-stage API image with `base`, `development`, `test`, and `production` stages
+- `Dockerfile.frontend` - Multi-stage frontend image with `base`, `test`, `builder`, and `production` stages
 
-### Docker Compose Files
-- `docker-compose.yml` - Main development stack (API + Frontend + PostgreSQL)
-- `docker-compose.api-test.yml` - API test environment with isolated test database
-- `docker-compose.frontend-test.yml` - Frontend test environment
+### Docker Compose File (Consolidated)
+- `docker-compose.yml` - Single file with profiles for all environments:
+  - `--profile dev` - Development stack (API + Frontend + PostgreSQL)
+  - `--profile api-test` - API test environment using `test` stage
+  - `--profile frontend-test` - Frontend test environment using `test` stage
 
 ### Scripts
 - `api/entrypoint.sh` - Database initialization and seeding for API container
