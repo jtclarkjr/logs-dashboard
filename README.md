@@ -20,6 +20,8 @@ The application is deployed on Google Cloud Platform using Cloud Run:
 - **Frontend**: https://logs-dashboard-1056575639677.asia-northeast1.run.app/
 - **API**: https://logs-dashboard-api-1056575639677.asia-northeast1.run.app/
 
+[Pull Request](https://github.com/jtclarkjr/logs-dashboard/pull/1) with details and comments regarding deployment
+
 ## Project Structure
 
 ```
