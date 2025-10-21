@@ -18,7 +18,7 @@ This project uses a **Makefile** to simplify Docker Compose commands and script 
 The application is deployed on Google Cloud Platform using Cloud Run:
 
 - **Frontend**: https://logs-dashboard-1056575639677.asia-northeast1.run.app/
-- **API**: https://logs-dashboard-api-1056575639677.asia-northeast1.run.app/
+- **API**: https://logs-dashboard-api-1056575639677.asia-northeast1.run.app/docs
 
 [Pull Request](https://github.com/jtclarkjr/logs-dashboard/pull/1) with details and comments regarding deployment
 
