@@ -23,7 +23,7 @@ class LogCRUD:
                 message=log_data.message,
                 severity=log_data.severity,
                 source=log_data.source,
-                timestamp=log_data.timestamp or datetime.utcnow()
+                timestamp=log_data.timestamp or datetime.now()
             )
             db.add(db_log)
             db.commit()
