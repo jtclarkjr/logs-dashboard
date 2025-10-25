@@ -10,27 +10,24 @@ ENV PYTHONUNBUFFERED=1 \
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install system dependencies and Python dependencies in one layer
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
         curl \
+    && pip install --no-cache-dir -r requirements.txt \
+    && apt-get purge -y --auto-remove build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY requirements.txt .
-
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy application code (shared by all stages)
+COPY --chmod=755 entrypoint.sh test_runner.sh* ./
+COPY . .
 
 # Development stage
 FROM base AS development
-
-# Copy application code
-COPY . .
-
-# Make entrypoint script executable
-RUN chmod +x /app/entrypoint.sh
 
 # Expose port
 EXPOSE 8000
@@ -46,14 +43,6 @@ FROM base AS test
 ENV DEBUG=true \
     PYTHONPATH=/app
 
-# Copy application code
-COPY . .
-
-# Copy pytest configuration and test runner
-COPY pytest.ini ./
-COPY test_runner.sh /app/test_runner.sh
-RUN chmod +x /app/test_runner.sh
-
 # Override entrypoint and set command to run tests
 ENTRYPOINT []
 CMD ["/app/test_runner.sh"]
@@ -61,11 +50,11 @@ CMD ["/app/test_runner.sh"]
 # Production stage
 FROM base AS production
 
-# Copy application code
-COPY . .
+# Create non-root user and change ownership
+RUN groupadd -r appuser && useradd -r -g appuser appuser \
+    && chown -R appuser:appuser /app
 
-# Make entrypoint script executable
-RUN chmod +x /app/entrypoint.sh
+USER appuser
 
 # Expose port
 EXPOSE 8000
