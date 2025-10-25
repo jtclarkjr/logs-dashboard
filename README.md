@@ -155,14 +155,10 @@ The API will be available at `http://localhost:8000`
 
 ### Testing
 
-#### Set up test environment 
-Builds Docker images with fresh dependencies for test environment. The point is to not need to locally install deps like Bun to run tests.
-
-```bash
-make setup-test
-```
-
 #### Quick Testing Commands
+
+After running `make up`, you can run tests immediately without additional setup:
+
 ```bash
 # Run all tests (API + Frontend)
 make test
@@ -173,6 +169,16 @@ make test-parallel
 # Quick validation tests
 make test-fast
 ```
+
+#### Optional: Fresh Test Environment Setup
+
+Only needed for initial setup or when forcing a clean rebuild of test images:
+
+```bash
+make setup-test
+```
+
+This does a fresh no-cache build specifically for test images (api-test and frontend-test). **Not required if you've already run `make up`**.
 
 #### Test Types
 ```bash

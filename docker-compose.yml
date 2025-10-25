@@ -93,7 +93,6 @@ services:
       - ./frontend/bun.config.ts:/app/bun.config.ts
       - ./frontend/tsconfig.json:/app/tsconfig.json
       - ./frontend/tailwind.config.ts:/app/tailwind.config.ts
-      - ./frontend/next.config.mjs:/app/next.config.mjs
     command: ["bun", "test"]  # Default command for running tests
 
   # PostgreSQL database service - Development
