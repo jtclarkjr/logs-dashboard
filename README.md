@@ -139,6 +139,9 @@ The frontend will be available at `http://localhost:3000`
 #### API Setup
 
 ```bash
+# Run docker for db instance
+make up
+
 cd api
 # Create virtual environment
 python -m venv venv
@@ -147,11 +150,21 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
+# Create .env.local for local development (overrides .env)
+DATABASE_URL=postgresql://postgres:password@localhost:5432/logs_dashboard
+API_PORT=8001
+
+# Update main.py
+PORT: int = int(os.getenv("API_PORT", "8001"))
+load_dotenv(".env.local", override=True) 
+
 # Run the API
 python main.py
 ```
 
-The API will be available at `http://localhost:8000`
+The API will be available at `http://localhost:8001`
+
+**Note:** The `.env.local` file overrides settings from `.env` when running locally. This allows you to connect to the PostgreSQL database running in Docker (via `localhost`) while the API runs directly on your host machine on port 8001 to avoid conflicts.
 
 ### Testing
 
