@@ -129,6 +129,11 @@ make clean
 #### Frontend Setup
 
 ```bash
+# If running with local api instead of docker
+# Create .env.local for local development
+NEXT_PUBLIC_API_URL=http://localhost:8001
+API_URL=http://api:8001
+
 cd frontend
 bun install
 bun dev
