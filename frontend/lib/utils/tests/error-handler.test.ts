@@ -297,7 +297,9 @@ describe('error-handler', () => {
 
       logWarning('Test message', apiError)
 
-      expect(mockConsoleWarn).toHaveBeenCalledWith('Test message', { error: 'formatted' })
+      expect(mockConsoleWarn).toHaveBeenCalledWith('Test message', {
+        error: 'formatted'
+      })
     })
   })
 
@@ -311,7 +313,8 @@ describe('error-handler', () => {
         message: 'Not Found',
         canRetry: false,
         details: [],
-        suggestedAction: 'The requested resource could not be found. Please check the URL or navigate back.'
+        suggestedAction:
+          'The requested resource could not be found. Please check the URL or navigate back.'
       })
     })
 
@@ -337,7 +340,8 @@ describe('error-handler', () => {
         message: 'Bad Request',
         canRetry: true,
         details: [],
-        suggestedAction: 'There was an issue with your request. Please check your input and try again.'
+        suggestedAction:
+          'There was an issue with your request. Please check your input and try again.'
       })
     })
   })
@@ -347,26 +351,32 @@ describe('error-handler', () => {
       const validationErrors: ValidationErrorDetail[] = [
         { field: 'email', reason: 'Invalid' }
       ]
-      const apiError = new MockApiError('Validation Error', 422, 1001, undefined, validationErrors)
-      
+      const apiError = new MockApiError(
+        'Validation Error',
+        422,
+        1001,
+        undefined,
+        validationErrors
+      )
+
       const result = isRetryableError(apiError)
-      
+
       expect(result).toBe(false)
     })
 
     it('should return false for ApiError not found errors', () => {
       const apiError = new MockApiError('Not Found', 404, 2001)
-      
+
       const result = isRetryableError(apiError)
-      
+
       expect(result).toBe(false)
     })
 
     it('should return true for ApiError server errors', () => {
       const apiError = new MockApiError('Server Error', 500)
-      
+
       const result = isRetryableError(apiError)
-      
+
       expect(result).toBe(true)
     })
   })
@@ -374,10 +384,12 @@ describe('error-handler', () => {
   describe('Additional getErrorMessage cases', () => {
     it('should get detailed message from ApiError', () => {
       const apiError = new MockApiError('API Error', 400)
-      apiError.getDetailedMessage = jest.fn().mockReturnValue('Detailed API error message')
-      
+      apiError.getDetailedMessage = jest
+        .fn()
+        .mockReturnValue('Detailed API error message')
+
       const result = getErrorMessage(apiError)
-      
+
       expect(result).toBe('Detailed API error message')
       expect(apiError.getDetailedMessage).toHaveBeenCalled()
     })
@@ -390,7 +402,9 @@ describe('error-handler', () => {
 
       logError('Test message', apiError)
 
-      expect(mockConsoleError).toHaveBeenCalledWith('Test message', { error: 'api error data' })
+      expect(mockConsoleError).toHaveBeenCalledWith('Test message', {
+        error: 'api error data'
+      })
     })
 
     it('should log Error instances with cause when present', () => {

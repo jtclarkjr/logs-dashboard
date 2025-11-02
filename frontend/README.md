@@ -9,7 +9,7 @@ built with Next.js and a comprehensive design system approach.
 
 ### Core Framework
 
-- **Next.js 15** - React framework with App Router and API routes
+- **Next.js 16** - React framework with App Router and API routes
 - **React 19** - Latest React with concurrent features
 - **TypeScript 5** - Type-safe development
 - **Turbopack** - High-performance bundler for development

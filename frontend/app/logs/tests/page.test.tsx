@@ -7,7 +7,6 @@ import type { SortOrder, SortByField } from '@/lib/types/filters'
 import { SeverityLevel } from '@/lib/enums/severity'
 import { DEFAULT_PAGE_SIZE } from '@/lib/constants/pagination'
 
-
 // Mock data
 const mockLogListResponse: LogListResponse = {
   logs: [
@@ -68,13 +67,16 @@ describe('LogsPage', () => {
   describe('Default behavior', () => {
     it('should render with default parameters when no search params provided', async () => {
       const searchParams = Promise.resolve({})
-      const { container, getByTestId } = render(await LogsPage({ searchParams }))
+      const { container, getByTestId } = render(
+        await LogsPage({ searchParams })
+      )
 
       const clientComponent = getByTestId('logs-client')
       expect(clientComponent).toBeTruthy()
 
       const initialFilters = JSON.parse(
-        container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+        container.querySelector('[data-testid="initial-filters"]')
+          ?.textContent || '{}'
       )
 
       // Check default filters
@@ -92,10 +94,12 @@ describe('LogsPage', () => {
       const { container } = render(await LogsPage({ searchParams }))
 
       const initialData = JSON.parse(
-        container.querySelector('[data-testid="initial-data"]')?.textContent || '{}'
+        container.querySelector('[data-testid="initial-data"]')?.textContent ||
+          '{}'
       )
       const initialFilters = JSON.parse(
-        container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+        container.querySelector('[data-testid="initial-filters"]')
+          ?.textContent || '{}'
       )
 
       expect(initialFilters.currentPage).toBe(1)
@@ -113,7 +117,8 @@ describe('LogsPage', () => {
         const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')
+            ?.textContent || '{}'
         )
         expect(initialFilters.currentPage).toBe(3)
       })
@@ -148,7 +153,8 @@ describe('LogsPage', () => {
         const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')
+            ?.textContent || '{}'
         )
         expect(initialFilters.searchQuery).toBe('error message')
       })
@@ -161,7 +167,8 @@ describe('LogsPage', () => {
         const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')
+            ?.textContent || '{}'
         )
         expect(initialFilters.selectedSeverity).toBe('error')
       })
@@ -174,7 +181,8 @@ describe('LogsPage', () => {
         const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')
+            ?.textContent || '{}'
         )
         expect(initialFilters.selectedSource).toBe('web-server')
       })
@@ -223,7 +231,8 @@ describe('LogsPage', () => {
         const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')
+            ?.textContent || '{}'
         )
         expect(initialFilters.sortBy).toBe('severity')
       })
@@ -236,7 +245,8 @@ describe('LogsPage', () => {
         const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')
+            ?.textContent || '{}'
         )
         expect(initialFilters.sortOrder).toBe('asc')
       })
@@ -255,7 +265,8 @@ describe('LogsPage', () => {
         const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')
+            ?.textContent || '{}'
         )
 
         expect(initialFilters.dateRange).toBeTruthy()
@@ -275,7 +286,8 @@ describe('LogsPage', () => {
         const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')
+            ?.textContent || '{}'
         )
         expect(initialFilters.dateRange).toBeUndefined()
       })
@@ -288,7 +300,8 @@ describe('LogsPage', () => {
         const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')
+            ?.textContent || '{}'
         )
         expect(initialFilters.dateRange).toBeUndefined()
       })
@@ -311,7 +324,8 @@ describe('LogsPage', () => {
         const { container } = render(await LogsPage({ searchParams }))
 
         const initialFilters = JSON.parse(
-          container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+          container.querySelector('[data-testid="initial-filters"]')
+            ?.textContent || '{}'
         )
 
         expect(initialFilters.currentPage).toBe(2)
@@ -367,7 +381,8 @@ describe('LogsPage', () => {
       const { container } = render(await LogsPage({ searchParams }))
 
       const initialData = JSON.parse(
-        container.querySelector('[data-testid="initial-data"]')?.textContent || '{}'
+        container.querySelector('[data-testid="initial-data"]')?.textContent ||
+          '{}'
       )
 
       expect(initialData.logs).toBeTruthy()
@@ -491,7 +506,9 @@ describe('LogsPage', () => {
       // Should render without throwing an error
       const { container } = render(await LogsPage({ searchParams }))
 
-      expect(container.querySelector('[data-testid="logs-client"]')).toBeTruthy()
+      expect(
+        container.querySelector('[data-testid="logs-client"]')
+      ).toBeTruthy()
     })
   })
 
@@ -506,14 +523,18 @@ describe('LogsPage', () => {
 
       const { container } = render(await LogsPage({ searchParams }))
 
-      const clientComponent = container.querySelector('[data-testid="logs-client"]')
+      const clientComponent = container.querySelector(
+        '[data-testid="logs-client"]'
+      )
       expect(clientComponent).toBeTruthy()
 
       const initialData = JSON.parse(
-        container.querySelector('[data-testid="initial-data"]')?.textContent || '{}'
+        container.querySelector('[data-testid="initial-data"]')?.textContent ||
+          '{}'
       )
       const initialFilters = JSON.parse(
-        container.querySelector('[data-testid="initial-filters"]')?.textContent || '{}'
+        container.querySelector('[data-testid="initial-filters"]')
+          ?.textContent || '{}'
       )
 
       expect(initialData).toBeTruthy()

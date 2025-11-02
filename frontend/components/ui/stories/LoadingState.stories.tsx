@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs'
 import { LoadingState } from '../loading-state'
 
 const meta: Meta<typeof LoadingState> = {

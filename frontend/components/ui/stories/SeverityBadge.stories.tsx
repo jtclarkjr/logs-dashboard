@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs'
 import { SeverityBadge } from '../severity-badge'
 import { SeverityLevel } from '@/lib/enums/severity'
 

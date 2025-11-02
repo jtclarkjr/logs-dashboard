@@ -11,15 +11,13 @@ export function useDebouncedValue<T>(
   const [debouncedValue, setDebouncedValue] = useState(value)
 
   useEffect(() => {
-    // If the value is empty (like during reset), set it immediately
-    if (!value) {
-      setDebouncedValue(value)
-      return
-    }
+    // If the value is empty (like during reset), set it with minimal delay
+    // Use 0 delay instead of synchronous setState
+    const debounceDelay = !value ? 0 : delay
 
     const timer = setTimeout(() => {
       setDebouncedValue(value)
-    }, delay)
+    }, debounceDelay)
 
     return () => {
       clearTimeout(timer)

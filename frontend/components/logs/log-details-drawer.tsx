@@ -48,10 +48,10 @@ export function LogDetailsDrawer({
   onDelete
 }: LogDetailsDrawerProps) {
   const [formData, setFormData] = useState({
-    message: '',
-    severity: SeverityLevel.INFO,
-    source: '',
-    timestamp: ''
+    message: log?.message || '',
+    severity: log?.severity || SeverityLevel.INFO,
+    source: log?.source || '',
+    timestamp: log?.timestamp || ''
   })
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
@@ -81,18 +81,22 @@ export function LogDetailsDrawer({
     }
   }
 
-  // Reset form when log changes or when drawer opens
+  // Reset form when log ID changes (new log selected)
   useEffect(() => {
-    if (log && open) {
-      setFormData({
-        message: log.message,
-        severity: log.severity,
-        source: log.source,
-        timestamp: log.timestamp
-      })
-      setFieldErrors({}) // Clear any previous errors
+    if (log) {
+      const timeoutId = setTimeout(() => {
+        setFormData({
+          message: log.message,
+          severity: log.severity,
+          source: log.source,
+          timestamp: log.timestamp
+        })
+        setFieldErrors({}) // Clear any previous errors
+      }, 0)
+
+      return () => clearTimeout(timeoutId)
     }
-  }, [log, open])
+  }, [log])
 
   if (!log) return null
 

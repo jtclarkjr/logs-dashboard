@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
 interface FadeTransitionBaseProps {
@@ -31,14 +31,6 @@ export function FadeTransition<T extends React.ElementType = 'div'>({
   onTransitionComplete,
   ...props
 }: FadeTransitionProps<T>) {
-  const [internalVisible, setInternalVisible] = useState(isVisible)
-
-  useEffect(() => {
-    if (isVisible !== internalVisible) {
-      setInternalVisible(isVisible)
-    }
-  }, [isVisible, internalVisible])
-
   useEffect(() => {
     if (onTransitionComplete) {
       const timeout = setTimeout(
@@ -50,7 +42,7 @@ export function FadeTransition<T extends React.ElementType = 'div'>({
 
       return () => clearTimeout(timeout)
     }
-  }, [internalVisible, duration, onTransitionComplete])
+  }, [isVisible, duration, onTransitionComplete])
 
   const Component = as || 'div'
 
@@ -58,7 +50,7 @@ export function FadeTransition<T extends React.ElementType = 'div'>({
     <Component
       className={cn(
         durationClasses[duration],
-        internalVisible ? 'opacity-100' : 'opacity-0',
+        isVisible ? 'opacity-100' : 'opacity-0',
         className
       )}
       {...props}
